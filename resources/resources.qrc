@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/ui">
+        <file>qml/main.qml</file>
+        <file>qml/Setting.qml</file>
+        <file>qml/AutoGo.qml</file>
+    </qresource>
+</RCC>

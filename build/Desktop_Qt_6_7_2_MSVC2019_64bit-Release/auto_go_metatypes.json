@@ -1,0 +1,812 @@
+[
+    {
+        "classes": [
+            {
+                "className": "BoardAnalyzer",
+                "object": true,
+                "qualifiedClassName": "BoardAnalyzer",
+                "signals": [
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "newMyStoneColor",
+                                "type": "StoneData::StoneColor"
+                            }
+                        ],
+                        "name": "myStoneColorUpdate",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "data",
+                                "type": "BoardData"
+                            }
+                        ],
+                        "name": "analyzeBoardData",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "data",
+                                "type": "BoardData"
+                            }
+                        ],
+                        "name": "analyzeIndefinitelyData",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "gameStarted",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "lastMoveStoneData",
+                                "type": "StoneData"
+                            }
+                        ],
+                        "name": "lastMoveStone",
+                        "returnType": "void"
+                    }
+                ],
+                "slots": [
+                    {
+                        "access": "public",
+                        "name": "analyzeBoard",
+                        "returnType": "BoardData"
+                    },
+                    {
+                        "access": "public",
+                        "name": "checkMyStoneColor",
+                        "returnType": "StoneData::StoneColor"
+                    },
+                    {
+                        "access": "public",
+                        "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "resetBoardData",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "analyzeIndefinitely",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "stop",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "waitForGameStarting",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "QObject"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "BoardAnalyzer.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "BoardData",
+                "gadget": true,
+                "properties": [
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 0,
+                        "name": "boardDataArray",
+                        "read": "getBoardDataArray",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QList<QList<int>>",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 1,
+                        "name": "requestCounting",
+                        "read": "getRequestCounting",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "bool",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 2,
+                        "name": "requestDraw",
+                        "read": "getRequestDraw",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "bool",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 3,
+                        "name": "requestUndo",
+                        "read": "getRequestUndo",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "bool",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 4,
+                        "name": "gameOver",
+                        "read": "getGameOver",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "bool",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 5,
+                        "name": "unknownUnexpected",
+                        "read": "getUnknownUnexpected",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "bool",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 6,
+                        "name": "needMove",
+                        "read": "getNeedMove",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "bool",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 7,
+                        "name": "myStoneColor",
+                        "read": "getMyStoneColor",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "StoneData::StoneColor",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 8,
+                        "name": "lastMoveStone",
+                        "read": "getLastMoveStone",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "StoneData",
+                        "user": false
+                    }
+                ],
+                "qualifiedClassName": "BoardData"
+            }
+        ],
+        "inputFile": "BoardData.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "BoardInteractor",
+                "object": true,
+                "qualifiedClassName": "BoardInteractor",
+                "signals": [
+                    {
+                        "access": "public",
+                        "name": "startGameFinished",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "moveFinished",
+                        "returnType": "void"
+                    }
+                ],
+                "slots": [
+                    {
+                        "access": "public",
+                        "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "stoneData",
+                                "type": "StoneData"
+                            }
+                        ],
+                        "name": "moveStone",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "stonePoint",
+                                "type": "QPoint"
+                            }
+                        ],
+                        "name": "moveStone",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "acceptRequest",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "rejectRequest",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "startGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "startGame1",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "startGame2",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "clickConfirmMove",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "QObject"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "BoardInteractor.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "Controller",
+                "object": true,
+                "qualifiedClassName": "Controller",
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "QObject"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "Controller.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "classInfos": [
+                    {
+                        "name": "QML.Element",
+                        "value": "auto"
+                    }
+                ],
+                "className": "GameBoardHandler",
+                "object": true,
+                "qualifiedClassName": "GameBoardHandler",
+                "signals": [
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "boardDataArray",
+                                "type": "QList<QList<int>>"
+                            }
+                        ],
+                        "name": "boardDataArrayUpdate",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "stoneData",
+                                "type": "StoneData"
+                            }
+                        ],
+                        "name": "bestPointUpdate",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "startInit",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "startGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "gameOver",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "success",
+                                "type": "bool"
+                            }
+                        ],
+                        "name": "startInitFinished",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "stonePoint",
+                                "type": "QPoint"
+                            }
+                        ],
+                        "name": "toPlay",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toStartAnalyzeIndefinitely",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toStartCheckMyStoneColor",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toStartTime",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toAcceptRequest",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toRejectRequest",
+                        "returnType": "void"
+                    }
+                ],
+                "slots": [
+                    {
+                        "access": "public",
+                        "name": "start",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "arguments": [
+                            {
+                                "name": "myStoneColor",
+                                "type": "StoneData::StoneColor"
+                            }
+                        ],
+                        "name": "gameStartedHandle",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "analyzeIndefinitelyDelay",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "arguments": [
+                            {
+                                "name": "boardData",
+                                "type": "BoardData"
+                            }
+                        ],
+                        "name": "onStoneMoved",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "checkMyStoneColorDelay",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "QObject"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "GameBoardHandler.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "classInfos": [
+                    {
+                        "name": "QML.Element",
+                        "value": "auto"
+                    }
+                ],
+                "className": "GoBoardItem",
+                "object": true,
+                "qualifiedClassName": "GoBoardItem",
+                "slots": [
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "data",
+                                "type": "QList<QList<int>>"
+                            }
+                        ],
+                        "name": "setBoardData",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "newBestMove",
+                                "type": "StoneData"
+                            }
+                        ],
+                        "name": "setBestMove",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "private",
+                        "arguments": [
+                            {
+                                "name": "painter",
+                                "type": "QPainter*"
+                            }
+                        ],
+                        "name": "drawStarPoints",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "private",
+                        "arguments": [
+                            {
+                                "name": "painter",
+                                "type": "QPainter*"
+                            },
+                            {
+                                "name": "bestMove",
+                                "type": "StoneData"
+                            }
+                        ],
+                        "name": "drawBestMove",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "QQuickPaintedItem"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "GoBoardItem.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "KatagoInteractor",
+                "object": true,
+                "properties": [
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 0,
+                        "name": "lastMoveStone",
+                        "read": "getLastMoveStone",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "StoneData",
+                        "user": false
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 1,
+                        "name": "myStoneColor",
+                        "notify": "myStoneColorChanged",
+                        "read": "getMyStoneColor",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "StoneData::StoneColor",
+                        "user": false,
+                        "write": "setMyStoneColor"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 2,
+                        "name": "m_bestMove",
+                        "notify": "bestMoveChanged",
+                        "read": "getBestMove",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "StoneData",
+                        "user": false,
+                        "write": "setBestMove"
+                    }
+                ],
+                "qualifiedClassName": "KatagoInteractor",
+                "signals": [
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "success",
+                                "type": "bool"
+                            }
+                        ],
+                        "name": "initFinished",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "stoneData",
+                                "type": "StoneData"
+                            }
+                        ],
+                        "name": "bestMove",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "stoneData",
+                                "type": "StoneData"
+                            }
+                        ],
+                        "name": "bestMoveChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "myStoneColorChanged",
+                        "returnType": "void"
+                    }
+                ],
+                "slots": [
+                    {
+                        "access": "public",
+                        "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "clearBoard",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "stopAnalyze",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "stoneData",
+                                "type": "StoneData"
+                            }
+                        ],
+                        "name": "move",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "getBestMove",
+                        "returnType": "StoneData"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "analyzeKatagoOutput",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "QObject"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "KatagoInteractor.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "MaaController",
+                "object": true,
+                "qualifiedClassName": "MaaController",
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "Controller"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "MaaController.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "MumuScreencaptor",
+                "object": true,
+                "qualifiedClassName": "MumuScreencaptor",
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "Screencaptor"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "MumuScreencaptor.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "Screencaptor",
+                "object": true,
+                "qualifiedClassName": "Screencaptor",
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "QObject"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "Screencaptor.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "StoneData",
+                "enums": [
+                    {
+                        "isClass": false,
+                        "isFlag": false,
+                        "name": "StoneColor",
+                        "values": [
+                            "None",
+                            "Black",
+                            "White"
+                        ]
+                    }
+                ],
+                "gadget": true,
+                "properties": [
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 0,
+                        "name": "point",
+                        "read": "getPoint",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QPoint",
+                        "user": false,
+                        "write": "setPoint"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 1,
+                        "name": "color",
+                        "read": "getColor",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "StoneData::StoneColor",
+                        "user": false,
+                        "write": "setColor"
+                    }
+                ],
+                "qualifiedClassName": "StoneData"
+            }
+        ],
+        "inputFile": "StoneData.h",
+        "outputRevision": 68
+    }
+]
