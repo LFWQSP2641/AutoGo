@@ -169,8 +169,8 @@ void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
     const float cellHeight = (bottomRight.y - topLeft.y) / (rows - 1);
 
     // 用于略微调整棋子检测点的位置，避免棋盘线干扰
-    const int offsetX = 10; // x轴偏移量
-    const int offsetY = 10; // y轴偏移量
+    const int offsetX = 15; // x轴偏移量
+    const int offsetY = 15; // y轴偏移量
     const int offsetCX = 8; // 监测点x轴偏移量
     const int offsetCY = 8; // 监测点y轴偏移量
 
@@ -199,8 +199,10 @@ void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
             if (pixelValue[0] < 100) // 黑子
             {
                 currentPiece = 1;
-                const cv::Vec3b pixelCValue = image.at<cv::Vec3b>(checkCY, checkCX);
-                if (pixelCValue[0] == 255)
+                const QList<cv::Vec3b> pixelCValues{ image.at<cv::Vec3b>(checkCY, checkCX),
+                                                     image.at<cv::Vec3b>(checkCY + 5, checkCX),
+                                                     image.at<cv::Vec3b>(checkCY, checkCX + 5) };
+                if (pixelCValues.at(0)[0] == 255 && pixelCValues.at(1)[0] == 255 && pixelCValues.at(2)[0] == 255)
                 {
                     boardData.lastMoveStone.setColor(StoneData::StoneColor::Black);
                     boardData.lastMoveStone.setPoint(QPoint(j, i));
@@ -209,8 +211,10 @@ void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
             else if (pixelValue[0] > 200) // 白子
             {
                 currentPiece = 2;
-                const cv::Vec3b pixelCValue = image.at<cv::Vec3b>(checkCY, checkCX);
-                if (pixelCValue[0] == 0)
+                const QList<cv::Vec3b> pixelCValues{ image.at<cv::Vec3b>(checkCY, checkCX),
+                                                     image.at<cv::Vec3b>(checkCY + 5, checkCX),
+                                                     image.at<cv::Vec3b>(checkCY, checkCX + 5) };
+                if (pixelCValues.at(0)[0] == 0 && pixelCValues.at(1)[0] == 0 && pixelCValues.at(2)[0] == 0)
                 {
                     boardData.lastMoveStone.setColor(StoneData::StoneColor::White);
                     boardData.lastMoveStone.setPoint(QPoint(j, i));
