@@ -79,11 +79,13 @@ void BoardAnalyzer::analyzeIndefinitely()
             qDebug() << Q_FUNC_INFO << QStringLiteral("Stone is moving");
             continue;
         }
-        emit analyzeIndefinitelyData(boardData);
+        const bool moved(m_boardData.getLastMoveStone() != boardData.getLastMoveStone() &&
+                         boardData.getLastMoveStone().getPoint() != QPoint(-1, -1));
+        if (boardData.hasUnexpected() || moved)
+            emit analyzeIndefinitelyData(boardData);
         if (boardData.hasUnexpected())
             break;
-        if (m_boardData.getLastMoveStone() != boardData.getLastMoveStone() &&
-            boardData.getLastMoveStone().getPoint() != QPoint(-1, -1))
+        if (moved)
         {
             qDebug() << Q_FUNC_INFO << QStringLiteral("LastMoveStone:") << boardData.getLastMoveStone();
             emit lastMoveStone(boardData.getLastMoveStone());

@@ -1,2 +1,2 @@
-- [ ] "timer had been running"报错
+- [x] "timer had been running"报错
 - [x] 棋子上倒计时时, 棋子颜色识别错误
