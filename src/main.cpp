@@ -1,3 +1,5 @@
+#include "Settings.h"
+
 #include <QDir>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
@@ -9,6 +11,8 @@ int main(int argc, char *argv[])
 
     QDir().mkpath(QCoreApplication::applicationDirPath()
                       .append(QStringLiteral("/debug")));
+
+    qmlRegisterSingletonInstance("Settings", 1, 0, "Settings", Settings::getSingletonSettings());
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/ui/qml/main.qml"));

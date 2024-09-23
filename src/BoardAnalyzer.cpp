@@ -1,5 +1,7 @@
 #include "BoardAnalyzer.h"
 
+#include "Settings.h"
+
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
@@ -55,7 +57,7 @@ StoneData::StoneColor BoardAnalyzer::checkMyStoneColor()
 
 void BoardAnalyzer::init()
 {
-    screencaptor->init(QStringLiteral("D:/mumu"));
+    screencaptor->init(Settings::getSingletonSettings()->mumuPath(), Settings::getSingletonSettings()->mumuIndex());
 }
 
 void BoardAnalyzer::resetBoardData()
@@ -72,6 +74,11 @@ void BoardAnalyzer::analyzeIndefinitely()
         const auto boardData(analyzeBoard());
         if (m_boardData == boardData)
             continue;
+        if (boardData.getIsMoving())
+        {
+            qDebug() << Q_FUNC_INFO << QStringLiteral("Stone is moving");
+            continue;
+        }
         emit analyzeIndefinitelyData(boardData);
         if (boardData.hasUnexpected())
             break;
@@ -84,6 +91,7 @@ void BoardAnalyzer::analyzeIndefinitely()
         m_boardData = std::move(boardData);
     }
     qDebug() << Q_FUNC_INFO << QStringLiteral("exit");
+    emit analyzeStoped();
 }
 
 void BoardAnalyzer::stop()
@@ -142,6 +150,12 @@ void BoardAnalyzer::isTurnToPlay(const cv::Mat &image, BoardData &boardData)
 
 void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
 {
+    if (image.at<cv::Vec3b>(1661, 513) == cv::Vec3b(33, 63, 1))
+    {
+        boardData.isMoving = true;
+        return;
+    }
+
     // 棋盘大小为19x19
     const int rows = 19;
     const int cols = 19;

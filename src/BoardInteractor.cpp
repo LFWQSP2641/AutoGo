@@ -1,6 +1,7 @@
 #include "BoardInteractor.h"
 
 #include "InteractiveInterface/MaaController.h"
+#include "Settings.h"
 
 #include <QRect>
 #include <QTimer>
@@ -13,7 +14,7 @@ BoardInteractor::BoardInteractor(QObject *parent)
 
 void BoardInteractor::init()
 {
-    controller->init(QStringLiteral("127.0.0.1:16416"));
+    controller->init(Settings::getSingletonSettings()->adbSerial());
 }
 
 void BoardInteractor::moveStone(const StoneData &stoneData)

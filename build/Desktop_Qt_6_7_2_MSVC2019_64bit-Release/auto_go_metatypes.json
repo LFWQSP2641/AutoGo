@@ -54,6 +54,11 @@
                         ],
                         "name": "lastMoveStone",
                         "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "analyzeStoped",
+                        "returnType": "void"
                     }
                 ],
                 "slots": [
@@ -226,6 +231,19 @@
                         "stored": true,
                         "type": "StoneData",
                         "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 9,
+                        "name": "isMoving",
+                        "read": "getIsMoving",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "bool",
+                        "user": false
                     }
                 ],
                 "qualifiedClassName": "BoardData"
@@ -381,7 +399,7 @@
                     },
                     {
                         "access": "public",
-                        "name": "startGame",
+                        "name": "clearBestPoint",
                         "returnType": "void"
                     },
                     {
@@ -398,6 +416,11 @@
                             }
                         ],
                         "name": "startInitFinished",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toStartGame",
                         "returnType": "void"
                     },
                     {
@@ -423,7 +446,13 @@
                     },
                     {
                         "access": "public",
-                        "name": "toStartTime",
+                        "arguments": [
+                            {
+                                "name": "msec",
+                                "type": "int"
+                            }
+                        ],
+                        "name": "toStartTimer",
                         "returnType": "void"
                     },
                     {
@@ -435,12 +464,17 @@
                         "access": "public",
                         "name": "toRejectRequest",
                         "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toReset",
+                        "returnType": "void"
                     }
                 ],
                 "slots": [
                     {
                         "access": "public",
-                        "name": "start",
+                        "name": "startGame",
                         "returnType": "void"
                     },
                     {
@@ -461,11 +495,6 @@
                     },
                     {
                         "access": "protected",
-                        "name": "analyzeIndefinitelyDelay",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "protected",
                         "arguments": [
                             {
                                 "name": "boardData",
@@ -479,6 +508,11 @@
                         "access": "protected",
                         "name": "checkMyStoneColorDelay",
                         "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "onInitFinished",
+                        "returnType": "void"
                     }
                 ],
                 "superClasses": [
@@ -490,6 +524,17 @@
             }
         ],
         "inputFile": "GameBoardHandler.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "Global",
+                "namespace": true,
+                "qualifiedClassName": "Global"
+            }
+        ],
+        "inputFile": "Global.h",
         "outputRevision": 68
     },
     {
@@ -525,6 +570,16 @@
                             }
                         ],
                         "name": "setBestMove",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "clearBoardData",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "clearBestMove",
                         "returnType": "void"
                     },
                     {
@@ -759,6 +814,174 @@
     {
         "classes": [
             {
+                "className": "Settings",
+                "object": true,
+                "properties": [
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 0,
+                        "name": "mumuPath",
+                        "notify": "mumuPathChanged",
+                        "read": "mumuPath",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false,
+                        "write": "setMumuPath"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 1,
+                        "name": "mumuIndex",
+                        "notify": "mumuIndexChanged",
+                        "read": "mumuIndex",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "int",
+                        "user": false,
+                        "write": "setMumuIndex"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 2,
+                        "name": "mumuDisplayId",
+                        "notify": "mumuDisplayIdChanged",
+                        "read": "mumuDisplayId",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "int",
+                        "user": false,
+                        "write": "setMumuDisplayId"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 3,
+                        "name": "adbPath",
+                        "notify": "adbPathChanged",
+                        "read": "adbPath",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false,
+                        "write": "setAdbPath"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 4,
+                        "name": "adbSerial",
+                        "notify": "adbSerialChanged",
+                        "read": "adbSerial",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false,
+                        "write": "setAdbSerial"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 5,
+                        "name": "kataGoPath",
+                        "notify": "kataGoPathChanged",
+                        "read": "kataGoPath",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false,
+                        "write": "setKataGoPath"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 6,
+                        "name": "kataGoCommand",
+                        "notify": "kataGoCommandChanged",
+                        "read": "kataGoCommand",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false,
+                        "write": "setKataGoCommand"
+                    }
+                ],
+                "qualifiedClassName": "Settings",
+                "signals": [
+                    {
+                        "access": "public",
+                        "name": "mumuPathChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "mumuIndexChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "mumuDisplayIdChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "adbPathChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "adbSerialChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "kataGoPathChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "kataGoCommandChanged",
+                        "returnType": "void"
+                    }
+                ],
+                "slots": [
+                    {
+                        "access": "public",
+                        "name": "saveToFile",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "QObject"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "Settings.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
                 "className": "StoneData",
                 "enums": [
                     {
@@ -807,6 +1030,17 @@
             }
         ],
         "inputFile": "StoneData.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "Util",
+                "namespace": true,
+                "qualifiedClassName": "Util"
+            }
+        ],
+        "inputFile": "Util.h",
         "outputRevision": 68
     }
 ]

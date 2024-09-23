@@ -9,7 +9,8 @@ BoardData::BoardData()
       unknownUnexpected(false),
       needMove(false),
       myStoneColor(StoneData::StoneColor::None),
-      lastMoveStone(StoneData())
+      lastMoveStone(StoneData()),
+      isMoving(false)
 {
 }
 
@@ -74,4 +75,9 @@ bool BoardData::hasUnexpected() const
 {
     return requestCounting || requestDraw || requestUndo || gameOver ||
            unknownUnexpected;
+}
+
+bool BoardData::getIsMoving() const
+{
+    return isMoving;
 }

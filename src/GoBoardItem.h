@@ -24,6 +24,9 @@ public slots:
     void setBoardData(const QVector<QVector<int>> &data);
     void setBestMove(const StoneData &newBestMove);
 
+    void clearBoardData();
+    void clearBestMove();
+
 private:
     QVector<QVector<int>> m_boardData;
 

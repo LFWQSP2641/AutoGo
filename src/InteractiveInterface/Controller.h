@@ -16,7 +16,6 @@ public:
 
 protected:
     static QPoint normDistributionGenerator(const QRect &rect);
-    static int normDistributionGenerator(int minVal, int maxVal);
 
 signals:
 };

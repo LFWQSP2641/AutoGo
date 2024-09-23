@@ -9,6 +9,9 @@ GoBoardItem::GoBoardItem(QQuickItem *parent)
 
 void GoBoardItem::paint(QPainter *painter)
 {
+    // 启用抗锯齿
+    painter->setRenderHint(QPainter::Antialiasing, true);
+
     int gridSize = qMin(width(), height()) / 20; // 格子大小
     int margin = gridSize;                       // 边界大小
 
@@ -57,6 +60,16 @@ void GoBoardItem::setBestMove(const StoneData &newBestMove)
     update(); // 触发重绘
 }
 
+void GoBoardItem::clearBoardData()
+{
+    setBoardData(QVector<QVector<int>>(19, QVector<int>(19, 0)));
+}
+
+void GoBoardItem::clearBestMove()
+{
+    setBestMove(StoneData());
+}
+
 void GoBoardItem::drawStarPoints(QPainter *painter)
 {
     int gridSize = qMin(width(), height()) / 20; // 每格的实际大小
@@ -89,16 +102,25 @@ void GoBoardItem::drawBestMove(QPainter *painter, const StoneData &bestMove)
         return; // 如果没有最佳下法，不绘制
     }
 
+    int row = bestMove.getPoint().y(); // 行
+    int col = bestMove.getPoint().x(); // 列
+
+    // 检查对应位置是否为空
+    if (m_boardData[row][col] != 0)
+    {
+        return; // 如果该位置已有棋子，不绘制最佳下法
+    }
+
     int gridSize = qMin(width(), height()) / 20; // 格子大小
     int margin = gridSize;                       // 边界大小
 
     // 获取最佳下法的位置
-    int x = margin + bestMove.getPoint().x() * gridSize;
-    int y = margin + bestMove.getPoint().y() * gridSize;
+    int x = margin + col * gridSize;
+    int y = margin + row * gridSize;
 
     // 绘制外层蓝色圆圈
-    painter->setPen(QPen(Qt::blue, 3)); // 蓝色边框
-    painter->setBrush(Qt::NoBrush);     // 不填充内部
+    painter->setPen(QPen(QColor(255, 165, 0), 3)); // 亮橙色边框
+    painter->setBrush(Qt::NoBrush);                // 不填充内部
     painter->drawEllipse(QPointF(x, y), gridSize / 2, gridSize / 2);
 
     // 根据棋子的颜色绘制棋子

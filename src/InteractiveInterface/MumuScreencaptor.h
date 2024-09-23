@@ -15,7 +15,7 @@ public:
 
     virtual std::optional<cv::Mat> screencap() override;
 
-    bool init(const QString &mumuPath);
+    bool init(const QString &mumuPath, int mumuIndex);
     bool reload();
     void uninit();
 
@@ -24,8 +24,7 @@ protected:
     QLibrary *library;
     typedef int (*NemuCaptureDisplayType)(int, unsigned int, int, int *, int *, unsigned char *);
     NemuCaptureDisplayType m_nemuCaptureDisplayFunction = nullptr;
-    int m_MumuInstIndex = 1;
-    int m_mumuDisplayId = 0;
+    int m_MumuInstIndex = 0;
 
     int m_mumuHandle = 0;
     int m_displayWidth = 0;

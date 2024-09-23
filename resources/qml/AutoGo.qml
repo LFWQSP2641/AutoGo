@@ -12,10 +12,11 @@ Item {
             Layout.fillWidth: true
         }
         Button {
+            id: startGameButton
             text: "start"
             onClicked: {
-                handler.start()
-                enabled = false
+                handler.startGame()
+                startGameButton.enabled = false
             }
         }
     }
@@ -28,6 +29,16 @@ Item {
         }
         onBestPointUpdate: function(stoneData) {
             goBoard.setBestMove(stoneData)
+        }
+        onClearBestPoint: {
+            goBoard.clearBestMove()
+        }
+        onGameOver: {
+            startGameButton.enabled = true
+        }
+        onToReset: {
+            goBoard.clearBestMove()
+            goBoard.clearBoardData()
         }
     }
 }

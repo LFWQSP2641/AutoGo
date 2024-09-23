@@ -20,7 +20,7 @@ public:
     explicit GameBoardHandler(QObject *parent = nullptr);
 
 public slots:
-    void start();
+    void startGame();
 
 protected:
     BoardAnalyzer *boardAnalyzer;
@@ -34,33 +34,40 @@ protected:
     QTimer *timer;
     QThread *timerThread;
 
+    bool inited;
+
 protected slots:
     void init();
 
     void gameStartedHandle(StoneData::StoneColor myStoneColor);
-    void analyzeIndefinitelyDelay();
     void onStoneMoved(const BoardData &boardData);
     void checkMyStoneColorDelay();
+
+    void onInitFinished();
 
 signals:
     void boardDataArrayUpdate(const QVector<QVector<int>> boardDataArray);
     void bestPointUpdate(const StoneData &stoneData);
 
     void startInit();
-    void startGame();
+
+    void clearBestPoint();
 
     void gameOver();
 
     void startInitFinished(bool success);
 
     // 所有to字辈的用于多线程传递
+    void toStartGame();
     void toPlay(const QPoint &stonePoint);
     void toStartAnalyzeIndefinitely();
     void toStartCheckMyStoneColor();
-    void toStartTime();
+    void toStartTimer(int msec);
 
     void toAcceptRequest();
     void toRejectRequest();
+
+    void toReset();
 };
 
 #endif // GAMEBOARDHANDLER_H

@@ -1,5 +1,7 @@
 #include "MaaController.h"
 
+#include "src/Settings.h"
+
 #include <QCoreApplication>
 #include <QDir>
 #include <QPoint>
@@ -32,7 +34,7 @@ bool MaaController::init(const QString &adbSerial)
     QEventLoop eventLoop;
     maaTouchProcess->setProcessChannelMode(QProcess::MergedChannels);
     connect(maaTouchProcess, &QProcess::finished, &eventLoop, &QEventLoop::quit);
-    maaTouchProcess->start(QStringLiteral("adb"),
+    maaTouchProcess->start(Settings::getSingletonSettings()->adbPath(),
                            QStringList{ QStringLiteral("connect"),
                                         adbSerial });
     eventLoop.exec();
@@ -44,7 +46,7 @@ bool MaaController::init(const QString &adbSerial)
         if (result.contains(i))
             return false;
     }
-    maaTouchProcess->start(QStringLiteral("adb"),
+    maaTouchProcess->start(Settings::getSingletonSettings()->adbPath(),
                            QStringList{ QStringLiteral("-s"),
                                         adbSerial,
                                         QStringLiteral("push"),
@@ -56,7 +58,7 @@ bool MaaController::init(const QString &adbSerial)
         return false;
     connect(maaTouchProcess, &QProcess::started, &eventLoop, &QEventLoop::quit, Qt::SingleShotConnection);
     maaTouchProcess->start(
-        QStringLiteral("adb"),
+        Settings::getSingletonSettings()->adbPath(),
         QStringList{
             QStringLiteral("-s"), adbSerial, QStringLiteral("shell"),
             QStringLiteral(

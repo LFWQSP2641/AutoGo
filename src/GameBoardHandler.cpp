@@ -3,7 +3,9 @@
 #include "BoardAnalyzer.h"
 #include "BoardInteractor.h"
 #include "KatagoInteractor.h"
+#include "Util.h"
 
+#include <QDateTime>
 #include <QDebug>
 #include <QThread>
 #include <QTimer>
@@ -17,7 +19,8 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
       boardInteractorThread(new QThread),
       katagoInteractorThread(new QThread),
       timer(new QTimer),
-      timerThread(new QThread)
+      timerThread(new QThread),
+      inited(false)
 {
     boardAnalyzer->moveToThread(boardAnalyzerThread);
     boardInteractor->moveToThread(boardInteractorThread);
@@ -27,7 +30,6 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
     connect(katagoInteractorThread, &QThread::finished, katagoInteractor, &KatagoInteractor::deleteLater);
 
     timer->setSingleShot(true);
-    timer->setInterval(5000);
 
     timer->moveToThread(timerThread);
     connect(timerThread, &QThread::finished, timer, &QTimer::deleteLater);
@@ -40,9 +42,9 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
 
     connect(katagoInteractor, &KatagoInteractor::initFinished, this, &GameBoardHandler::startInitFinished);
 
-    connect(this, &GameBoardHandler::startInitFinished, this, &GameBoardHandler::startGame);
+    connect(this, &GameBoardHandler::startInitFinished, this, &GameBoardHandler::onInitFinished);
 
-    connect(this, &GameBoardHandler::startGame, boardInteractor, &BoardInteractor::startGame);
+    connect(this, &GameBoardHandler::toStartGame, boardInteractor, &BoardInteractor::startGame);
 
     connect(boardInteractor, &BoardInteractor::startGameFinished, boardAnalyzer, &BoardAnalyzer::waitForGameStarting);
 
@@ -57,12 +59,12 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
     connect(boardAnalyzer, &BoardAnalyzer::analyzeIndefinitelyData, this, &GameBoardHandler::onStoneMoved);
     connect(boardAnalyzer, &BoardAnalyzer::lastMoveStone, katagoInteractor, &KatagoInteractor::move);
 
-    connect(this, &GameBoardHandler::toStartTime, timer, QOverload<>::of(&QTimer::start));
+    connect(boardInteractor, &BoardInteractor::moveFinished, this, &GameBoardHandler::clearBestPoint);
+
+    connect(this, &GameBoardHandler::toStartTimer, timer, QOverload<int>::of(&QTimer::start));
     connect(timer, &QTimer::timeout, katagoInteractor, &KatagoInteractor::getBestMove);
-    connect(timer, &QTimer::timeout, boardAnalyzer, &BoardAnalyzer::stop);
     connect(timer, &QTimer::timeout, timer, []
-            { qDebug() << QStringLiteral("time out"); });
-    connect(boardInteractor, &BoardInteractor::moveFinished, boardAnalyzer, &BoardAnalyzer::analyzeIndefinitely);
+            { qDebug() << QStringLiteral("time out") << QDateTime::currentMSecsSinceEpoch(); });
     connect(katagoInteractor, &KatagoInteractor::bestMoveChanged, this, &GameBoardHandler::bestPointUpdate);
     connect(katagoInteractor, &KatagoInteractor::bestMove, boardInteractor, QOverload<const StoneData &>::of(&BoardInteractor::moveStone));
 
@@ -71,11 +73,22 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
 
     connect(this, &GameBoardHandler::gameOver, katagoInteractor, &KatagoInteractor::stopAnalyze);
     connect(this, &GameBoardHandler::gameOver, boardAnalyzer, &BoardAnalyzer::stop);
+
+    connect(this, &GameBoardHandler::toReset, boardAnalyzer, &BoardAnalyzer::resetBoardData);
+    connect(this, &GameBoardHandler::toReset, katagoInteractor, &KatagoInteractor::clearBoard);
 }
 
-void GameBoardHandler::start()
+void GameBoardHandler::startGame()
 {
-    emit startInit();
+    if (inited)
+    {
+        emit toReset();
+        emit toStartGame();
+    }
+    else
+    {
+        emit startInit();
+    }
 }
 
 void GameBoardHandler::init()
@@ -92,29 +105,19 @@ void GameBoardHandler::gameStartedHandle(StoneData::StoneColor myStoneColor)
     if (myStoneColor == StoneData::StoneColor::Black)
     {
         emit toPlay(QPoint(3, 3));
-        return;
-    }
-    else if (myStoneColor == StoneData::StoneColor::White)
-    {
-        analyzeIndefinitelyDelay();
     }
     else if (myStoneColor == StoneData::StoneColor::None)
     {
         qWarning() << Q_FUNC_INFO << QStringLiteral("myStoneColor is None");
         return;
     }
-}
-
-void GameBoardHandler::analyzeIndefinitelyDelay()
-{
-    qDebug() << Q_FUNC_INFO;
-    QTimer::singleShot(500, this, &GameBoardHandler::toStartAnalyzeIndefinitely);
+    emit toStartAnalyzeIndefinitely();
 }
 
 void GameBoardHandler::onStoneMoved(const BoardData &boardData)
 {
-    qDebug() << Q_FUNC_INFO;
-    emit boardDataArrayUpdate(boardData.getBoardDataArray());
+    if (!boardData.hasUnexpected())
+        emit boardDataArrayUpdate(boardData.getBoardDataArray());
 
     if (boardData.getRequestCounting() || boardData.getRequestUndo())
     {
@@ -131,13 +134,26 @@ void GameBoardHandler::onStoneMoved(const BoardData &boardData)
 
     if (boardData.getNeedMove())
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("timer starting");
-        emit toStartTime();
+        const auto msec(Util::generateTanhRandom(3000, 7000));
+        qDebug() << Q_FUNC_INFO << QStringLiteral("timer starting, msec:") << msec << QDateTime::currentMSecsSinceEpoch();
+        if (timer->isActive())
+            qWarning() << "timer had been running";
+        emit toStartTimer(msec);
+    }
+    else
+    {
+        qDebug() << Q_FUNC_INFO << QStringLiteral("not my turn");
     }
 }
 
 void GameBoardHandler::checkMyStoneColorDelay()
 {
     qDebug() << Q_FUNC_INFO;
-    QTimer::singleShot(3000, this, &GameBoardHandler::toStartCheckMyStoneColor);
+    QTimer::singleShot(2000, this, &GameBoardHandler::toStartCheckMyStoneColor);
+}
+
+void GameBoardHandler::onInitFinished()
+{
+    inited = true;
+    emit toStartGame();
 }

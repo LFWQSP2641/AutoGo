@@ -1,5 +1,7 @@
 #include "MumuScreencaptor.h"
 
+#include "src/Settings.h"
+
 #include <QDir>
 #include <QFile>
 #include <QLibrary>
@@ -22,7 +24,7 @@ std::optional<cv::Mat> MumuScreencaptor::screencap()
         return std::nullopt;
     int ret = m_nemuCaptureDisplayFunction(
         m_mumuHandle,
-        m_mumuDisplayId,
+        Settings::getSingletonSettings()->mumuDisplayId(),
         static_cast<int>(m_displayBuffer.size()),
         &m_displayWidth,
         &m_displayHeight,
@@ -39,20 +41,21 @@ std::optional<cv::Mat> MumuScreencaptor::screencap()
     return dst;
 }
 
-bool MumuScreencaptor::init(const QString &mumuPath)
+bool MumuScreencaptor::init(const QString &mumuPath, int mumuIndex)
 {
     QString dllPath(mumuPath);
     dllPath.append(QStringLiteral("/shell/sdk/external_renderer_ipc.dll"));
     if (!QFile(dllPath).exists())
         return false;
     m_mumuPath = mumuPath;
+    m_MumuInstIndex = mumuIndex;
     library->setFileName(dllPath);
     typedef int (*NemuConnectType)(const wchar_t *, int);
     NemuConnectType nemuConnect = NemuConnectType(library->resolve("nemu_connect"));
     if (nemuConnect == nullptr)
         return false;
     std::wstring wstring(QDir::toNativeSeparators(mumuPath).toStdWString());
-    m_mumuHandle = nemuConnect(wstring.c_str(), m_MumuInstIndex);
+    m_mumuHandle = nemuConnect(wstring.c_str(), mumuIndex);
     if (m_mumuHandle == 0)
         return false;
 
@@ -63,13 +66,16 @@ bool MumuScreencaptor::init(const QString &mumuPath)
 
     int ret = m_nemuCaptureDisplayFunction(
         m_mumuHandle,
-        m_mumuDisplayId,
+        Settings::getSingletonSettings()->mumuDisplayId(),
         0,
         &m_displayWidth,
         &m_displayHeight,
         nullptr);
     if (ret != 0)
+    {
+        uninit();
         return false;
+    }
 
     m_displayBuffer.resize(m_displayWidth * m_displayHeight * 4);
 
@@ -79,7 +85,7 @@ bool MumuScreencaptor::init(const QString &mumuPath)
 bool MumuScreencaptor::reload()
 {
     uninit();
-    return init(m_mumuPath);
+    return init(m_mumuPath, m_MumuInstIndex);
 }
 
 void MumuScreencaptor::uninit()

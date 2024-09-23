@@ -1,5 +1,7 @@
 #include "KatagoInteractor.h"
 
+#include "Settings.h"
+
 #include <QDebug>
 #include <QEventLoop>
 #include <QProcess>
@@ -29,11 +31,8 @@ void KatagoInteractor::init()
     // katagoProcess->setWorkingDirectory(QStringLiteral("D:/Software/GoAI/katago"));
     katagoProcess->setProcessChannelMode(QProcess::MergedChannels);
     katagoProcess->start(
-        QStringLiteral("D:/Software/GoAI/katago/katago.exe"),
-        QStringList{
-            QStringLiteral("gtp"), QStringLiteral("-model"),
-            QStringLiteral("D:/Software/GoAI/katago/kata1-b28c512nbt-s7332806912-d4357057652.bin.gz"),
-            QStringLiteral("-config"), QStringLiteral("D:/Software/GoAI/katago/gtp_time_limit.cfg") });
+        Settings::getSingletonSettings()->kataGoPath(),
+        QProcess::splitCommand(Settings::getSingletonSettings()->kataGoCommand()));
     while (true)
     {
         timeOut->start();
@@ -138,7 +137,7 @@ QString KatagoInteractor::pointToGTP(const QPoint &point)
 
     // 构建 GTP 格式的字符串，例如 "A1"
     const auto result(QString("%1%2").arg(columnLetter).arg(gtpRow));
-    qDebug() << Q_FUNC_INFO << point << result;
+    // qDebug() << Q_FUNC_INFO << point << result;
     return result;
 }
 
@@ -158,7 +157,7 @@ QPoint KatagoInteractor::gptToPoint(const QString &gtpMove)
     int y = 19 - gtpRow;
 
     const QPoint result(x, y);
-    qDebug() << Q_FUNC_INFO << gtpMove << result;
+    // qDebug() << Q_FUNC_INFO << gtpMove << result;
     return result;
 }
 

@@ -30,24 +30,30 @@ HEADERS += \
     src/BoardData.h \
     src/BoardInteractor.h \
     src/GameBoardHandler.h \
+    src/Global.h \
     src/GoBoardItem.h \
     src/InteractiveInterface/Controller.h \
     src/InteractiveInterface/MaaController.h \
     src/InteractiveInterface/MumuScreencaptor.h \
     src/InteractiveInterface/Screencaptor.h \
     src/KatagoInteractor.h \
-    src/StoneData.h
+    src/Settings.h \
+    src/StoneData.h \
+    src/Util.h
 
 SOURCES += \
         src/BoardAnalyzer.cpp \
         src/BoardData.cpp \
         src/BoardInteractor.cpp \
         src/GameBoardHandler.cpp \
+        src/Global.cpp \
         src/GoBoardItem.cpp \
         src/InteractiveInterface/Controller.cpp \
         src/InteractiveInterface/MaaController.cpp \
         src/InteractiveInterface/MumuScreencaptor.cpp \
         src/InteractiveInterface/Screencaptor.cpp \
         src/KatagoInteractor.cpp \
+        src/Settings.cpp \
         src/StoneData.cpp \
+        src/Util.cpp \
         src/main.cpp

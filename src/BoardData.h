@@ -38,6 +38,8 @@ public:
 
     bool hasUnexpected() const;
 
+    bool getIsMoving() const;
+
 protected:
     QVector<QVector<int>> boardDataArray;
     bool requestCounting;
@@ -52,6 +54,8 @@ protected:
 
     StoneData lastMoveStone;
 
+    bool isMoving;
+
 private:
     Q_PROPERTY(QVector<QVector<int>> boardDataArray READ getBoardDataArray CONSTANT FINAL)
     Q_PROPERTY(bool requestCounting READ getRequestCounting CONSTANT FINAL)
@@ -62,6 +66,7 @@ private:
     Q_PROPERTY(bool needMove READ getNeedMove CONSTANT FINAL)
     Q_PROPERTY(StoneData::StoneColor myStoneColor READ getMyStoneColor CONSTANT FINAL)
     Q_PROPERTY(StoneData lastMoveStone READ getLastMoveStone CONSTANT FINAL)
+    Q_PROPERTY(bool isMoving READ getIsMoving CONSTANT FINAL)
 };
 
 Q_DECLARE_METATYPE(BoardData)

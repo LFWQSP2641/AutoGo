@@ -43,6 +43,7 @@ signals:
     void analyzeIndefinitelyData(const BoardData &data);
     void gameStarted();
     void lastMoveStone(const StoneData &lastMoveStoneData);
+    void analyzeStoped();
 };
 
 #endif // BOARDANALYZER_H
