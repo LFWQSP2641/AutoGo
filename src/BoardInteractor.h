@@ -23,18 +23,21 @@ public slots:
     void acceptRequest();
     void rejectRequest();
 
-    void startGame();
+    void matchGame();
+
+    void closeGameOverDialog();
+
+    void breakToMain();
 
 protected:
     MaaController *controller;
 
 protected slots:
-    void startGame1();
-    void startGame2();
+    void matchGame1();
+    void matchGame2();
     void clickConfirmMove();
 
 signals:
-    void startGameFinished();
     void moveFinished();
 };
 

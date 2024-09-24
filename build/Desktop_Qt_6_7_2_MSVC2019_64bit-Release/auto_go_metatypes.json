@@ -59,6 +59,31 @@
                         "access": "public",
                         "name": "analyzeStoped",
                         "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toMatchGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toAcceptRequest",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toRejectRequest",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toCloseGameOverDialog",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "toBreakToMain",
+                        "returnType": "void"
                     }
                 ],
                 "slots": [
@@ -94,7 +119,7 @@
                     },
                     {
                         "access": "public",
-                        "name": "waitForGameStarting",
+                        "name": "startGame",
                         "returnType": "void"
                     }
                 ],
@@ -261,11 +286,6 @@
                 "signals": [
                     {
                         "access": "public",
-                        "name": "startGameFinished",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
                         "name": "moveFinished",
                         "returnType": "void"
                     }
@@ -310,17 +330,27 @@
                     },
                     {
                         "access": "public",
-                        "name": "startGame",
+                        "name": "matchGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "closeGameOverDialog",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "breakToMain",
                         "returnType": "void"
                     },
                     {
                         "access": "protected",
-                        "name": "startGame1",
+                        "name": "matchGame1",
                         "returnType": "void"
                     },
                     {
                         "access": "protected",
-                        "name": "startGame2",
+                        "name": "matchGame2",
                         "returnType": "void"
                     },
                     {
@@ -404,6 +434,11 @@
                     },
                     {
                         "access": "public",
+                        "name": "gameStarted",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
                         "name": "gameOver",
                         "returnType": "void"
                     },
@@ -416,6 +451,11 @@
                             }
                         ],
                         "name": "startInitFinished",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "checkingAppNavigation",
                         "returnType": "void"
                     },
                     {

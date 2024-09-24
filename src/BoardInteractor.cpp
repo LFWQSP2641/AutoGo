@@ -64,19 +64,28 @@ void BoardInteractor::rejectRequest()
     controller->Controller::click(QRect(QPoint(142, 1089), QPoint(475, 1172)));
 }
 
-void BoardInteractor::startGame()
+void BoardInteractor::matchGame()
 {
-    startGame1();
-    QTimer::singleShot(100, this, &BoardInteractor::startGame2);
-    QTimer::singleShot(200, this, &BoardInteractor::startGameFinished);
+    matchGame1();
+    QTimer::singleShot(100, this, &BoardInteractor::matchGame2);
 }
 
-void BoardInteractor::startGame1()
+void BoardInteractor::closeGameOverDialog()
+{
+    controller->Controller::click(QRect(QPoint(975, 328), QPoint(1020, 378)));
+}
+
+void BoardInteractor::breakToMain()
+{
+    controller->Controller::click(QRect(QPoint(40, 125), QPoint(100, 150)));
+}
+
+void BoardInteractor::matchGame1()
 {
     controller->Controller::click(QRect(QPoint(34, 1357), QPoint(338, 1514)));
 }
 
-void BoardInteractor::startGame2()
+void BoardInteractor::matchGame2()
 {
     controller->Controller::click(QRect(QPoint(175, 646), QPoint(900, 848)));
 }

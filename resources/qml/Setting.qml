@@ -6,6 +6,7 @@ import Settings
 Item {
     Flickable {
         anchors.fill: parent
+        clip: true
         contentHeight: settingItemsLayout.height
         ColumnLayout {
             id: settingItemsLayout

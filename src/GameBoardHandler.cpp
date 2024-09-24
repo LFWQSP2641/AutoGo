@@ -44,11 +44,17 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
 
     connect(this, &GameBoardHandler::startInitFinished, this, &GameBoardHandler::onInitFinished);
 
-    connect(this, &GameBoardHandler::toStartGame, boardInteractor, &BoardInteractor::startGame);
+    connect(this, &GameBoardHandler::toStartGame, boardAnalyzer, &BoardAnalyzer::startGame);
+    connect(this, &GameBoardHandler::toStartGame, this, &GameBoardHandler::checkingAppNavigation);
 
-    connect(boardInteractor, &BoardInteractor::startGameFinished, boardAnalyzer, &BoardAnalyzer::waitForGameStarting);
+    connect(boardAnalyzer, &BoardAnalyzer::toMatchGame, boardInteractor, &BoardInteractor::matchGame);
+    connect(boardAnalyzer, &BoardAnalyzer::toAcceptRequest, boardInteractor, &BoardInteractor::acceptRequest);
+    connect(boardAnalyzer, &BoardAnalyzer::toRejectRequest, boardInteractor, &BoardInteractor::rejectRequest);
+    connect(boardAnalyzer, &BoardAnalyzer::toCloseGameOverDialog, boardInteractor, &BoardInteractor::closeGameOverDialog);
+    connect(boardAnalyzer, &BoardAnalyzer::toBreakToMain, boardInteractor, &BoardInteractor::breakToMain);
 
     connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::checkMyStoneColorDelay);
+    connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::gameStarted);
 
     connect(boardAnalyzer, &BoardAnalyzer::myStoneColorUpdate, katagoInteractor, &KatagoInteractor::setMyStoneColor);
     connect(this, &GameBoardHandler::toPlay, boardInteractor, QOverload<const QPoint &>::of(&BoardInteractor::moveStone));

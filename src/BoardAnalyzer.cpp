@@ -5,6 +5,7 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDebug>
+#include <QThread>
 #include <QUuid>
 #include <opencv2/opencv.hpp>
 
@@ -102,7 +103,78 @@ void BoardAnalyzer::stop()
     toStop = true;
 }
 
-void BoardAnalyzer::waitForGameStarting()
+void BoardAnalyzer::startGame()
+{
+    while (true)
+    {
+        const auto image(screencaptor->screencap());
+        if (!image)
+        {
+            qWarning() << QStringLiteral("image is null");
+            continue;
+        }
+        if (image.value().at<cv::Vec3b>(324, 0) == cv::Vec3b(139, 202, 240) &&
+            image.value().at<cv::Vec3b>(1814, 145) == cv::Vec3b(56, 88, 28))
+        {
+            qDebug() << Q_FUNC_INFO << "game started";
+            emit gameStarted();
+            break;
+        }
+        if (checkGameState(image.value()))
+        {
+            waitForGameMatching();
+        }
+        else
+        {
+            // 等待界面响应, 避免多次点击
+            QThread::sleep(1);
+        }
+    }
+}
+
+bool BoardAnalyzer::checkGameState(const cv::Mat &image)
+{
+    if (image.at<cv::Vec3b>(333, 1000) == cv::Vec3b(133, 166, 125)) // 弹窗的关闭按钮
+    {
+        emit toCloseGameOverDialog();
+    }
+    else if (image.at<cv::Vec3b>(138, 36) == cv::Vec3b(123, 139, 104) &&
+             image.at<cv::Vec3b>(150, 96) == cv::Vec3b(123, 139, 104)) // 左上角的返回
+    {
+        emit toBreakToMain();
+    }
+    else if (image.at<cv::Vec3b>(713, 501) == cv::Vec3b(83, 104, 156))
+    {
+        if (image.at<cv::Vec3b>(888, 476) == cv::Vec3b(95, 127, 71)) // 重新匹配
+        {
+            emit toAcceptRequest();
+        }
+        else if (image.at<cv::Vec3b>(888, 476) == cv::Vec3b(108, 138, 87)) // 续战
+        {
+            emit toRejectRequest();
+        }
+    }
+    else if (image.at<cv::Vec3b>(0, 540) == cv::Vec3b(222, 236, 216)) // 主页面
+    {
+        emit toMatchGame();
+        return true;
+    }
+    else
+    {
+        const auto filePath(QCoreApplication::applicationDirPath()
+                                .append(QStringLiteral("/debug/"))
+                                .append(QUuid::createUuid()
+                                            .toString(QUuid::WithoutBraces)
+                                            .append(QStringLiteral(".png"))));
+        cv::imwrite(filePath.toStdString(), image);
+        qWarning() << Q_FUNC_INFO
+                   << QStringLiteral("matching failed")
+                   << filePath;
+    }
+    return false;
+}
+
+void BoardAnalyzer::waitForGameMatching()
 {
     const auto startTime(QDateTime::currentSecsSinceEpoch());
     do
@@ -113,12 +185,10 @@ void BoardAnalyzer::waitForGameStarting()
             qWarning() << QStringLiteral("image is null");
             continue;
         }
-        if (image.value().at<cv::Vec3b>(324, 0) == cv::Vec3b(139, 202, 240) &&
-            image.value().at<cv::Vec3b>(1814, 145) == cv::Vec3b(56, 88, 28))
+        if (image.value().at<cv::Vec3b>(544, 532) != cv::Vec3b(83, 104, 156) ||
+            image.value().at<cv::Vec3b>(1114, 518) != cv::Vec3b(65, 96, 41))
             break;
     } while (QDateTime::currentSecsSinceEpoch() - startTime < 60);
-    qDebug() << Q_FUNC_INFO << "game started";
-    emit gameStarted();
 }
 
 StoneData::StoneColor BoardAnalyzer::getMyStoneColor(const cv::Mat &image)
@@ -237,10 +307,10 @@ bool BoardAnalyzer::checkGameStatus(const cv::Mat &image, BoardData &boardData)
     if (hasUnexpected)
     {
         qDebug() << Q_FUNC_INFO << QStringLiteral("hasUnexpected");
-        const cv::Vec3b pixelValue = image.at<cv::Vec3b>(888, 475);
+        const cv::Vec3b pixelValue = image.at<cv::Vec3b>(888, 476);
         if (pixelValue == cv::Vec3b(72, 107, 40))
             boardData.requestDraw = true;
-        else if (pixelValue == cv::Vec3b(118, 146, 99))
+        else if (pixelValue == cv::Vec3b(222, 235, 236))
             boardData.requestCounting = true;
         else if (pixelValue == cv::Vec3b(92, 123, 66))
             boardData.requestUndo = true;

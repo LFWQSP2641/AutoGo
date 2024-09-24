@@ -23,13 +23,16 @@ public slots:
     void analyzeIndefinitely();
     void stop();
 
-    void waitForGameStarting();
+    void startGame();
 
 protected:
     MumuScreencaptor *screencaptor;
     BoardData m_boardData;
 
     bool toStop;
+
+    bool checkGameState(const cv::Mat &image);
+    void waitForGameMatching();
 
     static StoneData::StoneColor getMyStoneColor(const cv::Mat &image);
 
@@ -44,6 +47,12 @@ signals:
     void gameStarted();
     void lastMoveStone(const StoneData &lastMoveStoneData);
     void analyzeStoped();
+
+    void toMatchGame();
+    void toAcceptRequest();
+    void toRejectRequest();
+    void toCloseGameOverDialog();
+    void toBreakToMain();
 };
 
 #endif // BOARDANALYZER_H

@@ -53,9 +53,12 @@ signals:
 
     void clearBestPoint();
 
+    void gameStarted();
     void gameOver();
 
     void startInitFinished(bool success);
+
+    void checkingAppNavigation();
 
     // 所有to字辈的用于多线程传递
     void toStartGame();
