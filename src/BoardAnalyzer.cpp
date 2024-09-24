@@ -114,7 +114,9 @@ void BoardAnalyzer::startGame()
             continue;
         }
         if (image.value().at<cv::Vec3b>(324, 0) == cv::Vec3b(139, 202, 240) &&
-            image.value().at<cv::Vec3b>(1814, 145) == cv::Vec3b(56, 88, 28))
+            image.value().at<cv::Vec3b>(1814, 145) == cv::Vec3b(56, 88, 28) &&
+            image.value().at<cv::Vec3b>(1510, 957) != cv::Vec3b(73, 101, 49) &&
+            image.value().at<cv::Vec3b>(1609, 515) != cv::Vec3b(57, 89, 30))
         {
             qDebug() << Q_FUNC_INFO << "game started";
             emit gameStarted();
@@ -158,18 +160,6 @@ bool BoardAnalyzer::checkGameState(const cv::Mat &image)
     {
         emit toMatchGame();
         return true;
-    }
-    else
-    {
-        const auto filePath(QCoreApplication::applicationDirPath()
-                                .append(QStringLiteral("/debug/"))
-                                .append(QUuid::createUuid()
-                                            .toString(QUuid::WithoutBraces)
-                                            .append(QStringLiteral(".png"))));
-        cv::imwrite(filePath.toStdString(), image);
-        qWarning() << Q_FUNC_INFO
-                   << QStringLiteral("matching failed")
-                   << filePath;
     }
     return false;
 }

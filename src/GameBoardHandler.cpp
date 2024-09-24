@@ -79,6 +79,7 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
 
     connect(this, &GameBoardHandler::gameOver, katagoInteractor, &KatagoInteractor::stopAnalyze);
     connect(this, &GameBoardHandler::gameOver, boardAnalyzer, &BoardAnalyzer::stop);
+    connect(this, &GameBoardHandler::gameOver, timer, &QTimer::stop);
 
     connect(this, &GameBoardHandler::toReset, boardAnalyzer, &BoardAnalyzer::resetBoardData);
     connect(this, &GameBoardHandler::toReset, katagoInteractor, &KatagoInteractor::clearBoard);
