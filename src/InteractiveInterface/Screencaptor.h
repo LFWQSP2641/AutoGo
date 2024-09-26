@@ -12,6 +12,8 @@ class Screencaptor : public QObject
 public:
     explicit Screencaptor(QObject *parent = nullptr);
 
+    virtual bool init() = 0;
+
     virtual std::optional<cv::Mat> screencap() = 0;
 
 signals:

@@ -1,7 +1,13 @@
 #include "Util.h"
 
+#include "Global.h"
+
+#include <QDebug>
+#include <QPoint>
 #include <QRandomGenerator>
 #include <cmath>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 #include <random>
 
 int Util::generateTruncatedNormal(int minVal, int maxVal)
@@ -34,4 +40,42 @@ int Util::generateTanhRandom(int minValue, int maxValue)
     double scaledRandom = (boundedRandom + 1.0) / 2.0 * (maxValue - minValue) + minValue;
 
     return qRound(scaledRandom); // 使用四舍五入
+}
+
+bool Util::isRegionEqual(const cv::Mat &image, const QString &templateImageName, const QPoint &topLeft)
+{
+    return isRegionEqual(image,
+                         cv::imread(Global::dataPath()
+                                        .append(QStringLiteral("/TemplateImage/"))
+                                        .append(templateImageName)
+                                        .append(QStringLiteral(".png"))
+                                        .toStdString()),
+                         topLeft);
+}
+
+bool Util::isRegionEqual(const cv::Mat &image, const cv::Mat &templateImage, const QPoint &topLeft)
+{
+    // 将QPoint转换为cv::Point
+    cv::Point topLeftCV(topLeft.x(), topLeft.y());
+
+    // 使用templateImage的尺寸来创建区域
+    cv::Rect region(topLeftCV.x, topLeftCV.y, templateImage.cols, templateImage.rows);
+
+    // 确保区域在图像范围内
+    if (region.x >= 0 && region.y >= 0 &&
+        region.x + region.width <= image.cols &&
+        region.y + region.height <= image.rows)
+    {
+        // 截取区域
+        cv::Mat imageRegion = image(region);
+
+        // 将图像和模板都转换为灰度图
+        cv::Mat grayImageRegion, grayTemplateImage;
+        cv::cvtColor(imageRegion, grayImageRegion, cv::COLOR_BGR2GRAY);
+        cv::cvtColor(templateImage, grayTemplateImage, cv::COLOR_BGR2GRAY);
+
+        // 进行逐像素比较
+        return cv::countNonZero(grayImageRegion != grayTemplateImage) == 0;
+    }
+    return false;
 }

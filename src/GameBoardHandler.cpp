@@ -51,7 +51,7 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
     connect(boardAnalyzer, &BoardAnalyzer::toAcceptRequest, boardInteractor, &BoardInteractor::acceptRequest);
     connect(boardAnalyzer, &BoardAnalyzer::toRejectRequest, boardInteractor, &BoardInteractor::rejectRequest);
     connect(boardAnalyzer, &BoardAnalyzer::toCloseGameOverDialog, boardInteractor, &BoardInteractor::closeGameOverDialog);
-    connect(boardAnalyzer, &BoardAnalyzer::toBreakToMain, boardInteractor, &BoardInteractor::breakToMain);
+    connect(boardAnalyzer, &BoardAnalyzer::toBackToMain, boardInteractor, &BoardInteractor::backToMain);
 
     connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::checkMyStoneColorDelay);
     connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::gameStarted);
@@ -96,6 +96,11 @@ void GameBoardHandler::startGame()
     {
         emit startInit();
     }
+}
+
+void GameBoardHandler::continuousStartGame()
+{
+    QTimer::singleShot(3000, this, &GameBoardHandler::startGame);
 }
 
 void GameBoardHandler::init()

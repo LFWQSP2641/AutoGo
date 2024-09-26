@@ -1,3 +1,4 @@
+#include "Global.h"
 #include "Settings.h"
 
 #include <QDir>
@@ -11,6 +12,8 @@ int main(int argc, char *argv[])
 
     QDir().mkpath(QCoreApplication::applicationDirPath()
                       .append(QStringLiteral("/debug")));
+
+    Global::initOnce();
 
     qmlRegisterSingletonInstance("Settings", 1, 0, "Settings", Settings::getSingletonSettings());
 

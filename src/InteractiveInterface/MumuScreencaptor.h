@@ -15,7 +15,9 @@ public:
 
     virtual std::optional<cv::Mat> screencap() override;
 
-    bool init(const QString &mumuPath, int mumuIndex);
+    virtual bool init() override;
+
+    // bool init(const QString &mumuPath, int mumuIndex);
     bool reload();
     void uninit();
 

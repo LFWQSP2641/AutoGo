@@ -15,7 +15,7 @@ MaaController::MaaController(QObject *parent)
 {
 }
 
-bool MaaController::init(const QString &adbSerial)
+bool MaaController::init()
 {
     QString maatouchPath;
     for (const auto &i :
@@ -36,7 +36,7 @@ bool MaaController::init(const QString &adbSerial)
     connect(maaTouchProcess, &QProcess::finished, &eventLoop, &QEventLoop::quit);
     maaTouchProcess->start(Settings::getSingletonSettings()->adbPath(),
                            QStringList{ QStringLiteral("connect"),
-                                        adbSerial });
+                                        Settings::getSingletonSettings()->adbSerial() });
     eventLoop.exec();
     QString result(maaTouchProcess->readAllStandardOutput());
     if (result.isEmpty())
@@ -48,7 +48,7 @@ bool MaaController::init(const QString &adbSerial)
     }
     maaTouchProcess->start(Settings::getSingletonSettings()->adbPath(),
                            QStringList{ QStringLiteral("-s"),
-                                        adbSerial,
+                                        Settings::getSingletonSettings()->adbSerial(),
                                         QStringLiteral("push"),
                                         maatouchPath,
                                         QStringLiteral("/data/local/tmp/maatouch") });
@@ -60,10 +60,11 @@ bool MaaController::init(const QString &adbSerial)
     maaTouchProcess->start(
         Settings::getSingletonSettings()->adbPath(),
         QStringList{
-            QStringLiteral("-s"), adbSerial, QStringLiteral("shell"),
+            QStringLiteral("-s"), Settings::getSingletonSettings()->adbSerial(),
+            QStringLiteral("shell"),
             QStringLiteral(
                 "export CLASSPATH=/data/local/tmp/maatouch; app_process "
-                "/data/local/tmp com.shxyke.MaaTouch.App") });
+                "/data/local/tmp com.shxyke.MaaTouch.App")});
     if (maaTouchProcess->state() == QProcess::Starting)
         eventLoop.exec();
     return true;

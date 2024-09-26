@@ -1,7 +1,6 @@
 #include "BoardInteractor.h"
 
 #include "InteractiveInterface/MaaController.h"
-#include "Settings.h"
 
 #include <QRect>
 #include <QTimer>
@@ -14,7 +13,7 @@ BoardInteractor::BoardInteractor(QObject *parent)
 
 void BoardInteractor::init()
 {
-    controller->init(Settings::getSingletonSettings()->adbSerial());
+    controller->init();
 }
 
 void BoardInteractor::moveStone(const StoneData &stoneData)
@@ -64,6 +63,11 @@ void BoardInteractor::rejectRequest()
     controller->Controller::click(QRect(QPoint(142, 1089), QPoint(475, 1172)));
 }
 
+void BoardInteractor::closeRequest()
+{
+    controller->Controller::click(QRect(QPoint(372, 1089), QPoint(706, 1172)));
+}
+
 void BoardInteractor::matchGame()
 {
     matchGame1();
@@ -75,7 +79,7 @@ void BoardInteractor::closeGameOverDialog()
     controller->Controller::click(QRect(QPoint(975, 328), QPoint(1020, 378)));
 }
 
-void BoardInteractor::breakToMain()
+void BoardInteractor::backToMain()
 {
     controller->Controller::click(QRect(QPoint(40, 125), QPoint(100, 150)));
 }

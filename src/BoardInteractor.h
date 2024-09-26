@@ -22,12 +22,13 @@ public slots:
 
     void acceptRequest();
     void rejectRequest();
+    void closeRequest();
 
     void matchGame();
 
     void closeGameOverDialog();
 
-    void breakToMain();
+    void backToMain();
 
 protected:
     MaaController *controller;

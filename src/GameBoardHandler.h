@@ -21,6 +21,7 @@ public:
 
 public slots:
     void startGame();
+    void continuousStartGame();
 
 protected:
     BoardAnalyzer *boardAnalyzer;

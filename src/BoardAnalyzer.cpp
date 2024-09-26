@@ -1,6 +1,6 @@
 #include "BoardAnalyzer.h"
 
-#include "Settings.h"
+#include "Util.h"
 
 #include <QCoreApplication>
 #include <QDateTime>
@@ -9,11 +9,86 @@
 #include <QUuid>
 #include <opencv2/opencv.hpp>
 
+QHash<QString, QPoint> BoardAnalyzer::templateImagePoints = {
+    {QStringLiteral("AnalysisPage"),               QPoint(0,   1770)},
+    { QStringLiteral("AnalysisPage2"),             QPoint(0,   1770)},
+    { QStringLiteral("CancelResumeBattleDialog"),  QPoint(200, 850) },
+    { QStringLiteral("CloseButton"),               QPoint(975, 330) },
+    { QStringLiteral("Backutton"),                 QPoint(30,  110) },
+    { QStringLiteral("Backutton2"),                QPoint(30,  110) },
+    { QStringLiteral("ConfirmDefeatDialog"),       QPoint(200, 850) },
+    { QStringLiteral("DurationChoiceDialog"),      QPoint(440, 250) },
+    { QStringLiteral("MainPage"),                  QPoint(0,   1520)},
+    { QStringLiteral("MatchDialog"),               QPoint(450, 510) },
+    { QStringLiteral("PlayingPage"),               QPoint(0,   1770)},
+    { QStringLiteral("PlayingPageWithMove"),       QPoint(400, 1640)},
+    { QStringLiteral("RequestCountingDialog"),     QPoint(200, 850) },
+    { QStringLiteral("RequestDrawDialog"),         QPoint(200, 850) },
+    { QStringLiteral("RequestRematchDialog"),      QPoint(200, 850) },
+    { QStringLiteral("RequestResumeBattleDialog"), QPoint(200, 850) },
+    { QStringLiteral("RequestUndoDialog"),         QPoint(200, 850) },
+    { QStringLiteral("TipDialogWithButton"),       QPoint(490, 710) }
+};
+
 BoardAnalyzer::BoardAnalyzer(QObject *parent)
     : QObject{ parent },
       screencaptor(new MumuScreencaptor(this)),
       toStop(false)
 {
+}
+
+BoardAnalyzer::appNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &image)
+{
+    auto funcEqual([image](const QString &name) -> bool
+                   { return Util::isRegionEqual(image, name, templateImagePoints.value(name)); });
+
+    if (funcEqual(QStringLiteral("TipDialogWithButton")))
+    {
+        if (funcEqual(QStringLiteral("RequestCountingDialog")))
+            return BoardAnalyzer::requestCountingDialog;
+        if (funcEqual(QStringLiteral("RequestDrawDialog")))
+            return BoardAnalyzer::requestDrawDialog;
+        if (funcEqual(QStringLiteral("RequestRematchDialog")))
+            return BoardAnalyzer::requestRematchDialog;
+        if (funcEqual(QStringLiteral("RequestResumeBattleDialog")))
+            return BoardAnalyzer::requestResumeBattleDialog;
+        if (funcEqual(QStringLiteral("RequestUndoDialog")))
+            return BoardAnalyzer::requestUndoDialog;
+        if (funcEqual(QStringLiteral("ConfirmDefeatDialog")))
+            return BoardAnalyzer::confirmDefeatDialog;
+        if (funcEqual(QStringLiteral("CancelResumeBattleDialog")))
+            return BoardAnalyzer::cancelResumeBattleDialog;
+        return BoardAnalyzer::otherDialog;
+    }
+    if (funcEqual(QStringLiteral("DurationChoiceDialog")))
+        return BoardAnalyzer::durationChoiceDialog;
+    if (funcEqual(QStringLiteral("MatchDialog")))
+        return BoardAnalyzer::matchDialog;
+    if (funcEqual(QStringLiteral("CloseButton")))
+        return BoardAnalyzer::onlyCloseButtonDialog;
+    if (funcEqual(QStringLiteral("PlayingPage")))
+    {
+        if (image.at<cv::Vec3b>(946, 288) == cv::Vec3b(78, 111, 80))
+            return BoardAnalyzer::tipDialog;
+        return BoardAnalyzer::playingPage;
+    }
+    if (funcEqual(QStringLiteral("PlayingPageWithMove")))
+        return BoardAnalyzer::playingPageWithMove;
+    if (funcEqual(QStringLiteral("AnalysisPage")) || funcEqual(QStringLiteral("AnalysisPage2")))
+        return BoardAnalyzer::analysisPage;
+    if (funcEqual(QStringLiteral("MainPage")))
+        return BoardAnalyzer::mainPage;
+    if (funcEqual(QStringLiteral("Backutton")) || funcEqual(QStringLiteral("Backutton2")))
+        return BoardAnalyzer::pageWithBack;
+
+    const auto filePath(QCoreApplication::applicationDirPath()
+                            .append(QStringLiteral("/debug/"))
+                            .append(QUuid::createUuid()
+                                        .toString(QUuid::WithoutBraces)
+                                        .append(QStringLiteral(".png"))));
+    cv::imwrite(filePath.toStdString(), image);
+    qWarning() << Q_FUNC_INFO << "not matching" << filePath;
+    return BoardAnalyzer::unknownPage;
 }
 
 BoardData BoardAnalyzer::analyzeBoard()
@@ -58,7 +133,7 @@ StoneData::StoneColor BoardAnalyzer::checkMyStoneColor()
 
 void BoardAnalyzer::init()
 {
-    screencaptor->init(Settings::getSingletonSettings()->mumuPath(), Settings::getSingletonSettings()->mumuIndex());
+    screencaptor->init();
 }
 
 void BoardAnalyzer::resetBoardData()
@@ -110,19 +185,17 @@ void BoardAnalyzer::startGame()
         const auto image(screencaptor->screencap());
         if (!image)
         {
-            qWarning() << QStringLiteral("image is null");
+            qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
             continue;
         }
-        if (image.value().at<cv::Vec3b>(324, 0) == cv::Vec3b(139, 202, 240) &&
-            image.value().at<cv::Vec3b>(1814, 145) == cv::Vec3b(56, 88, 28) &&
-            image.value().at<cv::Vec3b>(1510, 957) != cv::Vec3b(73, 101, 49) &&
-            image.value().at<cv::Vec3b>(1609, 515) != cv::Vec3b(57, 89, 30))
+        const auto result(appNavigationAnalyze(image.value()));
+        if (result == appNavigation::playingPage)
         {
             qDebug() << Q_FUNC_INFO << "game started";
             emit gameStarted();
             break;
         }
-        if (checkGameState(image.value()))
+        if (checkGameState(result))
         {
             waitForGameMatching();
         }
@@ -134,51 +207,55 @@ void BoardAnalyzer::startGame()
     }
 }
 
-bool BoardAnalyzer::checkGameState(const cv::Mat &image)
+bool BoardAnalyzer::checkGameState(appNavigation navigation)
 {
-    if (image.at<cv::Vec3b>(333, 1000) == cv::Vec3b(133, 166, 125)) // 弹窗的关闭按钮
+    qDebug() << Q_FUNC_INFO << navigation;
+    switch (navigation)
     {
+    case appNavigation::onlyCloseButtonDialog:
+        qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseGameOverDialog");
         emit toCloseGameOverDialog();
-    }
-    else if (image.at<cv::Vec3b>(138, 36) == cv::Vec3b(123, 139, 104) &&
-             image.at<cv::Vec3b>(150, 96) == cv::Vec3b(123, 139, 104)) // 左上角的返回
-    {
-        emit toBreakToMain();
-    }
-    else if (image.at<cv::Vec3b>(713, 501) == cv::Vec3b(83, 104, 156))
-    {
-        if (image.at<cv::Vec3b>(888, 476) == cv::Vec3b(95, 127, 71)) // 重新匹配
-        {
-            emit toAcceptRequest();
-        }
-        else if (image.at<cv::Vec3b>(888, 476) == cv::Vec3b(108, 138, 87)) // 续战
-        {
-            emit toRejectRequest();
-        }
-    }
-    else if (image.at<cv::Vec3b>(0, 540) == cv::Vec3b(222, 236, 216)) // 主页面
-    {
+        break;
+    case appNavigation::analysisPage:
+    case appNavigation::pageWithBack:
+        qDebug() << Q_FUNC_INFO << QStringLiteral("toBackToMain");
+        emit toBackToMain();
+        break;
+    case appNavigation::requestRematchDialog:
+        qDebug() << Q_FUNC_INFO << QStringLiteral("toAcceptRequest");
+        emit toAcceptRequest();
+        break;
+    case appNavigation::requestResumeBattleDialog:
+        qDebug() << Q_FUNC_INFO << QStringLiteral("toRejectRequest");
+        emit toRejectRequest();
+        break;
+    case appNavigation::mainPage:
+        qDebug() << Q_FUNC_INFO << QStringLiteral("toMatchGame");
         emit toMatchGame();
         return true;
+        break;
+    default:
+        break;
     }
     return false;
 }
 
 void BoardAnalyzer::waitForGameMatching()
 {
+    qDebug() << Q_FUNC_INFO << QStringLiteral("enter");
     const auto startTime(QDateTime::currentSecsSinceEpoch());
     do
     {
         auto image(screencaptor->screencap());
         if (!image)
         {
-            qWarning() << QStringLiteral("image is null");
+            qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
             continue;
         }
-        if (image.value().at<cv::Vec3b>(544, 532) != cv::Vec3b(83, 104, 156) ||
-            image.value().at<cv::Vec3b>(1114, 518) != cv::Vec3b(65, 96, 41))
+        if (appNavigationAnalyze(image.value()) == appNavigation::playingPage)
             break;
     } while (QDateTime::currentSecsSinceEpoch() - startTime < 60);
+    qDebug() << Q_FUNC_INFO << QStringLiteral("exit");
 }
 
 StoneData::StoneColor BoardAnalyzer::getMyStoneColor(const cv::Mat &image)
@@ -212,12 +289,6 @@ void BoardAnalyzer::isTurnToPlay(const cv::Mat &image, BoardData &boardData)
 
 void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
 {
-    if (image.at<cv::Vec3b>(1661, 513) == cv::Vec3b(33, 63, 1))
-    {
-        boardData.isMoving = true;
-        return;
-    }
-
     // 棋盘大小为19x19
     const int rows = 19;
     const int cols = 19;
@@ -291,40 +362,36 @@ void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
 
 bool BoardAnalyzer::checkGameStatus(const cv::Mat &image, BoardData &boardData)
 {
-    bool hasUnexpected(image.at<cv::Vec3b>(713, 501) == cv::Vec3b(83, 104, 156));
-    bool pass(image.at<cv::Vec3b>(946, 288) == cv::Vec3b(78, 111, 80));
-    bool gameOver(image.at<cv::Vec3b>(333, 1000) == cv::Vec3b(133, 166, 125));
-    if (hasUnexpected)
+    const auto result(appNavigationAnalyze(image));
+    if (result != appNavigation::playingPage)
     {
         qDebug() << Q_FUNC_INFO << QStringLiteral("hasUnexpected");
-        const cv::Vec3b pixelValue = image.at<cv::Vec3b>(888, 476);
-        if (pixelValue == cv::Vec3b(72, 107, 40))
-            boardData.requestDraw = true;
-        else if (pixelValue == cv::Vec3b(222, 235, 236))
-            boardData.requestCounting = true;
-        else if (pixelValue == cv::Vec3b(92, 123, 66))
-            boardData.requestUndo = true;
-        else
+        switch (result)
         {
+        case appNavigation::playingPageWithMove:
+            boardData.isMoving = true;
+            break;
+        case appNavigation::requestDrawDialog:
+            boardData.requestDraw = true;
+            break;
+        case appNavigation::requestCountingDialog:
+            boardData.requestCounting = true;
+            break;
+        case appNavigation::requestUndoDialog:
+            boardData.requestUndo = true;
+            break;
+        case appNavigation::onlyCloseButtonDialog:
+            qDebug() << Q_FUNC_INFO << QStringLiteral("gameOver");
+            boardData.gameOver = true;
+            break;
+        case appNavigation::otherDialog:
             boardData.unknownUnexpected = true;
-            const auto filePath(QCoreApplication::applicationDirPath()
-                                    .append(QStringLiteral("/debug/"))
-                                    .append(QUuid::createUuid()
-                                                .toString(QUuid::WithoutBraces)
-                                                .append(QStringLiteral(".png"))));
-            cv::imwrite(filePath.toStdString(), image);
-            qWarning() << Q_FUNC_INFO << "not matching" << filePath;
+            break;
+        default:
+            qDebug() << Q_FUNC_INFO << result;
+            break;
         }
+        return false;
     }
-    else if (pass)
-    {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("pass");
-        boardData.needMove = true;
-    }
-    else if (gameOver)
-    {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("gameOver");
-        boardData.gameOver = true;
-    }
-    return !boardData.hasUnexpected();
+    return true;
 }

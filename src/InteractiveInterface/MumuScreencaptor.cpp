@@ -41,21 +41,21 @@ std::optional<cv::Mat> MumuScreencaptor::screencap()
     return dst;
 }
 
-bool MumuScreencaptor::init(const QString &mumuPath, int mumuIndex)
+bool MumuScreencaptor::init()
 {
-    QString dllPath(mumuPath);
+    QString dllPath(Settings::getSingletonSettings()->mumuPath());
     dllPath.append(QStringLiteral("/shell/sdk/external_renderer_ipc.dll"));
     if (!QFile(dllPath).exists())
         return false;
-    m_mumuPath = mumuPath;
-    m_MumuInstIndex = mumuIndex;
+    m_mumuPath = Settings::getSingletonSettings()->mumuPath();
+    m_MumuInstIndex = Settings::getSingletonSettings()->mumuIndex();
     library->setFileName(dllPath);
     typedef int (*NemuConnectType)(const wchar_t *, int);
     NemuConnectType nemuConnect = NemuConnectType(library->resolve("nemu_connect"));
     if (nemuConnect == nullptr)
         return false;
-    std::wstring wstring(QDir::toNativeSeparators(mumuPath).toStdWString());
-    m_mumuHandle = nemuConnect(wstring.c_str(), mumuIndex);
+    std::wstring wstring(QDir::toNativeSeparators(Settings::getSingletonSettings()->mumuPath()).toStdWString());
+    m_mumuHandle = nemuConnect(wstring.c_str(), Settings::getSingletonSettings()->mumuIndex());
     if (m_mumuHandle == 0)
         return false;
 
@@ -85,7 +85,7 @@ bool MumuScreencaptor::init(const QString &mumuPath, int mumuIndex)
 bool MumuScreencaptor::reload()
 {
     uninit();
-    return init(m_mumuPath, m_MumuInstIndex);
+    return init();
 }
 
 void MumuScreencaptor::uninit()

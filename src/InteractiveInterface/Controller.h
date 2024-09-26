@@ -11,6 +11,8 @@ class Controller : public QObject
 public:
     explicit Controller(QObject *parent = nullptr);
 
+    virtual bool init() = 0;
+
     virtual bool click(const QPoint &p) = 0;
     virtual bool click(const QRect &rect);
 

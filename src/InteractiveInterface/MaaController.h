@@ -12,7 +12,7 @@ class MaaController : public Controller
 public:
     explicit MaaController(QObject *parent = nullptr);
 
-    bool init(const QString &adbSerial);
+    virtual bool init() override;
 
     virtual bool click(const QPoint &p) override;
 

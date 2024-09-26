@@ -68,7 +68,7 @@ Item {
             if(continuousPlaySwitch.checked)
             {
                 gameLogArea.append("连续对弈")
-                handler.startGame()
+                handler.continuousStartGame()
             }
             else
             {
