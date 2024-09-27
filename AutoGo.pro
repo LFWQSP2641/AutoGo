@@ -16,11 +16,7 @@ QML_IMPORT_NAME = com.LFWQSP2641.qmlcomponents
 QML_IMPORT_MAJOR_VERSION = 1
 
 INCLUDEPATH += \
-    src \
-    D:/source/opencv/build/include/opencv2 \
-    D:/source/opencv/build/include
-
-LIBS += D:/source/opencv/build/x64/vc16/lib/opencv_world4100.lib
+    src
 
 RESOURCES += \
     resources/resources.qrc
@@ -57,3 +53,9 @@ SOURCES += \
         src/StoneData.cpp \
         src/Util.cpp \
         src/main.cpp
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../opencv/build/x64/vc16/lib/ -lopencv_world4100
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../opencv/build/x64/vc16/lib/ -lopencv_world4100d
+
+INCLUDEPATH += $$PWD/../../opencv/build/include
+DEPENDPATH += $$PWD/../../opencv/build/include

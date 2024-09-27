@@ -6,7 +6,7 @@ Window {
     width: 640
     height: 480
     visible: true
-    title: "auto_go"
+    title: "AutoGo"
 
     ColumnLayout {
         anchors.fill: parent

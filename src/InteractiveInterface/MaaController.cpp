@@ -1,5 +1,6 @@
 #include "MaaController.h"
 
+#include "src/Global.h"
 #include "src/Settings.h"
 
 #include <QCoreApplication>
@@ -19,12 +20,9 @@ bool MaaController::init()
 {
     QString maatouchPath;
     for (const auto &i :
-         QStringList{ QDir::currentPath().append(QStringLiteral("/maatouch")),
-                      QCoreApplication::applicationDirPath().append(
-                          QStringLiteral("/maatouch")) })
-    {
-        if (QFile(i).exists())
-        {
+         QStringList{QDir::currentPath().append(QStringLiteral("/maatouch")),
+                     Global::dataPath().append(QStringLiteral("/maatouch"))}) {
+        if (QFile(i).exists()) {
             maatouchPath = i;
             break;
         }
@@ -64,7 +62,7 @@ bool MaaController::init()
             QStringLiteral("shell"),
             QStringLiteral(
                 "export CLASSPATH=/data/local/tmp/maatouch; app_process "
-                "/data/local/tmp com.shxyke.MaaTouch.App")});
+                "/data/local/tmp com.shxyke.MaaTouch.App") });
     if (maaTouchProcess->state() == QProcess::Starting)
         eventLoop.exec();
     return true;
