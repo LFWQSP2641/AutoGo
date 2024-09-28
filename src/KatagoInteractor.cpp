@@ -86,8 +86,9 @@ void KatagoInteractor::move(const BoardData &boardData)
     jsonObject.insert(QStringLiteral("boardXSize"), 19);
     jsonObject.insert(QStringLiteral("boardYSize"), 19);
     // 开局加快下棋速度
-    if (m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size() < 11)
-        jsonObject.insert(QStringLiteral("maxVisits"), 128);
+    const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
+    if (moveSize < 10)
+        jsonObject.insert(QStringLiteral("maxVisits"), moveSize * 128);
     const QByteArray data(QJsonDocument(jsonObject).toJson(QJsonDocument::Compact).append(10));
     qDebug() << data;
     katagoProcess->write(data);
