@@ -21,14 +21,14 @@ public:
 
 public slots:
     // 设置棋盘数据，1表示黑子，2表示白子
-    void setBoardData(const QVector<QVector<int>> &data);
+    void setBoardData(const QList<QList<int>> &data);
     void setBestMove(const StoneData &newBestMove);
 
     void clearBoardData();
     void clearBestMove();
 
 private:
-    QVector<QVector<int>> m_boardData;
+    QList<QList<int>> m_boardData;
 
     StoneData m_bestMove;
 

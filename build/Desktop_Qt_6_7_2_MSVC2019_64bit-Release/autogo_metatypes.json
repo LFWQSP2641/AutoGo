@@ -3,6 +3,33 @@
         "classes": [
             {
                 "className": "BoardAnalyzer",
+                "enums": [
+                    {
+                        "isClass": false,
+                        "isFlag": false,
+                        "name": "appNavigation",
+                        "values": [
+                            "onlyCloseButtonDialog",
+                            "tipDialog",
+                            "confirmDefeatDialog",
+                            "requestDrawDialog",
+                            "requestCountingDialog",
+                            "requestUndoDialog",
+                            "requestRematchDialog",
+                            "requestResumeBattleDialog",
+                            "cancelResumeBattleDialog",
+                            "otherDialog",
+                            "playingPage",
+                            "playingPageWithMove",
+                            "analysisPage",
+                            "pageWithBack",
+                            "durationChoiceDialog",
+                            "matchDialog",
+                            "mainPage",
+                            "unknownPage"
+                        ]
+                    }
+                ],
                 "object": true,
                 "qualifiedClassName": "BoardAnalyzer",
                 "signals": [
@@ -268,6 +295,45 @@
                         "scriptable": true,
                         "stored": true,
                         "type": "bool",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 10,
+                        "name": "uuid",
+                        "read": "getUuid",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 11,
+                        "name": "initialStonesArray",
+                        "read": "getInitialStonesArray",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QList<StoneData>",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 12,
+                        "name": "moveStonesArray",
+                        "read": "getMoveStonesArray",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QList<StoneData>",
                         "user": false
                     }
                 ],
@@ -675,51 +741,6 @@
             {
                 "className": "KatagoInteractor",
                 "object": true,
-                "properties": [
-                    {
-                        "constant": true,
-                        "designable": true,
-                        "final": true,
-                        "index": 0,
-                        "name": "lastMoveStone",
-                        "read": "getLastMoveStone",
-                        "required": false,
-                        "scriptable": true,
-                        "stored": true,
-                        "type": "StoneData",
-                        "user": false
-                    },
-                    {
-                        "constant": false,
-                        "designable": true,
-                        "final": true,
-                        "index": 1,
-                        "name": "myStoneColor",
-                        "notify": "myStoneColorChanged",
-                        "read": "getMyStoneColor",
-                        "required": false,
-                        "scriptable": true,
-                        "stored": true,
-                        "type": "StoneData::StoneColor",
-                        "user": false,
-                        "write": "setMyStoneColor"
-                    },
-                    {
-                        "constant": false,
-                        "designable": true,
-                        "final": true,
-                        "index": 2,
-                        "name": "m_bestMove",
-                        "notify": "bestMoveChanged",
-                        "read": "getBestMove",
-                        "required": false,
-                        "scriptable": true,
-                        "stored": true,
-                        "type": "StoneData",
-                        "user": false,
-                        "write": "setBestMove"
-                    }
-                ],
                 "qualifiedClassName": "KatagoInteractor",
                 "signals": [
                     {
@@ -743,22 +764,6 @@
                         ],
                         "name": "bestMove",
                         "returnType": "void"
-                    },
-                    {
-                        "access": "public",
-                        "arguments": [
-                            {
-                                "name": "stoneData",
-                                "type": "StoneData"
-                            }
-                        ],
-                        "name": "bestMoveChanged",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
-                        "name": "myStoneColorChanged",
-                        "returnType": "void"
                     }
                 ],
                 "slots": [
@@ -781,17 +786,12 @@
                         "access": "public",
                         "arguments": [
                             {
-                                "name": "stoneData",
-                                "type": "StoneData"
+                                "name": "boardData",
+                                "type": "BoardData"
                             }
                         ],
                         "name": "move",
                         "returnType": "void"
-                    },
-                    {
-                        "access": "public",
-                        "name": "getBestMove",
-                        "returnType": "StoneData"
                     },
                     {
                         "access": "protected",

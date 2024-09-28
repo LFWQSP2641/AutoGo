@@ -34,6 +34,7 @@ public:
         mainPage,                  // 主页面
         unknownPage
     };
+    Q_ENUM(appNavigation)
 
     static QHash<QString, QPoint> templateImagePoints;
 
@@ -62,9 +63,9 @@ protected:
 
     static StoneData::StoneColor getMyStoneColor(const cv::Mat &image);
 
-    static void isTurnToPlay(const cv::Mat &image, BoardData &boardData);
-    static void getBoardArray(const cv::Mat &image, BoardData &boardData);
-    static bool checkGameStatus(const cv::Mat &image, BoardData &boardData);
+    void isTurnToPlay(const cv::Mat &image);
+    void getBoardArray(const cv::Mat &image);
+    bool checkGameStatus(const cv::Mat &image);
 
 signals:
     void myStoneColorUpdate(StoneData::StoneColor newMyStoneColor);

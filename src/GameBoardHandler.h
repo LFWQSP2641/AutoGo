@@ -32,8 +32,8 @@ protected:
     QThread *boardInteractorThread;
     QThread *katagoInteractorThread;
 
-    QTimer *timer;
-    QThread *timerThread;
+    // QTimer *timer;
+    // QThread *timerThread;
 
     bool inited;
 
@@ -47,7 +47,7 @@ protected slots:
     void onInitFinished();
 
 signals:
-    void boardDataArrayUpdate(const QVector<QVector<int>> boardDataArray);
+    void boardDataArrayUpdate(const QList<QList<int>> boardDataArray);
     void bestPointUpdate(const StoneData &stoneData);
 
     void startInit();
