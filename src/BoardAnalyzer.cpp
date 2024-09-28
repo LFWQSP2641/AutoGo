@@ -366,6 +366,12 @@ void BoardAnalyzer::getBoardArray(const cv::Mat &image)
             m_boardData.boardDataArray[i][j] = currentPiece;
         }
     }
+    // 己方执黑第一步时, needInitialStones会为true导致initialStonesArray异常
+    if (needInitialStones && m_boardData.initialStonesArray.size() == 1)
+    {
+        m_boardData.moveStonesArray = m_boardData.initialStonesArray;
+        m_boardData.initialStonesArray.clear();
+    }
 }
 
 bool BoardAnalyzer::checkGameStatus(const cv::Mat &image)
