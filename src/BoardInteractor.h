@@ -41,6 +41,7 @@ public slots:
     void matchGame();
 
     void closeGameOverDialog();
+    void closeLevelUpDialog();
 
     void backToMain();
 

@@ -219,6 +219,10 @@ bool BoardAnalyzer::checkGameState(AppNavigation navigation)
         qDebug() << Q_FUNC_INFO << QStringLiteral("toRejectRequest");
         emit toRejectRequest();
         break;
+    case AppNavigation::cancelResumeBattleDialog:
+        qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseRequest");
+        emit toCloseRequest();
+        break;
     case AppNavigation::mainPage:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toMatchGame");
         emit toMatchGame();

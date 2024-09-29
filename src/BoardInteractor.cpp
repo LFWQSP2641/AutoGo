@@ -87,6 +87,11 @@ void BoardInteractor::closeGameOverDialog()
     controller->Controller::click(QRect(QPoint(975, 328), QPoint(1020, 378)));
 }
 
+void BoardInteractor::closeLevelUpDialog()
+{
+    controller->Controller::click(QRect(QPoint(935, 205), QPoint(980, 260)));
+}
+
 void BoardInteractor::backToMain()
 {
     controller->Controller::click(QRect(QPoint(40, 125), QPoint(100, 150)));

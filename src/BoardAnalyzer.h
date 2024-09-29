@@ -78,7 +78,9 @@ signals:
     void toAcceptRequest();
     void toRejectRequest();
     void toCloseGameOverDialog();
+    void toCloseLevelUpDialog();
     void toBackToMain();
+    void toCloseRequest();
 };
 
 #endif // BOARDANALYZER_H

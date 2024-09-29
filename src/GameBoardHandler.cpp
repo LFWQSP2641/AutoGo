@@ -61,7 +61,9 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
     connect(boardAnalyzer, &BoardAnalyzer::toAcceptRequest, boardInteractor, &BoardInteractor::acceptRequest);
     connect(boardAnalyzer, &BoardAnalyzer::toRejectRequest, boardInteractor, &BoardInteractor::rejectRequest);
     connect(boardAnalyzer, &BoardAnalyzer::toCloseGameOverDialog, boardInteractor, &BoardInteractor::closeGameOverDialog);
+    connect(boardAnalyzer, &BoardAnalyzer::toCloseLevelUpDialog, boardInteractor, &BoardInteractor::closeLevelUpDialog);
     connect(boardAnalyzer, &BoardAnalyzer::toBackToMain, boardInteractor, &BoardInteractor::backToMain);
+    connect(boardAnalyzer, &BoardAnalyzer::toCloseRequest, boardInteractor, &BoardInteractor::closeRequest);
 
     connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::analyzeIndefinitelyDelay);
     connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::gameStarted);
