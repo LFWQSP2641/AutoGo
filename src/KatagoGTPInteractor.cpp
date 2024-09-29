@@ -71,15 +71,15 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
         qDebug() << Q_FUNC_INFO << QStringLiteral("boardData hasUnexpected");
         return;
     }
-    qDebug() << Q_FUNC_INFO << boardData.getLastMoveStone();
     m_boardData = boardData;
     QByteArray data;
     data.append(QByteArrayLiteral("play "));
-    data.append(boardData.getMyStoneColor() == StoneData::StoneColor::Black
+    data.append(boardData.getLastMoveStone().getColor() == StoneData::StoneColor::Black
                     ? QByteArrayLiteral("B ")
                     : QByteArrayLiteral("W "));
     data.append(pointToGTP(boardData.getLastMoveStone().getPoint()).toUtf8());
     data.append(QByteArrayLiteral("\n"));
+    qDebug() << Q_FUNC_INFO << data;
     katagoProcess->write(data);
     if (boardData.getMyStoneColor() != boardData.getLastMoveStone().getColor())
     {
