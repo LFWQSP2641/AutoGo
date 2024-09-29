@@ -80,7 +80,7 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
     // connect(timer, &QTimer::timeout, katagoInteractor, &KatagoInteractor::getBestMove);
     // connect(timer, &QTimer::timeout, timer, []
     //         { qDebug() << QStringLiteral("time out") << QDateTime::currentMSecsSinceEpoch(); });
-    // connect(katagoInteractor, &KatagoInteractor::bestMoveChanged, this, &GameBoardHandler::bestPointUpdate);
+    connect(katagoInteractor, &KatagoInteractor::bestMoveUpdate, this, &GameBoardHandler::bestPointUpdate);
     connect(katagoInteractor, &KatagoInteractor::bestMove, boardInteractor, QOverload<const StoneData &>::of(&BoardInteractor::moveStone));
 
     connect(this, &GameBoardHandler::toAcceptRequest, boardInteractor, &BoardInteractor::acceptRequest);

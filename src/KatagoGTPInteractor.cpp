@@ -1,6 +1,7 @@
 #include "KatagoGTPInteractor.h"
 
 #include "Settings.h"
+#include "Util.h"
 
 #include <QDebug>
 #include <QEventLoop>
@@ -12,8 +13,11 @@
 #include <QTimer>
 
 KatagoGTPInteractor::KatagoGTPInteractor(QObject *parent)
-    : KatagoInteractor{ parent }
+    : KatagoInteractor{ parent },
+      timer(new QTimer(this))
 {
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, this, &KatagoGTPInteractor::emitBestMove);
 }
 
 void KatagoGTPInteractor::init()
@@ -81,6 +85,31 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
     {
         qDebug() << Q_FUNC_INFO << QStringLiteral("kata-analyze 10");
         katagoProcess->write(QByteArrayLiteral("kata-analyze 10\n"));
+        startTimer();
+    }
+}
+
+void KatagoGTPInteractor::startTimer()
+{
+    const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
+    if (moveSize < 10)
+    {
+        timer->start(Util::generateTanhRandom(1000, 3000));
+        return;
+    }
+    switch (m_timeMode)
+    {
+    case KatagoInteractor::Short:
+        timer->start(Util::generateTanhRandom(5000, 15000));
+        break;
+    case KatagoInteractor::Medium:
+        timer->start(Util::generateTanhRandom(10000, 30000));
+        break;
+    case KatagoInteractor::Long:
+        timer->start(Util::generateTanhRandom(20000, 60000));
+        break;
+    default:
+        break;
     }
 }
 
@@ -116,6 +145,8 @@ void KatagoGTPInteractor::analyzeKatagoOutput()
                                 ? StoneData::StoneColor::White
                                 : StoneData::StoneColor::Black);
 
+        emit bestMoveUpdate(m_bestMove);
+
         // 清空bytes
         bytes.clear();
     }
@@ -124,4 +155,15 @@ void KatagoGTPInteractor::analyzeKatagoOutput()
         // 若未找到符合条件的结果，则截取bytes从index1处开始的子串
         bytes = bytes.mid(index1);
     }
+}
+
+void KatagoGTPInteractor::emitBestMove()
+{
+    if (m_bestMove.getColor() == StoneData::None)
+    {
+        QTimer::singleShot(100, this, &KatagoGTPInteractor::emitBestMove);
+        return;
+    }
+    emit bestMove(m_bestMove);
+    m_bestMove = StoneData();
 }

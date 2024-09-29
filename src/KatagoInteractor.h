@@ -57,6 +57,9 @@ signals:
     void bestMove(const StoneData &stoneData);
     void timeModeChanged();
 
+    // GUI
+    void bestMoveUpdate(const StoneData &stoneData);
+
 private:
     Q_PROPERTY(KatagoInteractor::TimeMode timeMode READ timeMode WRITE setTimeMode NOTIFY timeModeChanged FINAL)
 };

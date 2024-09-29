@@ -897,8 +897,18 @@
                         "returnType": "void"
                     },
                     {
+                        "access": "public",
+                        "name": "startTimer",
+                        "returnType": "void"
+                    },
+                    {
                         "access": "protected",
                         "name": "analyzeKatagoOutput",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "emitBestMove",
                         "returnType": "void"
                     }
                 ],
@@ -974,6 +984,17 @@
                     {
                         "access": "public",
                         "name": "timeModeChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "stoneData",
+                                "type": "StoneData"
+                            }
+                        ],
+                        "name": "bestMoveUpdate",
                         "returnType": "void"
                     }
                 ],

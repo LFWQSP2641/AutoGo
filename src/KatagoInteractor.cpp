@@ -1,6 +1,5 @@
 #include "KatagoInteractor.h"
 
-#include "Settings.h"
 
 #include <QDebug>
 #include <QEventLoop>

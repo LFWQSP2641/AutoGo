@@ -16,11 +16,16 @@ public slots:
     void stopAnalyze() override;
     void move(const BoardData &boardData) override;
 
+    void startTimer();
+
 protected:
     StoneData m_bestMove;
+    QTimer *timer;
 
 protected slots:
     void analyzeKatagoOutput() override;
+
+    void emitBestMove();
 };
 
 #endif // KATAGOGTPINTERACTOR_H

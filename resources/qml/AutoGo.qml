@@ -61,6 +61,7 @@ Item {
                     onClicked: {
                         handler.startGame()
                         startGameButton.enabled = false
+                        durationComboBox.enabled = false
                     }
                 }
                 Button {
@@ -69,6 +70,7 @@ Item {
                     text: "停止"
                     onClicked: {
                         handler.stopGame()
+                        startGameButton.enabled = true
                         startGameButton.enabled = true
                     }
                 }
@@ -97,6 +99,7 @@ Item {
             else
             {
                 startGameButton.enabled = true
+                durationComboBox.enabled = true
             }
         }
         onToReset: {
@@ -115,6 +118,7 @@ Item {
             else
             {
                 startGameButton.enabled = true
+                durationComboBox.enabled = true
                 gameLogArea.append("初始化失败")
             }
         }
