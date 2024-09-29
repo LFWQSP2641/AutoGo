@@ -121,11 +121,6 @@
                     },
                     {
                         "access": "public",
-                        "name": "checkMyStoneColor",
-                        "returnType": "StoneData::StoneColor"
-                    },
-                    {
-                        "access": "public",
                         "name": "init",
                         "returnType": "void"
                     },
@@ -602,11 +597,6 @@
                     },
                     {
                         "access": "public",
-                        "name": "toStartCheckMyStoneColor",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
                         "arguments": [
                             {
                                 "name": "msec",
@@ -699,7 +689,7 @@
                     },
                     {
                         "access": "protected",
-                        "name": "checkMyStoneColorDelay",
+                        "name": "analyzeIndefinitelyDelay",
                         "returnType": "void"
                     },
                     {

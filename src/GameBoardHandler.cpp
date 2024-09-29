@@ -63,12 +63,11 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
     connect(boardAnalyzer, &BoardAnalyzer::toCloseGameOverDialog, boardInteractor, &BoardInteractor::closeGameOverDialog);
     connect(boardAnalyzer, &BoardAnalyzer::toBackToMain, boardInteractor, &BoardInteractor::backToMain);
 
-    connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::checkMyStoneColorDelay);
+    connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::analyzeIndefinitelyDelay);
     connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::gameStarted);
 
     connect(this, &GameBoardHandler::toPlay, boardInteractor, QOverload<const QPoint &>::of(&BoardInteractor::moveStone));
     connect(this, &GameBoardHandler::toStartAnalyzeIndefinitely, boardAnalyzer, &BoardAnalyzer::analyzeIndefinitely);
-    connect(this, &GameBoardHandler::toStartCheckMyStoneColor, boardAnalyzer, &BoardAnalyzer::checkMyStoneColor);
     connect(boardAnalyzer, &BoardAnalyzer::myStoneColorUpdate, this, &GameBoardHandler::gameStartedHandle);
 
     connect(boardAnalyzer, &BoardAnalyzer::analyzeIndefinitelyData, this, &GameBoardHandler::onStoneMoved);
@@ -182,10 +181,10 @@ void GameBoardHandler::onStoneMoved(const BoardData &boardData)
     // }
 }
 
-void GameBoardHandler::checkMyStoneColorDelay()
+void GameBoardHandler::analyzeIndefinitelyDelay()
 {
     qDebug() << Q_FUNC_INFO;
-    QTimer::singleShot(2000, this, &GameBoardHandler::toStartCheckMyStoneColor);
+    QTimer::singleShot(2000, this, &::GameBoardHandler::toStartAnalyzeIndefinitely);
 }
 
 void GameBoardHandler::onInitFinished()

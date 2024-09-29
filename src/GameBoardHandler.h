@@ -44,7 +44,7 @@ protected slots:
 
     void gameStartedHandle(StoneData::StoneColor myStoneColor);
     void onStoneMoved(const BoardData &boardData);
-    void checkMyStoneColorDelay();
+    void analyzeIndefinitelyDelay();
 
     void onInitFinished();
 
@@ -68,7 +68,6 @@ signals:
     void toStopGame();
     void toPlay(const QPoint &stonePoint);
     void toStartAnalyzeIndefinitely();
-    void toStartCheckMyStoneColor();
     void toStartTimer(int msec);
     void toSetTimeMode(int timeMode);
 

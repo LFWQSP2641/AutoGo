@@ -111,21 +111,6 @@ BoardData BoardAnalyzer::analyzeBoard()
     return m_boardData;
 }
 
-StoneData::StoneColor BoardAnalyzer::checkMyStoneColor()
-{
-    auto image(screencaptor->screencap());
-    if (!image)
-    {
-        qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
-        emit myStoneColorUpdate(StoneData::StoneColor::None);
-        return StoneData::StoneColor::None;
-    }
-
-    const auto myStoneColor(getMyStoneColor(image.value()));
-    emit myStoneColorUpdate(myStoneColor);
-    return myStoneColor;
-}
-
 void BoardAnalyzer::init()
 {
     screencaptor->init();
@@ -150,6 +135,13 @@ void BoardAnalyzer::analyzeIndefinitely()
         {
             qDebug() << Q_FUNC_INFO << QStringLiteral("Stone is moving");
             continue;
+        }
+        if (m_boardData.getMyStoneColor() != boardData.getMyStoneColor() &&
+            m_boardData.getMyStoneColor() != StoneData::StoneColor::None &&
+            m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size() == 0)
+        {
+            emit myStoneColorUpdate(m_boardData.getMyStoneColor());
+            return;
         }
         const bool moved(m_boardData.getLastMoveStone() != boardData.getLastMoveStone() &&
                          m_boardData.getLastMoveStone().getPoint() != QPoint(-1, -1));

@@ -43,8 +43,6 @@ public:
 public slots:
     BoardData analyzeBoard();
 
-    StoneData::StoneColor checkMyStoneColor();
-
     void init();
     void resetBoardData();
     void analyzeIndefinitely();
