@@ -22,6 +22,7 @@ QHash<QString, QPoint> BoardAnalyzer::templateImagePoints = {
     { QStringLiteral("MatchDialog"),               QPoint(450, 510) },
     { QStringLiteral("PlayingPage"),               QPoint(0,   1770)},
     { QStringLiteral("PlayingPageWithMove"),       QPoint(400, 1640)},
+    { QStringLiteral("PlayingPageWithMove2"),      QPoint(400, 1640)},
     { QStringLiteral("RequestCountingDialog"),     QPoint(200, 850) },
     { QStringLiteral("RequestDrawDialog"),         QPoint(200, 850) },
     { QStringLiteral("RequestRematchDialog"),      QPoint(200, 850) },
@@ -37,7 +38,7 @@ BoardAnalyzer::BoardAnalyzer(QObject *parent)
 {
 }
 
-BoardAnalyzer::appNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &image)
+BoardAnalyzer::AppNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &image)
 {
     auto funcEqual([image](const QString &name) -> bool
                    { return Util::isRegionEqual(image, name, templateImagePoints.value(name)); });
@@ -72,7 +73,7 @@ BoardAnalyzer::appNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &
             return BoardAnalyzer::tipDialog;
         return BoardAnalyzer::playingPage;
     }
-    if (funcEqual(QStringLiteral("PlayingPageWithMove")))
+    if (funcEqual(QStringLiteral("PlayingPageWithMove")) || funcEqual(QStringLiteral("PlayingPageWithMove2")))
         return BoardAnalyzer::playingPageWithMove;
     if (funcEqual(QStringLiteral("AnalysisPage")) || funcEqual(QStringLiteral("AnalysisPage2")))
         return BoardAnalyzer::analysisPage;
@@ -97,38 +98,17 @@ BoardData BoardAnalyzer::analyzeBoard()
     if (!image)
     {
         qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
-        return BoardData();
+        return m_boardData;
     }
 
-    BoardData boardData;
-
-    if (checkGameStatus(image.value(), boardData))
+    if (checkGameStatus(image.value()))
     {
-        boardData.myStoneColor = this->getMyStoneColor(image.value());
-        isTurnToPlay(image.value(), boardData);
-        getBoardArray(image.value(), boardData);
+        m_boardData.myStoneColor = this->getMyStoneColor(image.value());
+        isTurnToPlay(image.value());
+        getBoardArray(image.value());
     }
-    else
-    {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("checkGameStatus return false");
-    }
-    emit analyzeBoardData(boardData);
-    return boardData;
-}
-
-StoneData::StoneColor BoardAnalyzer::checkMyStoneColor()
-{
-    auto image(screencaptor->screencap());
-    if (!image)
-    {
-        qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
-        emit myStoneColorUpdate(StoneData::StoneColor::None);
-        return StoneData::StoneColor::None;
-    }
-
-    const auto myStoneColor(getMyStoneColor(image.value()));
-    emit myStoneColorUpdate(myStoneColor);
-    return myStoneColor;
+    emit analyzeBoardData(m_boardData);
+    return m_boardData;
 }
 
 void BoardAnalyzer::init()
@@ -147,26 +127,33 @@ void BoardAnalyzer::analyzeIndefinitely()
     toStop = false;
     while (!toStop)
     {
-        const auto boardData(analyzeBoard());
-        if (m_boardData == boardData)
+        const auto boardData(m_boardData);
+        analyzeBoard();
+        if (boardData == m_boardData)
             continue;
-        if (boardData.getIsMoving())
+        if (m_boardData.getIsMoving())
         {
             qDebug() << Q_FUNC_INFO << QStringLiteral("Stone is moving");
             continue;
         }
+        if (m_boardData.getMyStoneColor() != boardData.getMyStoneColor() &&
+            m_boardData.getMyStoneColor() != StoneData::StoneColor::None &&
+            m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size() == 0)
+        {
+            emit myStoneColorUpdate(m_boardData.getMyStoneColor());
+            return;
+        }
         const bool moved(m_boardData.getLastMoveStone() != boardData.getLastMoveStone() &&
-                         boardData.getLastMoveStone().getPoint() != QPoint(-1, -1));
-        if (boardData.hasUnexpected() || moved)
-            emit analyzeIndefinitelyData(boardData);
-        if (boardData.hasUnexpected())
+                         m_boardData.getLastMoveStone().getPoint() != QPoint(-1, -1));
+        if (m_boardData.hasUnexpected() || moved)
+            emit analyzeIndefinitelyData(m_boardData);
+        if (m_boardData.hasUnexpected())
             break;
         if (moved)
         {
-            qDebug() << Q_FUNC_INFO << QStringLiteral("LastMoveStone:") << boardData.getLastMoveStone();
-            emit lastMoveStone(boardData.getLastMoveStone());
+            qDebug() << Q_FUNC_INFO << QStringLiteral("LastMoveStone:") << m_boardData.getLastMoveStone();
+            emit lastMoveStone(m_boardData.getLastMoveStone());
         }
-        m_boardData = std::move(boardData);
     }
     qDebug() << Q_FUNC_INFO << QStringLiteral("exit");
     emit analyzeStoped();
@@ -189,7 +176,7 @@ void BoardAnalyzer::startGame()
             continue;
         }
         const auto result(appNavigationAnalyze(image.value()));
-        if (result == appNavigation::playingPage)
+        if (result == AppNavigation::playingPage)
         {
             qDebug() << Q_FUNC_INFO << "game started";
             emit gameStarted();
@@ -207,29 +194,29 @@ void BoardAnalyzer::startGame()
     }
 }
 
-bool BoardAnalyzer::checkGameState(appNavigation navigation)
+bool BoardAnalyzer::checkGameState(AppNavigation navigation)
 {
     qDebug() << Q_FUNC_INFO << navigation;
     switch (navigation)
     {
-    case appNavigation::onlyCloseButtonDialog:
+    case AppNavigation::onlyCloseButtonDialog:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseGameOverDialog");
         emit toCloseGameOverDialog();
         break;
-    case appNavigation::analysisPage:
-    case appNavigation::pageWithBack:
+    case AppNavigation::analysisPage:
+    case AppNavigation::pageWithBack:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toBackToMain");
         emit toBackToMain();
         break;
-    case appNavigation::requestRematchDialog:
+    case AppNavigation::requestRematchDialog:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toAcceptRequest");
         emit toAcceptRequest();
         break;
-    case appNavigation::requestResumeBattleDialog:
+    case AppNavigation::requestResumeBattleDialog:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toRejectRequest");
         emit toRejectRequest();
         break;
-    case appNavigation::mainPage:
+    case AppNavigation::mainPage:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toMatchGame");
         emit toMatchGame();
         return true;
@@ -252,7 +239,7 @@ void BoardAnalyzer::waitForGameMatching()
             qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
             continue;
         }
-        if (appNavigationAnalyze(image.value()) == appNavigation::playingPage)
+        if (appNavigationAnalyze(image.value()) == AppNavigation::playingPage)
             break;
     } while (QDateTime::currentSecsSinceEpoch() - startTime < 60);
     qDebug() << Q_FUNC_INFO << QStringLiteral("exit");
@@ -281,13 +268,13 @@ StoneData::StoneColor BoardAnalyzer::getMyStoneColor(const cv::Mat &image)
     }
 }
 
-void BoardAnalyzer::isTurnToPlay(const cv::Mat &image, BoardData &boardData)
+void BoardAnalyzer::isTurnToPlay(const cv::Mat &image)
 {
     const cv::Vec3b pixelValue = image.at<cv::Vec3b>(305, 305);
-    boardData.needMove = (pixelValue == cv::Vec3b(118, 254, 255));
+    m_boardData.needMove = (pixelValue == cv::Vec3b(118, 254, 255));
 }
 
-void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
+void BoardAnalyzer::getBoardArray(const cv::Mat &image)
 {
     // 棋盘大小为19x19
     const int rows = 19;
@@ -306,6 +293,8 @@ void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
     const int offsetY = 15; // y轴偏移量
     const int offsetCX = 8; // 监测点x轴偏移量
     const int offsetCY = 8; // 监测点y轴偏移量
+
+    const auto needInitialStones(m_boardData.getInitialStonesArray().isEmpty() && m_boardData.getMoveStonesArray().isEmpty());
 
     // 遍历棋盘的每个格子，判断当前格子内是否有棋子
     for (int i = 0; i < rows; ++i)
@@ -337,8 +326,14 @@ void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
                                                      image.at<cv::Vec3b>(checkCY, checkCX + 5) };
                 if (pixelCValues.at(0)[0] == 255 && pixelCValues.at(1)[0] == 255 && pixelCValues.at(2)[0] == 255)
                 {
-                    boardData.lastMoveStone.setColor(StoneData::StoneColor::Black);
-                    boardData.lastMoveStone.setPoint(QPoint(j, i));
+                    m_boardData.lastMoveStone.setColor(StoneData::StoneColor::Black);
+                    m_boardData.lastMoveStone.setPoint(QPoint(j, i));
+                    if (m_boardData.moveStonesArray.isEmpty() || m_boardData.moveStonesArray.last() != m_boardData.lastMoveStone)
+                        m_boardData.moveStonesArray.append(m_boardData.lastMoveStone);
+                }
+                else if (needInitialStones)
+                {
+                    m_boardData.initialStonesArray.append(StoneData(StoneData::StoneColor::Black, QPoint(j, i)));
                 }
             }
             else if (pixelValue[0] > 200) // 白子
@@ -349,43 +344,60 @@ void BoardAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
                                                      image.at<cv::Vec3b>(checkCY, checkCX + 5) };
                 if (pixelCValues.at(0)[0] == 0 && pixelCValues.at(1)[0] == 0 && pixelCValues.at(2)[0] == 0)
                 {
-                    boardData.lastMoveStone.setColor(StoneData::StoneColor::White);
-                    boardData.lastMoveStone.setPoint(QPoint(j, i));
+                    m_boardData.lastMoveStone.setColor(StoneData::StoneColor::White);
+                    m_boardData.lastMoveStone.setPoint(QPoint(j, i));
+                    if (m_boardData.moveStonesArray.isEmpty() || m_boardData.moveStonesArray.last() != m_boardData.lastMoveStone)
+                        m_boardData.moveStonesArray.append(m_boardData.lastMoveStone);
+                }
+                else if (needInitialStones)
+                {
+                    m_boardData.initialStonesArray.append(StoneData(StoneData::StoneColor::White, QPoint(j, i)));
                 }
             }
 
             // 更新二维数组中的棋盘状态
-            boardData.boardDataArray[i][j] = currentPiece;
+            m_boardData.boardDataArray[i][j] = currentPiece;
         }
+    }
+    // 己方执黑第一步时, needInitialStones会为true导致initialStonesArray异常
+    if (needInitialStones && m_boardData.initialStonesArray.size() == 1)
+    {
+        m_boardData.moveStonesArray = m_boardData.initialStonesArray;
+        m_boardData.initialStonesArray.clear();
     }
 }
 
-bool BoardAnalyzer::checkGameStatus(const cv::Mat &image, BoardData &boardData)
+bool BoardAnalyzer::checkGameStatus(const cv::Mat &image)
 {
+    m_boardData.isMoving = false;
+    m_boardData.requestDraw = false;
+    m_boardData.requestCounting = false;
+    m_boardData.requestUndo = false;
+    m_boardData.gameOver = false;
+    m_boardData.unknownUnexpected = false;
     const auto result(appNavigationAnalyze(image));
-    if (result != appNavigation::playingPage)
+    if (result != AppNavigation::playingPage)
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("hasUnexpected");
         switch (result)
         {
-        case appNavigation::playingPageWithMove:
-            boardData.isMoving = true;
+        case AppNavigation::playingPageWithMove:
+            m_boardData.isMoving = true;
             break;
-        case appNavigation::requestDrawDialog:
-            boardData.requestDraw = true;
+        case AppNavigation::requestDrawDialog:
+            m_boardData.requestDraw = true;
             break;
-        case appNavigation::requestCountingDialog:
-            boardData.requestCounting = true;
+        case AppNavigation::requestCountingDialog:
+            m_boardData.requestCounting = true;
             break;
-        case appNavigation::requestUndoDialog:
-            boardData.requestUndo = true;
+        case AppNavigation::requestUndoDialog:
+            m_boardData.requestUndo = true;
             break;
-        case appNavigation::onlyCloseButtonDialog:
+        case AppNavigation::onlyCloseButtonDialog:
             qDebug() << Q_FUNC_INFO << QStringLiteral("gameOver");
-            boardData.gameOver = true;
+            m_boardData.gameOver = true;
             break;
-        case appNavigation::otherDialog:
-            boardData.unknownUnexpected = true;
+        case AppNavigation::otherDialog:
+            m_boardData.unknownUnexpected = true;
             break;
         default:
             qDebug() << Q_FUNC_INFO << result;

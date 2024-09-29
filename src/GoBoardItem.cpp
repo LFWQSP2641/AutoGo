@@ -4,7 +4,7 @@ GoBoardItem::GoBoardItem(QQuickItem *parent)
     : QQuickPaintedItem(parent)
 {
     // 初始化19x19的棋盘，0表示无子
-    m_boardData = QVector<QVector<int>>(19, QVector<int>(19, 0));
+    m_boardData = QList<QList<int>>(19, QList<int>(19, 0));
 }
 
 void GoBoardItem::paint(QPainter *painter)
@@ -48,7 +48,7 @@ void GoBoardItem::paint(QPainter *painter)
     drawBestMove(painter, m_bestMove);
 }
 
-void GoBoardItem::setBoardData(const QVector<QVector<int>> &data)
+void GoBoardItem::setBoardData(const QList<QList<int>> &data)
 {
     m_boardData = data;
     update(); // 触发重绘
@@ -62,7 +62,7 @@ void GoBoardItem::setBestMove(const StoneData &newBestMove)
 
 void GoBoardItem::clearBoardData()
 {
-    setBoardData(QVector<QVector<int>>(19, QVector<int>(19, 0)));
+    setBoardData(QList<QList<int>>(19, QList<int>(19, 0)));
 }
 
 void GoBoardItem::clearBestMove()

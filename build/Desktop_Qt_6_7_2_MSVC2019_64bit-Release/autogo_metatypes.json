@@ -3,6 +3,33 @@
         "classes": [
             {
                 "className": "BoardAnalyzer",
+                "enums": [
+                    {
+                        "isClass": false,
+                        "isFlag": false,
+                        "name": "AppNavigation",
+                        "values": [
+                            "onlyCloseButtonDialog",
+                            "tipDialog",
+                            "confirmDefeatDialog",
+                            "requestDrawDialog",
+                            "requestCountingDialog",
+                            "requestUndoDialog",
+                            "requestRematchDialog",
+                            "requestResumeBattleDialog",
+                            "cancelResumeBattleDialog",
+                            "otherDialog",
+                            "playingPage",
+                            "playingPageWithMove",
+                            "analysisPage",
+                            "pageWithBack",
+                            "durationChoiceDialog",
+                            "matchDialog",
+                            "mainPage",
+                            "unknownPage"
+                        ]
+                    }
+                ],
                 "object": true,
                 "qualifiedClassName": "BoardAnalyzer",
                 "signals": [
@@ -91,11 +118,6 @@
                         "access": "public",
                         "name": "analyzeBoard",
                         "returnType": "BoardData"
-                    },
-                    {
-                        "access": "public",
-                        "name": "checkMyStoneColor",
-                        "returnType": "StoneData::StoneColor"
                     },
                     {
                         "access": "public",
@@ -269,6 +291,45 @@
                         "stored": true,
                         "type": "bool",
                         "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 10,
+                        "name": "uuid",
+                        "read": "getUuid",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 11,
+                        "name": "initialStonesArray",
+                        "read": "getInitialStonesArray",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QList<StoneData>",
+                        "user": false
+                    },
+                    {
+                        "constant": true,
+                        "designable": true,
+                        "final": true,
+                        "index": 12,
+                        "name": "moveStonesArray",
+                        "read": "getMoveStonesArray",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QList<StoneData>",
+                        "user": false
                     }
                 ],
                 "qualifiedClassName": "BoardData"
@@ -281,12 +342,46 @@
         "classes": [
             {
                 "className": "BoardInteractor",
+                "enums": [
+                    {
+                        "isClass": false,
+                        "isFlag": false,
+                        "name": "TimeMode",
+                        "values": [
+                            "Short",
+                            "Medium",
+                            "Long"
+                        ]
+                    }
+                ],
                 "object": true,
+                "properties": [
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 0,
+                        "name": "timeMode",
+                        "notify": "timeModeChanged",
+                        "read": "timeMode",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "BoardInteractor::TimeMode",
+                        "user": false,
+                        "write": "setTimeMode"
+                    }
+                ],
                 "qualifiedClassName": "BoardInteractor",
                 "signals": [
                     {
                         "access": "public",
                         "name": "moveFinished",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "timeModeChanged",
                         "returnType": "void"
                     }
                 ],
@@ -294,6 +389,17 @@
                     {
                         "access": "public",
                         "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "newTimeMode",
+                                "type": "int"
+                            }
+                        ],
+                        "name": "setTimeModeFromInt",
                         "returnType": "void"
                     },
                     {
@@ -470,6 +576,11 @@
                     },
                     {
                         "access": "public",
+                        "name": "toStopGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
                         "arguments": [
                             {
                                 "name": "stonePoint",
@@ -486,11 +597,6 @@
                     },
                     {
                         "access": "public",
-                        "name": "toStartCheckMyStoneColor",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
                         "arguments": [
                             {
                                 "name": "msec",
@@ -498,6 +604,17 @@
                             }
                         ],
                         "name": "toStartTimer",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "timeMode",
+                                "type": "int"
+                            }
+                        ],
+                        "name": "toSetTimeMode",
                         "returnType": "void"
                     },
                     {
@@ -524,7 +641,23 @@
                     },
                     {
                         "access": "public",
+                        "name": "stopGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
                         "name": "continuousStartGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "timeMode",
+                                "type": "int"
+                            }
+                        ],
+                        "name": "setTimeMode",
                         "returnType": "void"
                     },
                     {
@@ -556,7 +689,7 @@
                     },
                     {
                         "access": "protected",
-                        "name": "checkMyStoneColorDelay",
+                        "name": "analyzeIndefinitelyDelay",
                         "returnType": "void"
                     },
                     {
@@ -673,51 +806,145 @@
     {
         "classes": [
             {
+                "className": "KatagoAnalysisInteractor",
+                "object": true,
+                "qualifiedClassName": "KatagoAnalysisInteractor",
+                "slots": [
+                    {
+                        "access": "public",
+                        "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "clearBoard",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "stopAnalyze",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "boardData",
+                                "type": "BoardData"
+                            }
+                        ],
+                        "name": "move",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "analyzeKatagoOutput",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "KatagoInteractor"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "KatagoAnalysisInteractor.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "KatagoGTPInteractor",
+                "object": true,
+                "qualifiedClassName": "KatagoGTPInteractor",
+                "slots": [
+                    {
+                        "access": "public",
+                        "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "clearBoard",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "stopAnalyze",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "boardData",
+                                "type": "BoardData"
+                            }
+                        ],
+                        "name": "move",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "startTimer",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "analyzeKatagoOutput",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "emitBestMove",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "KatagoInteractor"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "KatagoGTPInteractor.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
                 "className": "KatagoInteractor",
+                "enums": [
+                    {
+                        "isClass": false,
+                        "isFlag": false,
+                        "name": "TimeMode",
+                        "values": [
+                            "Short",
+                            "Medium",
+                            "Long"
+                        ]
+                    }
+                ],
                 "object": true,
                 "properties": [
                     {
-                        "constant": true,
+                        "constant": false,
                         "designable": true,
                         "final": true,
                         "index": 0,
-                        "name": "lastMoveStone",
-                        "read": "getLastMoveStone",
+                        "name": "timeMode",
+                        "notify": "timeModeChanged",
+                        "read": "timeMode",
                         "required": false,
                         "scriptable": true,
                         "stored": true,
-                        "type": "StoneData",
-                        "user": false
-                    },
-                    {
-                        "constant": false,
-                        "designable": true,
-                        "final": true,
-                        "index": 1,
-                        "name": "myStoneColor",
-                        "notify": "myStoneColorChanged",
-                        "read": "getMyStoneColor",
-                        "required": false,
-                        "scriptable": true,
-                        "stored": true,
-                        "type": "StoneData::StoneColor",
+                        "type": "KatagoInteractor::TimeMode",
                         "user": false,
-                        "write": "setMyStoneColor"
-                    },
-                    {
-                        "constant": false,
-                        "designable": true,
-                        "final": true,
-                        "index": 2,
-                        "name": "m_bestMove",
-                        "notify": "bestMoveChanged",
-                        "read": "getBestMove",
-                        "required": false,
-                        "scriptable": true,
-                        "stored": true,
-                        "type": "StoneData",
-                        "user": false,
-                        "write": "setBestMove"
+                        "write": "setTimeMode"
                     }
                 ],
                 "qualifiedClassName": "KatagoInteractor",
@@ -746,18 +973,18 @@
                     },
                     {
                         "access": "public",
+                        "name": "timeModeChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
                         "arguments": [
                             {
                                 "name": "stoneData",
                                 "type": "StoneData"
                             }
                         ],
-                        "name": "bestMoveChanged",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
-                        "name": "myStoneColorChanged",
+                        "name": "bestMoveUpdate",
                         "returnType": "void"
                     }
                 ],
@@ -781,8 +1008,8 @@
                         "access": "public",
                         "arguments": [
                             {
-                                "name": "stoneData",
-                                "type": "StoneData"
+                                "name": "boardData",
+                                "type": "BoardData"
                             }
                         ],
                         "name": "move",
@@ -790,8 +1017,14 @@
                     },
                     {
                         "access": "public",
-                        "name": "getBestMove",
-                        "returnType": "StoneData"
+                        "arguments": [
+                            {
+                                "name": "newTimeMode",
+                                "type": "int"
+                            }
+                        ],
+                        "name": "setTimeModeFromInt",
+                        "returnType": "void"
                     },
                     {
                         "access": "protected",
@@ -962,15 +1195,45 @@
                         "designable": true,
                         "final": true,
                         "index": 6,
-                        "name": "kataGoCommand",
-                        "notify": "kataGoCommandChanged",
-                        "read": "kataGoCommand",
+                        "name": "kataGoAnalysisCommand",
+                        "notify": "kataGoAnalysisCommandChanged",
+                        "read": "kataGoAnalysisCommand",
                         "required": false,
                         "scriptable": true,
                         "stored": true,
                         "type": "QString",
                         "user": false,
-                        "write": "setKataGoCommand"
+                        "write": "setKataGoAnalysisCommand"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 7,
+                        "name": "kataGoGTPCommand",
+                        "notify": "kataGoGTPCommandChanged",
+                        "read": "kataGoGTPCommand",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false,
+                        "write": "setKataGoGTPCommand"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 8,
+                        "name": "kataGoMode",
+                        "notify": "kataGoModeChanged",
+                        "read": "kataGoMode",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false,
+                        "write": "setKataGoMode"
                     }
                 ],
                 "qualifiedClassName": "Settings",
@@ -1007,7 +1270,17 @@
                     },
                     {
                         "access": "public",
-                        "name": "kataGoCommandChanged",
+                        "name": "kataGoAnalysisCommandChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "kataGoGTPCommandChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "kataGoModeChanged",
                         "returnType": "void"
                     }
                 ],

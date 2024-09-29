@@ -13,7 +13,7 @@ class BoardAnalyzer : public QObject
 public:
     explicit BoardAnalyzer(QObject *parent = nullptr);
 
-    enum appNavigation
+    enum AppNavigation
     {
         onlyCloseButtonDialog,     // 对局结束和升级等有关闭按钮的弹窗
         tipDialog,                 // 先手及跳过, 没有弹窗, 但是会影响棋子识别
@@ -34,15 +34,14 @@ public:
         mainPage,                  // 主页面
         unknownPage
     };
+    Q_ENUM(AppNavigation)
 
     static QHash<QString, QPoint> templateImagePoints;
 
-    static BoardAnalyzer::appNavigation appNavigationAnalyze(const cv::Mat &image);
+    static BoardAnalyzer::AppNavigation appNavigationAnalyze(const cv::Mat &image);
 
 public slots:
     BoardData analyzeBoard();
-
-    StoneData::StoneColor checkMyStoneColor();
 
     void init();
     void resetBoardData();
@@ -57,14 +56,14 @@ protected:
 
     bool toStop;
 
-    bool checkGameState(appNavigation navigation);
+    bool checkGameState(AppNavigation navigation);
     void waitForGameMatching();
 
     static StoneData::StoneColor getMyStoneColor(const cv::Mat &image);
 
-    static void isTurnToPlay(const cv::Mat &image, BoardData &boardData);
-    static void getBoardArray(const cv::Mat &image, BoardData &boardData);
-    static bool checkGameStatus(const cv::Mat &image, BoardData &boardData);
+    void isTurnToPlay(const cv::Mat &image);
+    void getBoardArray(const cv::Mat &image);
+    bool checkGameStatus(const cv::Mat &image);
 
 signals:
     void myStoneColorUpdate(StoneData::StoneColor newMyStoneColor);

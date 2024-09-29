@@ -18,7 +18,7 @@ public:
 
     bool operator==(const BoardData &other) const;
 
-    QVector<QVector<int>> getBoardDataArray() const;
+    QList<QList<int>> getBoardDataArray() const;
 
     bool getRequestCounting() const;
 
@@ -40,8 +40,14 @@ public:
 
     bool getIsMoving() const;
 
+    QString getUuid() const;
+
+    QList<StoneData> getInitialStonesArray() const;
+
+    QList<StoneData> getMoveStonesArray() const;
+
 protected:
-    QVector<QVector<int>> boardDataArray;
+    QList<QList<int>> boardDataArray;
     bool requestCounting;
     bool requestDraw;
     bool requestUndo;
@@ -56,8 +62,12 @@ protected:
 
     bool isMoving;
 
+    QString uuid;
+    QList<StoneData> initialStonesArray;
+    QList<StoneData> moveStonesArray;
+
 private:
-    Q_PROPERTY(QVector<QVector<int>> boardDataArray READ getBoardDataArray CONSTANT FINAL)
+    Q_PROPERTY(QList<QList<int>> boardDataArray READ getBoardDataArray CONSTANT FINAL)
     Q_PROPERTY(bool requestCounting READ getRequestCounting CONSTANT FINAL)
     Q_PROPERTY(bool requestDraw READ getRequestDraw CONSTANT FINAL)
     Q_PROPERTY(bool requestUndo READ getRequestUndo CONSTANT FINAL)
@@ -67,6 +77,9 @@ private:
     Q_PROPERTY(StoneData::StoneColor myStoneColor READ getMyStoneColor CONSTANT FINAL)
     Q_PROPERTY(StoneData lastMoveStone READ getLastMoveStone CONSTANT FINAL)
     Q_PROPERTY(bool isMoving READ getIsMoving CONSTANT FINAL)
+    Q_PROPERTY(QString uuid READ getUuid CONSTANT FINAL)
+    Q_PROPERTY(QList<StoneData> initialStonesArray READ getInitialStonesArray CONSTANT FINAL)
+    Q_PROPERTY(QList<StoneData> moveStonesArray READ getMoveStonesArray CONSTANT FINAL)
 };
 
 Q_DECLARE_METATYPE(BoardData)

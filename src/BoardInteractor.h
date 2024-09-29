@@ -14,8 +14,22 @@ class BoardInteractor : public QObject
 public:
     explicit BoardInteractor(QObject *parent = nullptr);
 
+    // 对局模式时长
+    enum TimeMode
+    {
+        Short = 0,
+        Medium,
+        Long
+    };
+    Q_ENUM(TimeMode)
+
+    BoardInteractor::TimeMode timeMode() const;
+    void setTimeMode(BoardInteractor::TimeMode newTimeMode);
+
 public slots:
     void init();
+
+    void setTimeModeFromInt(int newTimeMode);
 
     void moveStone(const StoneData &stoneData);
     void moveStone(const QPoint &stonePoint);
@@ -32,6 +46,7 @@ public slots:
 
 protected:
     MaaController *controller;
+    BoardInteractor::TimeMode m_timeMode;
 
 protected slots:
     void matchGame1();
@@ -40,6 +55,10 @@ protected slots:
 
 signals:
     void moveFinished();
+    void timeModeChanged();
+
+private:
+    Q_PROPERTY(BoardInteractor::TimeMode timeMode READ timeMode WRITE setTimeMode NOTIFY timeModeChanged FINAL)
 };
 
 #endif // BOARDINTERACTOR_H

@@ -21,7 +21,9 @@ public:
 
 public slots:
     void startGame();
+    void stopGame();
     void continuousStartGame();
+    void setTimeMode(int timeMode);
 
 protected:
     BoardAnalyzer *boardAnalyzer;
@@ -32,8 +34,8 @@ protected:
     QThread *boardInteractorThread;
     QThread *katagoInteractorThread;
 
-    QTimer *timer;
-    QThread *timerThread;
+    // QTimer *timer;
+    // QThread *timerThread;
 
     bool inited;
 
@@ -42,12 +44,12 @@ protected slots:
 
     void gameStartedHandle(StoneData::StoneColor myStoneColor);
     void onStoneMoved(const BoardData &boardData);
-    void checkMyStoneColorDelay();
+    void analyzeIndefinitelyDelay();
 
     void onInitFinished();
 
 signals:
-    void boardDataArrayUpdate(const QVector<QVector<int>> boardDataArray);
+    void boardDataArrayUpdate(const QList<QList<int>> boardDataArray);
     void bestPointUpdate(const StoneData &stoneData);
 
     void startInit();
@@ -63,10 +65,11 @@ signals:
 
     // 所有to字辈的用于多线程传递
     void toStartGame();
+    void toStopGame();
     void toPlay(const QPoint &stonePoint);
     void toStartAnalyzeIndefinitely();
-    void toStartCheckMyStoneColor();
     void toStartTimer(int msec);
+    void toSetTimeMode(int timeMode);
 
     void toAcceptRequest();
     void toRejectRequest();

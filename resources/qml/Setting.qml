@@ -98,13 +98,50 @@ Item {
                     RowLayout {
                         Layout.fillWidth: true
                         Label {
-                            text: "KataGo参数:"
+                            text: "KataGo模式(重启生效):"
+                        }
+                        RadioButton {
+                            Layout.fillWidth: true
+                            text: "Analysis"
+                            checked: Settings.kataGoMode === "Analysis"
+                            onClicked: {
+                                Settings.kataGoMode = "Analysis"
+                                Settings.saveToFile()
+                            }
+                        }
+                        RadioButton {
+                            Layout.fillWidth: true
+                            text: "GTP"
+                            checked: Settings.kataGoMode === "GTP"
+                            onClicked: {
+                                Settings.kataGoMode = "GTP"
+                                Settings.saveToFile()
+                            }
+                        }
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Label {
+                            text: "KataGo Analysis参数:"
                         }
                         TextField {
                             Layout.fillWidth: true
                             placeholderText: "不包括KataGo.exe"
-                            text: Settings.kataGoCommand
-                            onTextChanged: Settings.kataGoCommand = text
+                            text: Settings.kataGoAnalysisCommand
+                            onTextChanged: Settings.kataGoAnalysisCommand = text
+                            onEditingFinished: Settings.saveToFile()
+                        }
+                    }
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Label {
+                            text: "KataGo GTP参数:"
+                        }
+                        TextField {
+                            Layout.fillWidth: true
+                            placeholderText: "不包括KataGo.exe"
+                            text: Settings.kataGoGTPCommand
+                            onTextChanged: Settings.kataGoGTPCommand = text
                             onEditingFinished: Settings.saveToFile()
                         }
                     }

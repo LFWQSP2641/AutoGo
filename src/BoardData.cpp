@@ -1,7 +1,9 @@
 #include "BoardData.h"
 
+#include <QDateTime>
+
 BoardData::BoardData()
-    : boardDataArray(QVector<QVector<int>>(19, QVector<int>(19, 0))),
+    : boardDataArray(QList<QList<int>>(19, QList<int>(19, 0))),
       requestCounting(false),
       requestDraw(false),
       requestUndo(false),
@@ -10,7 +12,8 @@ BoardData::BoardData()
       needMove(false),
       myStoneColor(StoneData::StoneColor::None),
       lastMoveStone(StoneData()),
-      isMoving(false)
+      isMoving(false),
+      uuid(QString::number(QDateTime::currentMSecsSinceEpoch()))
 {
 }
 
@@ -26,7 +29,7 @@ bool BoardData::operator==(const BoardData &other) const
            lastMoveStone == other.lastMoveStone;
 }
 
-QVector<QVector<int>> BoardData::getBoardDataArray() const
+QList<QList<int>> BoardData::getBoardDataArray() const
 {
     return boardDataArray;
 }
@@ -80,4 +83,19 @@ bool BoardData::hasUnexpected() const
 bool BoardData::getIsMoving() const
 {
     return isMoving;
+}
+
+QString BoardData::getUuid() const
+{
+    return uuid;
+}
+
+QList<StoneData> BoardData::getInitialStonesArray() const
+{
+    return initialStonesArray;
+}
+
+QList<StoneData> BoardData::getMoveStonesArray() const
+{
+    return moveStonesArray;
 }
