@@ -22,6 +22,7 @@ QHash<QString, QPoint> BoardAnalyzer::templateImagePoints = {
     { QStringLiteral("MatchDialog"),               QPoint(450, 510) },
     { QStringLiteral("PlayingPage"),               QPoint(0,   1770)},
     { QStringLiteral("PlayingPageWithMove"),       QPoint(400, 1640)},
+    { QStringLiteral("PlayingPageWithMove2"),      QPoint(400, 1640)},
     { QStringLiteral("RequestCountingDialog"),     QPoint(200, 850) },
     { QStringLiteral("RequestDrawDialog"),         QPoint(200, 850) },
     { QStringLiteral("RequestRematchDialog"),      QPoint(200, 850) },
@@ -72,7 +73,7 @@ BoardAnalyzer::appNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &
             return BoardAnalyzer::tipDialog;
         return BoardAnalyzer::playingPage;
     }
-    if (funcEqual(QStringLiteral("PlayingPageWithMove")))
+    if (funcEqual(QStringLiteral("PlayingPageWithMove")) || funcEqual(QStringLiteral("PlayingPageWithMove2")))
         return BoardAnalyzer::playingPageWithMove;
     if (funcEqual(QStringLiteral("AnalysisPage")) || funcEqual(QStringLiteral("AnalysisPage2")))
         return BoardAnalyzer::analysisPage;
