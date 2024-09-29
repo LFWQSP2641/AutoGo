@@ -29,8 +29,14 @@ public:
     QString kataGoPath() const;
     void setKataGoPath(const QString &newKataGoPath);
 
-    QString kataGoCommand() const;
-    void setKataGoCommand(const QString &newKataGoCommand);
+    QString kataGoAnalysisCommand() const;
+    void setKataGoAnalysisCommand(const QString &newKataGoAnalysisCommand);
+
+    QString kataGoGTPCommand() const;
+    void setKataGoGTPCommand(const QString &newKataGoGTPCommand);
+
+    QString kataGoMode() const;
+    void setKataGoMode(const QString &newKataGoMode);
 
 public slots:
     void saveToFile() const;
@@ -42,7 +48,9 @@ protected:
     QString m_adbPath;
     QString m_adbSerial;
     QString m_kataGoPath;
-    QString m_kataGoCommand;
+    QString m_kataGoAnalysisCommand;
+    QString m_kataGoGTPCommand;
+    QString m_kataGoMode;
 
 signals:
     void mumuPathChanged();
@@ -57,7 +65,11 @@ signals:
 
     void kataGoPathChanged();
 
-    void kataGoCommandChanged();
+    void kataGoAnalysisCommandChanged();
+
+    void kataGoGTPCommandChanged();
+
+    void kataGoModeChanged();
 
 private:
     Q_PROPERTY(QString mumuPath READ mumuPath WRITE setMumuPath NOTIFY mumuPathChanged FINAL)
@@ -66,7 +78,9 @@ private:
     Q_PROPERTY(QString adbPath READ adbPath WRITE setAdbPath NOTIFY adbPathChanged FINAL)
     Q_PROPERTY(QString adbSerial READ adbSerial WRITE setAdbSerial NOTIFY adbSerialChanged FINAL)
     Q_PROPERTY(QString kataGoPath READ kataGoPath WRITE setKataGoPath NOTIFY kataGoPathChanged FINAL)
-    Q_PROPERTY(QString kataGoCommand READ kataGoCommand WRITE setKataGoCommand NOTIFY kataGoCommandChanged FINAL)
+    Q_PROPERTY(QString kataGoAnalysisCommand READ kataGoAnalysisCommand WRITE setKataGoAnalysisCommand NOTIFY kataGoAnalysisCommandChanged FINAL)
+    Q_PROPERTY(QString kataGoGTPCommand READ kataGoGTPCommand WRITE setKataGoGTPCommand NOTIFY kataGoGTPCommandChanged FINAL)
+    Q_PROPERTY(QString kataGoMode READ kataGoMode WRITE setKataGoMode NOTIFY kataGoModeChanged FINAL)
 };
 
 #endif // SETTINGS_H

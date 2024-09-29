@@ -38,7 +38,7 @@ BoardAnalyzer::BoardAnalyzer(QObject *parent)
 {
 }
 
-BoardAnalyzer::appNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &image)
+BoardAnalyzer::AppNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &image)
 {
     auto funcEqual([image](const QString &name) -> bool
                    { return Util::isRegionEqual(image, name, templateImagePoints.value(name)); });
@@ -184,7 +184,7 @@ void BoardAnalyzer::startGame()
             continue;
         }
         const auto result(appNavigationAnalyze(image.value()));
-        if (result == appNavigation::playingPage)
+        if (result == AppNavigation::playingPage)
         {
             qDebug() << Q_FUNC_INFO << "game started";
             emit gameStarted();
@@ -202,29 +202,29 @@ void BoardAnalyzer::startGame()
     }
 }
 
-bool BoardAnalyzer::checkGameState(appNavigation navigation)
+bool BoardAnalyzer::checkGameState(AppNavigation navigation)
 {
     qDebug() << Q_FUNC_INFO << navigation;
     switch (navigation)
     {
-    case appNavigation::onlyCloseButtonDialog:
+    case AppNavigation::onlyCloseButtonDialog:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseGameOverDialog");
         emit toCloseGameOverDialog();
         break;
-    case appNavigation::analysisPage:
-    case appNavigation::pageWithBack:
+    case AppNavigation::analysisPage:
+    case AppNavigation::pageWithBack:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toBackToMain");
         emit toBackToMain();
         break;
-    case appNavigation::requestRematchDialog:
+    case AppNavigation::requestRematchDialog:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toAcceptRequest");
         emit toAcceptRequest();
         break;
-    case appNavigation::requestResumeBattleDialog:
+    case AppNavigation::requestResumeBattleDialog:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toRejectRequest");
         emit toRejectRequest();
         break;
-    case appNavigation::mainPage:
+    case AppNavigation::mainPage:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toMatchGame");
         emit toMatchGame();
         return true;
@@ -247,7 +247,7 @@ void BoardAnalyzer::waitForGameMatching()
             qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
             continue;
         }
-        if (appNavigationAnalyze(image.value()) == appNavigation::playingPage)
+        if (appNavigationAnalyze(image.value()) == AppNavigation::playingPage)
             break;
     } while (QDateTime::currentSecsSinceEpoch() - startTime < 60);
     qDebug() << Q_FUNC_INFO << QStringLiteral("exit");
@@ -384,27 +384,27 @@ bool BoardAnalyzer::checkGameStatus(const cv::Mat &image)
     m_boardData.gameOver = false;
     m_boardData.unknownUnexpected = false;
     const auto result(appNavigationAnalyze(image));
-    if (result != appNavigation::playingPage)
+    if (result != AppNavigation::playingPage)
     {
         switch (result)
         {
-        case appNavigation::playingPageWithMove:
+        case AppNavigation::playingPageWithMove:
             m_boardData.isMoving = true;
             break;
-        case appNavigation::requestDrawDialog:
+        case AppNavigation::requestDrawDialog:
             m_boardData.requestDraw = true;
             break;
-        case appNavigation::requestCountingDialog:
+        case AppNavigation::requestCountingDialog:
             m_boardData.requestCounting = true;
             break;
-        case appNavigation::requestUndoDialog:
+        case AppNavigation::requestUndoDialog:
             m_boardData.requestUndo = true;
             break;
-        case appNavigation::onlyCloseButtonDialog:
+        case AppNavigation::onlyCloseButtonDialog:
             qDebug() << Q_FUNC_INFO << QStringLiteral("gameOver");
             m_boardData.gameOver = true;
             break;
-        case appNavigation::otherDialog:
+        case AppNavigation::otherDialog:
             m_boardData.unknownUnexpected = true;
             break;
         default:

@@ -21,7 +21,9 @@ public:
 
 public slots:
     void startGame();
+    void stopGame();
     void continuousStartGame();
+    void setTimeMode(int timeMode);
 
 protected:
     BoardAnalyzer *boardAnalyzer;
@@ -63,10 +65,12 @@ signals:
 
     // 所有to字辈的用于多线程传递
     void toStartGame();
+    void toStopGame();
     void toPlay(const QPoint &stonePoint);
     void toStartAnalyzeIndefinitely();
     void toStartCheckMyStoneColor();
     void toStartTimer(int msec);
+    void toSetTimeMode(int timeMode);
 
     void toAcceptRequest();
     void toRejectRequest();

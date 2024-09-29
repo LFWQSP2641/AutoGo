@@ -34,6 +34,26 @@ Item {
             }
             RowLayout {
                 Layout.fillWidth: true
+                Label {
+                    text: "时长选择:"
+                }
+                ComboBox {
+                    id: durationComboBox
+                    Layout.fillWidth: true
+                    model: ["短(1分钟)", "中(5分钟)", "长(20分钟)"]
+                    currentIndex: 0
+                    onCurrentIndexChanged: {
+                        handler.setTimeMode(currentIndex)
+                    }
+                }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Switch {
+                    id: continuousPlaySwitch
+                    Layout.fillWidth: true
+                    text: "连续对弈"
+                }
                 Button {
                     id: startGameButton
                     Layout.fillWidth: true
@@ -43,10 +63,14 @@ Item {
                         startGameButton.enabled = false
                     }
                 }
-                Switch {
-                    id: continuousPlaySwitch
+                Button {
+                    id: stopGameButton
                     Layout.fillWidth: true
-                    text: "连续对弈"
+                    text: "停止"
+                    onClicked: {
+                        handler.stopGame()
+                        startGameButton.enabled = true
+                    }
                 }
             }
         }

@@ -32,6 +32,8 @@ HEADERS += \
     src/InteractiveInterface/MaaController.h \
     src/InteractiveInterface/MumuScreencaptor.h \
     src/InteractiveInterface/Screencaptor.h \
+    src/KatagoAnalysisInteractor.h \
+    src/KatagoGTPInteractor.h \
     src/KatagoInteractor.h \
     src/Settings.h \
     src/StoneData.h \
@@ -48,6 +50,8 @@ SOURCES += \
         src/InteractiveInterface/MaaController.cpp \
         src/InteractiveInterface/MumuScreencaptor.cpp \
         src/InteractiveInterface/Screencaptor.cpp \
+        src/KatagoAnalysisInteractor.cpp \
+        src/KatagoGTPInteractor.cpp \
         src/KatagoInteractor.cpp \
         src/Settings.cpp \
         src/StoneData.cpp \

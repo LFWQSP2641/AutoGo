@@ -3,8 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Window {
-    width: 640
-    height: 480
+    width: 800
+    height: 500
     visible: true
     title: "AutoGo"
 

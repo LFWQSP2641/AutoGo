@@ -15,14 +15,29 @@ class KatagoInteractor : public QObject
 public:
     explicit KatagoInteractor(QObject *parent = nullptr);
 
+    // 对局模式时长
+    enum TimeMode
+    {
+        Short = 0,
+        Medium,
+        Long
+    };
+    Q_ENUM(TimeMode)
+
+    KatagoInteractor::TimeMode timeMode() const;
+    void setTimeMode(KatagoInteractor::TimeMode newTimeMode);
+
 public slots:
-    void init();
-    void clearBoard();
-    void stopAnalyze();
-    void move(const BoardData &boardData);
+    virtual void init() = 0;
+    virtual void clearBoard();
+    virtual void stopAnalyze() = 0;
+    virtual void move(const BoardData &boardData) = 0;
+
+    void setTimeModeFromInt(int newTimeMode);
 
 protected:
     BoardData m_boardData;
+    KatagoInteractor::TimeMode m_timeMode;
 
     QProcess *katagoProcess;
     QEventLoop *eventLoop;
@@ -35,11 +50,15 @@ protected:
     static QJsonArray stoneDataListToJsonArray(const QList<StoneData> &stoneDataList);
 
 protected slots:
-    void analyzeKatagoOutput();
+    virtual void analyzeKatagoOutput() = 0;
 
 signals:
     void initFinished(bool success);
     void bestMove(const StoneData &stoneData);
+    void timeModeChanged();
+
+private:
+    Q_PROPERTY(KatagoInteractor::TimeMode timeMode READ timeMode WRITE setTimeMode NOTIFY timeModeChanged FINAL)
 };
 
 #endif // KATAGOINTERACTOR_H

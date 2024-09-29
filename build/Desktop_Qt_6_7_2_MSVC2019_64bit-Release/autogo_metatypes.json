@@ -7,7 +7,7 @@
                     {
                         "isClass": false,
                         "isFlag": false,
-                        "name": "appNavigation",
+                        "name": "AppNavigation",
                         "values": [
                             "onlyCloseButtonDialog",
                             "tipDialog",
@@ -347,12 +347,46 @@
         "classes": [
             {
                 "className": "BoardInteractor",
+                "enums": [
+                    {
+                        "isClass": false,
+                        "isFlag": false,
+                        "name": "TimeMode",
+                        "values": [
+                            "Short",
+                            "Medium",
+                            "Long"
+                        ]
+                    }
+                ],
                 "object": true,
+                "properties": [
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 0,
+                        "name": "timeMode",
+                        "notify": "timeModeChanged",
+                        "read": "timeMode",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "BoardInteractor::TimeMode",
+                        "user": false,
+                        "write": "setTimeMode"
+                    }
+                ],
                 "qualifiedClassName": "BoardInteractor",
                 "signals": [
                     {
                         "access": "public",
                         "name": "moveFinished",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "timeModeChanged",
                         "returnType": "void"
                     }
                 ],
@@ -360,6 +394,17 @@
                     {
                         "access": "public",
                         "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "newTimeMode",
+                                "type": "int"
+                            }
+                        ],
+                        "name": "setTimeModeFromInt",
                         "returnType": "void"
                     },
                     {
@@ -536,6 +581,11 @@
                     },
                     {
                         "access": "public",
+                        "name": "toStopGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
                         "arguments": [
                             {
                                 "name": "stonePoint",
@@ -568,6 +618,17 @@
                     },
                     {
                         "access": "public",
+                        "arguments": [
+                            {
+                                "name": "timeMode",
+                                "type": "int"
+                            }
+                        ],
+                        "name": "toSetTimeMode",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
                         "name": "toAcceptRequest",
                         "returnType": "void"
                     },
@@ -590,7 +651,23 @@
                     },
                     {
                         "access": "public",
+                        "name": "stopGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
                         "name": "continuousStartGame",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "timeMode",
+                                "type": "int"
+                            }
+                        ],
+                        "name": "setTimeMode",
                         "returnType": "void"
                     },
                     {
@@ -739,8 +816,137 @@
     {
         "classes": [
             {
-                "className": "KatagoInteractor",
+                "className": "KatagoAnalysisInteractor",
                 "object": true,
+                "qualifiedClassName": "KatagoAnalysisInteractor",
+                "slots": [
+                    {
+                        "access": "public",
+                        "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "clearBoard",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "stopAnalyze",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "boardData",
+                                "type": "BoardData"
+                            }
+                        ],
+                        "name": "move",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "analyzeKatagoOutput",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "KatagoInteractor"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "KatagoAnalysisInteractor.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "KatagoGTPInteractor",
+                "object": true,
+                "qualifiedClassName": "KatagoGTPInteractor",
+                "slots": [
+                    {
+                        "access": "public",
+                        "name": "init",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "clearBoard",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "stopAnalyze",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "boardData",
+                                "type": "BoardData"
+                            }
+                        ],
+                        "name": "move",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "analyzeKatagoOutput",
+                        "returnType": "void"
+                    }
+                ],
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "KatagoInteractor"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "KatagoGTPInteractor.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
+                "className": "KatagoInteractor",
+                "enums": [
+                    {
+                        "isClass": false,
+                        "isFlag": false,
+                        "name": "TimeMode",
+                        "values": [
+                            "Short",
+                            "Medium",
+                            "Long"
+                        ]
+                    }
+                ],
+                "object": true,
+                "properties": [
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 0,
+                        "name": "timeMode",
+                        "notify": "timeModeChanged",
+                        "read": "timeMode",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "KatagoInteractor::TimeMode",
+                        "user": false,
+                        "write": "setTimeMode"
+                    }
+                ],
                 "qualifiedClassName": "KatagoInteractor",
                 "signals": [
                     {
@@ -763,6 +969,11 @@
                             }
                         ],
                         "name": "bestMove",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "timeModeChanged",
                         "returnType": "void"
                     }
                 ],
@@ -791,6 +1002,17 @@
                             }
                         ],
                         "name": "move",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "arguments": [
+                            {
+                                "name": "newTimeMode",
+                                "type": "int"
+                            }
+                        ],
+                        "name": "setTimeModeFromInt",
                         "returnType": "void"
                     },
                     {
@@ -962,15 +1184,45 @@
                         "designable": true,
                         "final": true,
                         "index": 6,
-                        "name": "kataGoCommand",
-                        "notify": "kataGoCommandChanged",
-                        "read": "kataGoCommand",
+                        "name": "kataGoAnalysisCommand",
+                        "notify": "kataGoAnalysisCommandChanged",
+                        "read": "kataGoAnalysisCommand",
                         "required": false,
                         "scriptable": true,
                         "stored": true,
                         "type": "QString",
                         "user": false,
-                        "write": "setKataGoCommand"
+                        "write": "setKataGoAnalysisCommand"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 7,
+                        "name": "kataGoGTPCommand",
+                        "notify": "kataGoGTPCommandChanged",
+                        "read": "kataGoGTPCommand",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false,
+                        "write": "setKataGoGTPCommand"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 8,
+                        "name": "kataGoMode",
+                        "notify": "kataGoModeChanged",
+                        "read": "kataGoMode",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "QString",
+                        "user": false,
+                        "write": "setKataGoMode"
                     }
                 ],
                 "qualifiedClassName": "Settings",
@@ -1007,7 +1259,17 @@
                     },
                     {
                         "access": "public",
-                        "name": "kataGoCommandChanged",
+                        "name": "kataGoAnalysisCommandChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "kataGoGTPCommandChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "kataGoModeChanged",
                         "returnType": "void"
                     }
                 ],

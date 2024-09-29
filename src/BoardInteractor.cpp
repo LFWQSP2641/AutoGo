@@ -2,18 +2,26 @@
 
 #include "InteractiveInterface/MaaController.h"
 
+#include <QDebug>
 #include <QRect>
 #include <QTimer>
 
 BoardInteractor::BoardInteractor(QObject *parent)
     : QObject{ parent },
-      controller(new MaaController(this))
+      controller(new MaaController(this)),
+      m_timeMode(BoardInteractor::TimeMode::Short)
 {
 }
 
 void BoardInteractor::init()
 {
     controller->init();
+}
+
+void BoardInteractor::setTimeModeFromInt(int newTimeMode)
+{
+    qDebug() << Q_FUNC_INFO << newTimeMode;
+    setTimeMode(BoardInteractor::TimeMode(newTimeMode));
 }
 
 void BoardInteractor::moveStone(const StoneData &stoneData)
@@ -84,6 +92,19 @@ void BoardInteractor::backToMain()
     controller->Controller::click(QRect(QPoint(40, 125), QPoint(100, 150)));
 }
 
+BoardInteractor::TimeMode BoardInteractor::timeMode() const
+{
+    return m_timeMode;
+}
+
+void BoardInteractor::setTimeMode(BoardInteractor::TimeMode newTimeMode)
+{
+    if (m_timeMode == newTimeMode)
+        return;
+    m_timeMode = newTimeMode;
+    emit timeModeChanged();
+}
+
 void BoardInteractor::matchGame1()
 {
     controller->Controller::click(QRect(QPoint(34, 1357), QPoint(338, 1514)));
@@ -91,7 +112,20 @@ void BoardInteractor::matchGame1()
 
 void BoardInteractor::matchGame2()
 {
-    controller->Controller::click(QRect(QPoint(175, 646), QPoint(900, 848)));
+    switch (m_timeMode)
+    {
+    case 0:
+        controller->Controller::click(QRect(QPoint(175, 646), QPoint(900, 848)));
+        break;
+    case 1:
+        controller->Controller::click(QRect(QPoint(175, 905), QPoint(900, 1107)));
+        break;
+    case 2:
+        controller->Controller::click(QRect(QPoint(175, 1164), QPoint(900, 1366)));
+        break;
+    default:
+        break;
+    }
 }
 
 void BoardInteractor::clickConfirmMove()
