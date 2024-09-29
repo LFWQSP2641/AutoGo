@@ -15,7 +15,8 @@ public:
 
     enum AppNavigation
     {
-        onlyCloseButtonDialog,     // 对局结束和升级等有关闭按钮的弹窗
+        gameOverDialog,            // 对局结束和升级等有关闭按钮的弹窗
+        levelUpDialog,             // 升级弹窗
         tipDialog,                 // 先手及跳过, 没有弹窗, 但是会影响棋子识别
         confirmDefeatDialog,       // 确认认输
         requestDrawDialog,         // 请求和棋

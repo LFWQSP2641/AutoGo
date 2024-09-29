@@ -13,7 +13,8 @@ QHash<QString, QPoint> BoardAnalyzer::templateImagePoints = {
     {QStringLiteral("AnalysisPage"),               QPoint(0,   1770)},
     { QStringLiteral("AnalysisPage2"),             QPoint(0,   1770)},
     { QStringLiteral("CancelResumeBattleDialog"),  QPoint(200, 850) },
-    { QStringLiteral("CloseButton"),               QPoint(975, 330) },
+    { QStringLiteral("GameOverDialogCloseButton"), QPoint(975, 330) },
+    { QStringLiteral("LevelUpDialogCloseButton"),  QPoint(935, 205) },
     { QStringLiteral("Backutton"),                 QPoint(30,  110) },
     { QStringLiteral("Backutton2"),                QPoint(30,  110) },
     { QStringLiteral("ConfirmDefeatDialog"),       QPoint(200, 850) },
@@ -65,8 +66,10 @@ BoardAnalyzer::AppNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &
         return BoardAnalyzer::durationChoiceDialog;
     if (funcEqual(QStringLiteral("MatchDialog")))
         return BoardAnalyzer::matchDialog;
-    if (funcEqual(QStringLiteral("CloseButton")))
-        return BoardAnalyzer::onlyCloseButtonDialog;
+    if (funcEqual(QStringLiteral("GameOverDialogCloseButton")))
+        return BoardAnalyzer::gameOverDialog;
+    if (funcEqual(QStringLiteral("LevelUpDialogCloseButton")))
+        return BoardAnalyzer::levelUpDialog;
     if (funcEqual(QStringLiteral("PlayingPage")))
     {
         if (image.at<cv::Vec3b>(946, 288) == cv::Vec3b(78, 111, 80))
@@ -199,7 +202,7 @@ bool BoardAnalyzer::checkGameState(AppNavigation navigation)
     qDebug() << Q_FUNC_INFO << navigation;
     switch (navigation)
     {
-    case AppNavigation::onlyCloseButtonDialog:
+    case AppNavigation::gameOverDialog:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseGameOverDialog");
         emit toCloseGameOverDialog();
         break;
@@ -392,7 +395,7 @@ bool BoardAnalyzer::checkGameStatus(const cv::Mat &image)
         case AppNavigation::requestUndoDialog:
             m_boardData.requestUndo = true;
             break;
-        case AppNavigation::onlyCloseButtonDialog:
+        case AppNavigation::gameOverDialog:
             qDebug() << Q_FUNC_INFO << QStringLiteral("gameOver");
             m_boardData.gameOver = true;
             break;
