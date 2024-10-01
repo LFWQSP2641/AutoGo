@@ -328,42 +328,33 @@ void BoardAnalyzer::getBoardArray(const cv::Mat &image)
             if (pixelValue[0] < 100) // 黑子
             {
                 currentPiece = 1;
-                const QList<cv::Vec3b> pixelCValues{ image.at<cv::Vec3b>(checkCY, checkCX),
-                                                     image.at<cv::Vec3b>(checkCY + 5, checkCX),
-                                                     image.at<cv::Vec3b>(checkCY, checkCX + 5) };
-                if (pixelCValues.at(0)[0] == 255 && pixelCValues.at(1)[0] == 255 && pixelCValues.at(2)[0] == 255)
-                {
-                    m_boardData.lastMoveStone.setColor(StoneData::StoneColor::Black);
-                    m_boardData.lastMoveStone.setPoint(QPoint(j, i));
-                    if (m_boardData.moveStonesArray.isEmpty() || m_boardData.moveStonesArray.last() != m_boardData.lastMoveStone)
-                        m_boardData.moveStonesArray.append(m_boardData.lastMoveStone);
-                }
-                else if (needInitialStones)
-                {
-                    m_boardData.initialStonesArray.append(StoneData(StoneData::StoneColor::Black, QPoint(j, i)));
-                }
             }
             else if (pixelValue[0] > 200) // 白子
             {
                 currentPiece = 2;
-                const QList<cv::Vec3b> pixelCValues{ image.at<cv::Vec3b>(checkCY, checkCX),
-                                                     image.at<cv::Vec3b>(checkCY + 5, checkCX),
-                                                     image.at<cv::Vec3b>(checkCY, checkCX + 5) };
-                if (pixelCValues.at(0)[0] == 0 && pixelCValues.at(1)[0] == 0 && pixelCValues.at(2)[0] == 0)
-                {
-                    m_boardData.lastMoveStone.setColor(StoneData::StoneColor::White);
-                    m_boardData.lastMoveStone.setPoint(QPoint(j, i));
-                    if (m_boardData.moveStonesArray.isEmpty() || m_boardData.moveStonesArray.last() != m_boardData.lastMoveStone)
-                        m_boardData.moveStonesArray.append(m_boardData.lastMoveStone);
-                }
-                else if (needInitialStones)
-                {
-                    m_boardData.initialStonesArray.append(StoneData(StoneData::StoneColor::White, QPoint(j, i)));
-                }
             }
-
             // 更新二维数组中的棋盘状态
             m_boardData.boardDataArray[i][j] = currentPiece;
+            if (currentPiece == 0)
+                continue;
+
+            const QList<cv::Vec3b> pixelCValues{ image.at<cv::Vec3b>(checkCY, checkCX),
+                                                 image.at<cv::Vec3b>(checkCY + 5, checkCX),
+                                                 image.at<cv::Vec3b>(checkCY, checkCX + 5) };
+            const unsigned char lastMovePixelValue(currentPiece == 1 ? 255 : 0);
+            const auto isLastMove(pixelCValues.at(0)[0] == lastMovePixelValue && pixelCValues.at(1)[0] == lastMovePixelValue && pixelCValues.at(2)[0] == lastMovePixelValue);
+            const StoneData::StoneColor lastMoveColor(currentPiece == 1 ? StoneData::StoneColor::Black : StoneData::StoneColor::White);
+            if (isLastMove)
+            {
+                m_boardData.lastMoveStone.setColor(lastMoveColor);
+                m_boardData.lastMoveStone.setPoint(QPoint(j, i));
+                if (m_boardData.moveStonesArray.isEmpty() || m_boardData.moveStonesArray.last() != m_boardData.lastMoveStone)
+                    m_boardData.moveStonesArray.append(m_boardData.lastMoveStone);
+            }
+            else if (needInitialStones)
+            {
+                m_boardData.initialStonesArray.append(StoneData(lastMoveColor, QPoint(j, i)));
+            }
         }
     }
     // 己方执黑第一步时, needInitialStones会为true导致initialStonesArray异常
