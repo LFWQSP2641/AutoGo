@@ -119,30 +119,44 @@ Item {
                             }
                         }
                     }
-                    RowLayout {
+                    GroupBox {
                         Layout.fillWidth: true
-                        Label {
-                            text: "KataGo Analysis参数:"
-                        }
-                        TextField {
-                            Layout.fillWidth: true
-                            placeholderText: "不包括KataGo.exe"
-                            text: Settings.kataGoAnalysisCommand
-                            onTextChanged: Settings.kataGoAnalysisCommand = text
-                            onEditingFinished: Settings.saveToFile()
+                        title: "KataGo Analysis"
+                        ColumnLayout {
+                            anchors.fill: parent
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Label {
+                                    text: "KataGo Analysis参数:"
+                                }
+                                TextField {
+                                    Layout.fillWidth: true
+                                    placeholderText: "不包括KataGo.exe"
+                                    text: Settings.kataGoAnalysisCommand
+                                    onTextChanged: Settings.kataGoAnalysisCommand = text
+                                    onEditingFinished: Settings.saveToFile()
+                                }
+                            }
                         }
                     }
-                    RowLayout {
+                    GroupBox {
                         Layout.fillWidth: true
-                        Label {
-                            text: "KataGo GTP参数:"
-                        }
-                        TextField {
-                            Layout.fillWidth: true
-                            placeholderText: "不包括KataGo.exe"
-                            text: Settings.kataGoGTPCommand
-                            onTextChanged: Settings.kataGoGTPCommand = text
-                            onEditingFinished: Settings.saveToFile()
+                        title: "KataGo GTP"
+                        ColumnLayout {
+                            anchors.fill: parent
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Label {
+                                    text: "KataGo GTP参数:"
+                                }
+                                TextField {
+                                    Layout.fillWidth: true
+                                    placeholderText: "不包括KataGo.exe"
+                                    text: Settings.kataGoGTPCommand
+                                    onTextChanged: Settings.kataGoGTPCommand = text
+                                    onEditingFinished: Settings.saveToFile()
+                                }
+                            }
                         }
                     }
                 }

@@ -16,34 +16,6 @@ KatagoAnalysisInteractor::KatagoAnalysisInteractor(QObject *parent)
 {
 }
 
-void KatagoAnalysisInteractor::init()
-{
-    disconnect(katagoProcess, &QProcess::readyRead, this, &KatagoAnalysisInteractor::analyzeKatagoOutput);
-    katagoProcess->setProcessChannelMode(QProcess::MergedChannels);
-    katagoProcess->start(
-        Settings::getSingletonSettings()->kataGoPath(),
-        QProcess::splitCommand(Settings::getSingletonSettings()->kataGoAnalysisCommand()));
-    while (true)
-    {
-        timeOut->start();
-        eventLoop->exec();
-        bytes.append(katagoProcess->readAllStandardOutput());
-        if (bytes.contains(QByteArrayLiteral("Started, ready to begin handling requests")))
-        {
-            bytes.clear();
-            connect(katagoProcess, &QProcess::readyReadStandardOutput, this, &KatagoAnalysisInteractor::analyzeKatagoOutput);
-            emit initFinished(true);
-            break;
-        }
-        else if (katagoProcess->state() == QProcess::NotRunning)
-        {
-            bytes.clear();
-            emit initFinished(false);
-            break;
-        }
-    }
-}
-
 void KatagoAnalysisInteractor::clearBoard()
 {
     qDebug() << Q_FUNC_INFO;
@@ -78,13 +50,35 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
     jsonObject.insert(QStringLiteral("komi"), 7.5);
     jsonObject.insert(QStringLiteral("boardXSize"), 19);
     jsonObject.insert(QStringLiteral("boardYSize"), 19);
-    // 开局加快下棋速度
     const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
+    double timeScaleFactor;
+    switch (m_timeMode)
+    {
+    case KatagoInteractor::TimeMode::Medium:
+        timeScaleFactor = 2;
+        break;
+    case KatagoInteractor::TimeMode::Long:
+        timeScaleFactor = 3;
+        break;
+    case KatagoInteractor::TimeMode::Short:
+    default:
+        timeScaleFactor = 1;
+        break;
+    }
+
+    // 开局加快下棋速度
     if (moveSize < 10)
-        jsonObject.insert(QStringLiteral("maxVisits"), moveSize * 128);
+        jsonObject.insert(QStringLiteral("maxVisits"), moveSize * 128 * timeScaleFactor);
+    else
+        jsonObject.insert(QStringLiteral("maxVisits"), 1024 * timeScaleFactor);
     const QByteArray data(QJsonDocument(jsonObject).toJson(QJsonDocument::Compact).append(10));
     qDebug() << data;
     katagoProcess->write(data);
+}
+
+QStringList KatagoAnalysisInteractor::getKataGoArgs() const
+{
+    return QProcess::splitCommand(Settings::getSingletonSettings()->kataGoAnalysisCommand());
 }
 
 void KatagoAnalysisInteractor::analyzeKatagoOutput()
@@ -172,4 +166,21 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
         bytes = bytes.mid(index1);
     }
 #endif
+}
+
+void KatagoAnalysisInteractor::analyzeKatagoInit()
+{
+    bytes.append(katagoProcess->readAllStandardOutput());
+    if (bytes.contains(QByteArrayLiteral("Started, ready to begin handling requests")))
+    {
+        bytes.clear();
+        disconnect(katagoProcess, &QProcess::readyReadStandardOutput, this, &KatagoAnalysisInteractor::analyzeKatagoInit);
+        connect(katagoProcess, &QProcess::readyReadStandardOutput, this, &KatagoAnalysisInteractor::analyzeKatagoOutput);
+        emit initFinished(true);
+    }
+    else if (katagoProcess->state() == QProcess::NotRunning)
+    {
+        bytes.clear();
+        emit initFinished(false);
+    }
 }

@@ -1,2 +1,6 @@
 - [x] "timer had been running"报错
 - [x] 棋子上倒计时时, 棋子颜色识别错误
+- [ ] 秒落子导致的点击错误
+- [ ] 未处理悔棋情况
+- [ ] 当进入倒计时才识别时, 可能会出现lastMoveStone为空(影响GTP)
+- [ ] 当进入倒计时才识别时, initialStonesArray与lastMoveStone和moveStonesArray冲突(影响Analysis)

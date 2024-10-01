@@ -11,13 +11,16 @@ public:
     explicit KatagoAnalysisInteractor(QObject *parent = nullptr);
 
 public slots:
-    void init() override;
-    void clearBoard() override;
-    void stopAnalyze() override;
-    void move(const BoardData &boardData) override;
+    virtual void clearBoard() override;
+    virtual void stopAnalyze() override;
+    virtual void move(const BoardData &boardData) override;
+
+protected:
+    virtual QStringList getKataGoArgs() const override;
 
 protected slots:
-    void analyzeKatagoOutput() override;
+    virtual void analyzeKatagoOutput() override;
+    virtual void analyzeKatagoInit() override;
 };
 
 #endif // KATAGOANALYSISINTERACTOR_H

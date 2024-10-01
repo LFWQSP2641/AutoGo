@@ -11,21 +11,16 @@ public:
     explicit KatagoGTPInteractor(QObject *parent = nullptr);
 
 public slots:
-    void init() override;
-    void clearBoard() override;
-    void stopAnalyze() override;
-    void move(const BoardData &boardData) override;
-
-    void startTimer();
+    virtual void clearBoard() override;
+    virtual void stopAnalyze() override;
+    virtual void move(const BoardData &boardData) override;
 
 protected:
-    StoneData m_bestMove;
-    QTimer *timer;
+    virtual QStringList getKataGoArgs() const override;
 
 protected slots:
-    void analyzeKatagoOutput() override;
-
-    void emitBestMove();
+    virtual void analyzeKatagoOutput() override;
+    virtual void analyzeKatagoInit() override;
 };
 
 #endif // KATAGOGTPINTERACTOR_H

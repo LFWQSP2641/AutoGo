@@ -168,19 +168,6 @@ void GameBoardHandler::onStoneMoved(const BoardData &boardData)
     {
         emit gameOver();
     }
-
-    // if (boardData.getNeedMove())
-    // {
-    //     const auto msec(Util::generateTanhRandom(3000, 7000));
-    //     qDebug() << Q_FUNC_INFO << QStringLiteral("timer starting, msec:") << msec << QDateTime::currentMSecsSinceEpoch();
-    //     if (timer->isActive())
-    //         qWarning() << "timer had been running";
-    //     emit toStartTimer(msec);
-    // }
-    // else
-    // {
-    //     qDebug() << Q_FUNC_INFO << QStringLiteral("not my turn");
-    // }
 }
 
 void GameBoardHandler::analyzeIndefinitelyDelay()

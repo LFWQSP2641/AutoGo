@@ -828,11 +828,6 @@
                 "slots": [
                     {
                         "access": "public",
-                        "name": "init",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
                         "name": "clearBoard",
                         "returnType": "void"
                     },
@@ -855,6 +850,11 @@
                     {
                         "access": "protected",
                         "name": "analyzeKatagoOutput",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "analyzeKatagoInit",
                         "returnType": "void"
                     }
                 ],
@@ -878,11 +878,6 @@
                 "slots": [
                     {
                         "access": "public",
-                        "name": "init",
-                        "returnType": "void"
-                    },
-                    {
-                        "access": "public",
                         "name": "clearBoard",
                         "returnType": "void"
                     },
@@ -903,18 +898,13 @@
                         "returnType": "void"
                     },
                     {
-                        "access": "public",
-                        "name": "startTimer",
-                        "returnType": "void"
-                    },
-                    {
                         "access": "protected",
                         "name": "analyzeKatagoOutput",
                         "returnType": "void"
                     },
                     {
                         "access": "protected",
-                        "name": "emitBestMove",
+                        "name": "analyzeKatagoInit",
                         "returnType": "void"
                     }
                 ],
@@ -961,6 +951,21 @@
                         "type": "KatagoInteractor::TimeMode",
                         "user": false,
                         "write": "setTimeMode"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 1,
+                        "name": "reportIntervalMS",
+                        "notify": "reportIntervalMSChanged",
+                        "read": "getReportIntervalMS",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "int",
+                        "user": false,
+                        "write": "setReportIntervalMS"
                     }
                 ],
                 "qualifiedClassName": "KatagoInteractor",
@@ -1002,6 +1007,11 @@
                         ],
                         "name": "bestMoveUpdate",
                         "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "reportIntervalMSChanged",
+                        "returnType": "void"
                     }
                 ],
                 "slots": [
@@ -1033,6 +1043,11 @@
                     },
                     {
                         "access": "public",
+                        "name": "startTimer",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
                         "arguments": [
                             {
                                 "name": "newTimeMode",
@@ -1044,7 +1059,17 @@
                     },
                     {
                         "access": "protected",
+                        "name": "emitBestMove",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
                         "name": "analyzeKatagoOutput",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "protected",
+                        "name": "analyzeKatagoInit",
                         "returnType": "void"
                     }
                 ],

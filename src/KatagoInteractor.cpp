@@ -1,5 +1,7 @@
 #include "KatagoInteractor.h"
 
+#include "Settings.h"
+#include "Util.h"
 
 #include <QDebug>
 #include <QEventLoop>
@@ -14,13 +16,10 @@ KatagoInteractor::KatagoInteractor(QObject *parent)
     : QObject{ parent },
       m_timeMode(KatagoInteractor::TimeMode::Short),
       katagoProcess(new QProcess(this)),
-      eventLoop(new QEventLoop(this)),
-      timeOut(new QTimer(this))
+      timer(new QTimer(this))
 {
-    timeOut->setSingleShot(true);
-    timeOut->setInterval(1000);
-    connect(katagoProcess, &QProcess::readyRead, eventLoop, &QEventLoop::quit);
-    connect(timeOut, &QTimer::timeout, eventLoop, &QEventLoop::quit);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, this, &KatagoInteractor::emitBestMove);
 }
 
 void KatagoInteractor::clearBoard()
@@ -29,9 +28,46 @@ void KatagoInteractor::clearBoard()
     m_boardData = BoardData();
 }
 
+void KatagoInteractor::startTimer()
+{
+    const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
+    if (moveSize < 10)
+    {
+        timer->start(Util::generateTanhRandom(1000, 3000));
+        return;
+    }
+    switch (m_timeMode)
+    {
+    case KatagoInteractor::Short:
+        timer->start(Util::generateTanhRandom(5000, 15000));
+        break;
+    case KatagoInteractor::Medium:
+        timer->start(Util::generateTanhRandom(10000, 30000));
+        break;
+    case KatagoInteractor::Long:
+        timer->start(Util::generateTanhRandom(20000, 60000));
+        break;
+    default:
+        break;
+    }
+}
+
 void KatagoInteractor::setTimeModeFromInt(int newTimeMode)
 {
     setTimeMode(KatagoInteractor::TimeMode(newTimeMode));
+}
+
+int KatagoInteractor::getReportIntervalMS() const
+{
+    return reportIntervalMS;
+}
+
+void KatagoInteractor::setReportIntervalMS(int newReportIntervalMS)
+{
+    if (reportIntervalMS == newReportIntervalMS)
+        return;
+    reportIntervalMS = newReportIntervalMS;
+    emit reportIntervalMSChanged();
 }
 
 KatagoInteractor::TimeMode KatagoInteractor::timeMode() const
@@ -45,6 +81,15 @@ void KatagoInteractor::setTimeMode(KatagoInteractor::TimeMode newTimeMode)
         return;
     m_timeMode = newTimeMode;
     emit timeModeChanged();
+}
+
+void KatagoInteractor::init()
+{
+    disconnect(katagoProcess, &QProcess::readyRead, this, &KatagoInteractor::analyzeKatagoOutput);
+    connect(katagoProcess, &QProcess::readyRead, this, &KatagoInteractor::analyzeKatagoInit);
+    katagoProcess->setProcessChannelMode(QProcess::MergedChannels);
+    katagoProcess->start(Settings::getSingletonSettings()->kataGoPath(),
+                         getKataGoArgs());
 }
 
 QString KatagoInteractor::pointToGTP(const QPoint &point)
@@ -110,4 +155,15 @@ QJsonArray KatagoInteractor::stoneDataListToJsonArray(const QList<StoneData> &st
         stonesMoveJsonArray.append(stoneJsonArray);
     }
     return stonesMoveJsonArray;
+}
+
+void KatagoInteractor::emitBestMove()
+{
+    if (m_bestMove.getColor() == StoneData::None)
+    {
+        QTimer::singleShot(100, this, &KatagoInteractor::emitBestMove);
+        return;
+    }
+    emit bestMove(m_bestMove);
+    m_bestMove = StoneData();
 }

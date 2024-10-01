@@ -1,7 +1,6 @@
 #include "KatagoGTPInteractor.h"
 
 #include "Settings.h"
-#include "Util.h"
 
 #include <QDebug>
 #include <QEventLoop>
@@ -13,41 +12,8 @@
 #include <QTimer>
 
 KatagoGTPInteractor::KatagoGTPInteractor(QObject *parent)
-    : KatagoInteractor{ parent },
-      timer(new QTimer(this))
+    : KatagoInteractor{ parent }
 {
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, this, &KatagoGTPInteractor::emitBestMove);
-}
-
-void KatagoGTPInteractor::init()
-{
-    disconnect(katagoProcess, &QProcess::readyRead, this, &KatagoGTPInteractor::analyzeKatagoOutput);
-    // katagoProcess->setWorkingDirectory(QStringLiteral("D:/Software/GoAI/katago"));
-    katagoProcess->setProcessChannelMode(QProcess::MergedChannels);
-    katagoProcess->start(
-        Settings::getSingletonSettings()->kataGoPath(),
-        QProcess::splitCommand(Settings::getSingletonSettings()->kataGoGTPCommand()));
-    while (true)
-    {
-        timeOut->start();
-        eventLoop->exec();
-        bytes.append(katagoProcess->readAllStandardOutput());
-        if (bytes.contains(QByteArrayLiteral("GTP ready, beginning main protocol loop")))
-        {
-            bytes.clear();
-            katagoProcess->write(QByteArrayLiteral("komi 7.5\n"));
-            connect(katagoProcess, &QProcess::readyReadStandardOutput, this, &KatagoGTPInteractor::analyzeKatagoOutput);
-            emit initFinished(true);
-            break;
-        }
-        else if (katagoProcess->state() == QProcess::NotRunning)
-        {
-            bytes.clear();
-            emit initFinished(false);
-            break;
-        }
-    }
 }
 
 void KatagoGTPInteractor::clearBoard()
@@ -98,34 +64,16 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
     m_boardData = boardData;
     if (boardData.getMyStoneColor() != boardData.getLastMoveStone().getColor())
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("kata-analyze 10");
-        katagoProcess->write(QByteArrayLiteral("kata-analyze 10\n"));
+        const QByteArray analyzeData(QByteArrayLiteral("kata-analyze ").append(QByteArray::number(reportIntervalMS / 10)).append(10));
+        qDebug() << Q_FUNC_INFO << analyzeData;
+        katagoProcess->write(analyzeData);
         startTimer();
     }
 }
 
-void KatagoGTPInteractor::startTimer()
+QStringList KatagoGTPInteractor::getKataGoArgs() const
 {
-    const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
-    if (moveSize < 10)
-    {
-        timer->start(Util::generateTanhRandom(1000, 3000));
-        return;
-    }
-    switch (m_timeMode)
-    {
-    case KatagoInteractor::Short:
-        timer->start(Util::generateTanhRandom(5000, 15000));
-        break;
-    case KatagoInteractor::Medium:
-        timer->start(Util::generateTanhRandom(10000, 30000));
-        break;
-    case KatagoInteractor::Long:
-        timer->start(Util::generateTanhRandom(20000, 60000));
-        break;
-    default:
-        break;
-    }
+    return QProcess::splitCommand(Settings::getSingletonSettings()->kataGoGTPCommand());
 }
 
 void KatagoGTPInteractor::analyzeKatagoOutput()
@@ -148,7 +96,7 @@ void KatagoGTPInteractor::analyzeKatagoOutput()
     // 当index1小于index2时，提取信息并进行处理
     if (index1 < index2)
     {
-        const QByteArray searchString3(QByteArrayLiteral(" "));
+        const char searchString3(32);
         auto index3 = bytes.indexOf(searchString3, index1 + searchString1.size());
 
         // 提取GTP字符串并转化为最佳下法点
@@ -172,13 +120,20 @@ void KatagoGTPInteractor::analyzeKatagoOutput()
     }
 }
 
-void KatagoGTPInteractor::emitBestMove()
+void KatagoGTPInteractor::analyzeKatagoInit()
 {
-    if (m_bestMove.getColor() == StoneData::None)
+    bytes.append(katagoProcess->readAllStandardOutput());
+    if (bytes.contains(QByteArrayLiteral("GTP ready, beginning main protocol loop")))
     {
-        QTimer::singleShot(100, this, &KatagoGTPInteractor::emitBestMove);
-        return;
+        bytes.clear();
+        disconnect(katagoProcess, &QProcess::readyReadStandardOutput, this, &KatagoGTPInteractor::analyzeKatagoInit);
+        connect(katagoProcess, &QProcess::readyReadStandardOutput, this, &KatagoGTPInteractor::analyzeKatagoOutput);
+        katagoProcess->write(QByteArrayLiteral("komi 7.5\n"));
+        emit initFinished(true);
     }
-    emit bestMove(m_bestMove);
-    m_bestMove = StoneData();
+    else if (katagoProcess->state() == QProcess::NotRunning)
+    {
+        bytes.clear();
+        emit initFinished(false);
+    }
 }

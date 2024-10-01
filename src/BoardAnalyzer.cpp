@@ -283,6 +283,11 @@ void BoardAnalyzer::isTurnToPlay(const cv::Mat &image)
 
 void BoardAnalyzer::getBoardArray(const cv::Mat &image)
 {
+    // WARNING:
+    // 未处理悔棋情况
+    // 当进入倒计时才识别时, 可能会出现lastMoveStone为空(影响GTP)
+    // initialStonesArray与lastMoveStone和moveStonesArray冲突(影响Analysis)
+
     // 棋盘大小为19x19
     const int rows = 19;
     const int cols = 19;

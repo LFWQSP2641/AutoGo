@@ -27,11 +27,16 @@ public:
     KatagoInteractor::TimeMode timeMode() const;
     void setTimeMode(KatagoInteractor::TimeMode newTimeMode);
 
+    int getReportIntervalMS() const;
+    void setReportIntervalMS(int newReportIntervalMS);
+
 public slots:
-    virtual void init() = 0;
+    virtual void init();
     virtual void clearBoard();
     virtual void stopAnalyze() = 0;
     virtual void move(const BoardData &boardData) = 0;
+
+    virtual void startTimer();
 
     void setTimeModeFromInt(int newTimeMode);
 
@@ -40,9 +45,13 @@ protected:
     KatagoInteractor::TimeMode m_timeMode;
 
     QProcess *katagoProcess;
-    QEventLoop *eventLoop;
-    QTimer *timeOut;
     QByteArray bytes;
+
+    int reportIntervalMS = 1000; // ms
+    StoneData m_bestMove;
+    QTimer *timer;
+
+    virtual QStringList getKataGoArgs() const = 0;
 
     static QString pointToGTP(const QPoint &point);
     static QPoint gptToPoint(const QString &gtpMove);
@@ -50,7 +59,9 @@ protected:
     static QJsonArray stoneDataListToJsonArray(const QList<StoneData> &stoneDataList);
 
 protected slots:
+    void emitBestMove();
     virtual void analyzeKatagoOutput() = 0;
+    virtual void analyzeKatagoInit() = 0;
 
 signals:
     void initFinished(bool success);
@@ -60,8 +71,11 @@ signals:
     // GUI
     void bestMoveUpdate(const StoneData &stoneData);
 
+    void reportIntervalMSChanged();
+
 private:
     Q_PROPERTY(KatagoInteractor::TimeMode timeMode READ timeMode WRITE setTimeMode NOTIFY timeModeChanged FINAL)
+    Q_PROPERTY(int reportIntervalMS READ getReportIntervalMS WRITE setReportIntervalMS NOTIFY reportIntervalMSChanged FINAL)
 };
 
 #endif // KATAGOINTERACTOR_H
