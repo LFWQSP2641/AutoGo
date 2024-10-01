@@ -206,6 +206,10 @@ bool BoardAnalyzer::checkGameState(AppNavigation navigation)
         qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseGameOverDialog");
         emit toCloseGameOverDialog();
         break;
+    case AppNavigation::levelUpDialog:
+        qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseLevelUpDialog");
+        emit toCloseLevelUpDialog();
+        break;
     case AppNavigation::analysisPage:
     case AppNavigation::pageWithBack:
         qDebug() << Q_FUNC_INFO << QStringLiteral("toBackToMain");
