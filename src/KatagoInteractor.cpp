@@ -159,7 +159,7 @@ QJsonArray KatagoInteractor::stoneDataListToJsonArray(const QList<StoneData> &st
 
 void KatagoInteractor::emitBestMove()
 {
-    if (m_bestMove.getColor() == StoneData::None)
+    if (m_bestMove.getColor() == StoneData::None || QDateTime::currentMSecsSinceEpoch() - lastMoveTime < 1000)
     {
         QTimer::singleShot(100, this, &KatagoInteractor::emitBestMove);
         return;

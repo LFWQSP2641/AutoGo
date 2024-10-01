@@ -37,6 +37,7 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
         qDebug() << Q_FUNC_INFO << QStringLiteral("boardData hasUnexpected");
         return;
     }
+    lastMoveTime = QDateTime::currentMSecsSinceEpoch();
     if ((!boardData.getInitialStonesArray().isEmpty()) && m_boardData.getInitialStonesArray() != boardData.getInitialStonesArray())
     {
         QByteArray data;

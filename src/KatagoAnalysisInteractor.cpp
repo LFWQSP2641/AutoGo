@@ -40,6 +40,7 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
         qDebug() << Q_FUNC_INFO << QStringLiteral("is my turn, not analysis");
         return;
     }
+    lastMoveTime = QDateTime::currentMSecsSinceEpoch();
     qDebug() << Q_FUNC_INFO << boardData.getLastMoveStone();
     m_boardData = boardData;
     QJsonObject jsonObject;
@@ -122,11 +123,12 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
     }
     const auto bestMovePoint(gptToPoint(bestMoveInfo.value(QStringLiteral("move")).toString()));
     qDebug() << Q_FUNC_INFO << bestMovePoint;
-    emit bestMove(StoneData(m_boardData.getLastMoveStone().getColor() ==
-                                    StoneData::StoneColor::Black
-                                ? StoneData::StoneColor::White
-                                : StoneData::StoneColor::Black,
-                            bestMovePoint));
+    m_bestMove = StoneData(m_boardData.getLastMoveStone().getColor() ==
+                                   StoneData::StoneColor::Black
+                               ? StoneData::StoneColor::White
+                               : StoneData::StoneColor::Black,
+                           bestMovePoint);
+    emitBestMove();
 #else
     // 定义要搜索的字符串
     const QByteArray searchString1(QByteArrayLiteral("moveInfos"));

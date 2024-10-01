@@ -51,6 +51,8 @@ protected:
     StoneData m_bestMove;
     QTimer *timer;
 
+    qint64 lastMoveTime = 0;
+
     virtual QStringList getKataGoArgs() const = 0;
 
     static QString pointToGTP(const QPoint &point);
