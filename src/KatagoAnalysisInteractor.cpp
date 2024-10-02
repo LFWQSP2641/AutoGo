@@ -51,27 +51,36 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
     jsonObject.insert(QStringLiteral("komi"), 7.5);
     jsonObject.insert(QStringLiteral("boardXSize"), 19);
     jsonObject.insert(QStringLiteral("boardYSize"), 19);
-    const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
-    double timeScaleFactor;
-    switch (m_timeMode)
-    {
-    case KatagoInteractor::TimeMode::Medium:
-        timeScaleFactor = 2;
-        break;
-    case KatagoInteractor::TimeMode::Long:
-        timeScaleFactor = 3;
-        break;
-    case KatagoInteractor::TimeMode::Short:
-    default:
-        timeScaleFactor = 1;
-        break;
-    }
 
-    // 开局加快下棋速度
-    if (moveSize < 10)
-        jsonObject.insert(QStringLiteral("maxVisits"), moveSize * 128 * timeScaleFactor);
+    if (Settings::getSingletonSettings()->kataGoSearchLimit())
+    {
+        const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
+        double timeScaleFactor;
+        switch (m_timeMode)
+        {
+        case KatagoInteractor::TimeMode::Medium:
+            timeScaleFactor = 2;
+            break;
+        case KatagoInteractor::TimeMode::Long:
+            timeScaleFactor = 3;
+            break;
+        case KatagoInteractor::TimeMode::Short:
+        default:
+            timeScaleFactor = 1;
+            break;
+        }
+
+        // 开局加快下棋速度
+        if (moveSize < 10)
+            jsonObject.insert(QStringLiteral("maxVisits"), Settings::getSingletonSettings()->kataGoMaxVisits() / moveSize * timeScaleFactor);
+        else
+            jsonObject.insert(QStringLiteral("maxVisits"), Settings::getSingletonSettings()->kataGoMaxVisits() * timeScaleFactor);
+    }
     else
-        jsonObject.insert(QStringLiteral("maxVisits"), 1024 * timeScaleFactor);
+    {
+        jsonObject.insert(QStringLiteral("reportDuringSearchEvery"), static_cast<double>(reportIntervalMS) / double(1000));
+        startTimer();
+    }
     const QByteArray data(QJsonDocument(jsonObject).toJson(QJsonDocument::Compact).append(10));
     qDebug() << data;
     katagoProcess->write(data);
@@ -128,7 +137,6 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
                                ? StoneData::StoneColor::White
                                : StoneData::StoneColor::Black,
                            bestMovePoint);
-    emitBestMove();
 #else
     // 定义要搜索的字符串
     const QByteArray searchString1(QByteArrayLiteral("moveInfos"));
@@ -154,11 +162,11 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
 
         // 设置最佳下法的点和颜色
 
-        emit bestMove(StoneData(m_boardData.getLastMoveStone().getColor() ==
-                                        StoneData::StoneColor::Black
-                                    ? StoneData::StoneColor::White
-                                    : StoneData::StoneColor::Black,
-                                gptToPoint(gtp)));
+        m_bestMove = StoneData(m_boardData.getLastMoveStone().getColor() ==
+                                       StoneData::StoneColor::Black
+                                   ? StoneData::StoneColor::White
+                                   : StoneData::StoneColor::Black,
+                               gptToPoint(gtp));
         // 清空bytes
         bytes.clear();
     }
@@ -166,8 +174,11 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
     {
         // 若未找到符合条件的结果，则截取bytes从index1处开始的子串
         bytes = bytes.mid(index1);
+        return;
     }
 #endif
+    if (Settings::getSingletonSettings()->kataGoSearchLimit())
+        emitBestMove();
 }
 
 void KatagoAnalysisInteractor::analyzeKatagoInit()

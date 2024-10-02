@@ -41,6 +41,8 @@ Settings::Settings(QObject *parent)
     m_kataGoAnalysisCommand = settingJsonObject.value(QStringLiteral("kataGoAnalysisCommand")).toString();
     m_kataGoGTPCommand = settingJsonObject.value(QStringLiteral("kataGoGTPCommand")).toString();
     m_kataGoMode = settingJsonObject.value(QStringLiteral("kataGoMode")).toString(QStringLiteral("Analysis"));
+    m_kataGoSearchLimit = settingJsonObject.value(QStringLiteral("kataGoSearchLimit")).toBool(true);
+    m_kataGoMaxVisits = settingJsonObject.value(QStringLiteral("kataGoMaxVisits")).toInt(1024);
 }
 
 bool Settings::mumuEnable() const
@@ -173,6 +175,32 @@ void Settings::setKataGoGTPCommand(const QString &newKataGoGTPCommand)
     emit kataGoGTPCommandChanged();
 }
 
+bool Settings::kataGoSearchLimit() const
+{
+    return m_kataGoSearchLimit;
+}
+
+void Settings::setKataGoSearchLimit(bool newKataGoSearchLimit)
+{
+    if (m_kataGoSearchLimit == newKataGoSearchLimit)
+        return;
+    m_kataGoSearchLimit = newKataGoSearchLimit;
+    emit kataGoSearchLimitChanged();
+}
+
+int Settings::kataGoMaxVisits() const
+{
+    return m_kataGoMaxVisits;
+}
+
+void Settings::setKataGoMaxVisits(int newKataGoMaxVisits)
+{
+    if (m_kataGoMaxVisits == newKataGoMaxVisits)
+        return;
+    m_kataGoMaxVisits = newKataGoMaxVisits;
+    emit kataGoMaxVisitsChanged();
+}
+
 void Settings::saveToFile() const
 {
     qDebug() << Q_FUNC_INFO;
@@ -187,6 +215,8 @@ void Settings::saveToFile() const
     settingJsonObject.insert(QStringLiteral("kataGoAnalysisCommand"), m_kataGoAnalysisCommand);
     settingJsonObject.insert(QStringLiteral("kataGoGTPCommand"), m_kataGoGTPCommand);
     settingJsonObject.insert(QStringLiteral("kataGoMode"), m_kataGoMode);
+    settingJsonObject.insert(QStringLiteral("kataGoSearchLimit"), m_kataGoSearchLimit);
+    settingJsonObject.insert(QStringLiteral("kataGoMaxVisits"), m_kataGoMaxVisits);
 
     QFile file{ Global::configPath().append(QStringLiteral("/setting.json")) };
     file.open(QFile::WriteOnly);

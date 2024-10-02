@@ -57,6 +57,19 @@ void KatagoInteractor::setTimeModeFromInt(int newTimeMode)
     setTimeMode(KatagoInteractor::TimeMode(newTimeMode));
 }
 
+qint64 KatagoInteractor::getMinMoveInterval() const
+{
+    return minMoveInterval;
+}
+
+void KatagoInteractor::setMinMoveInterval(qint64 newMinMoveInterval)
+{
+    if (minMoveInterval == newMinMoveInterval)
+        return;
+    minMoveInterval = newMinMoveInterval;
+    emit minMoveIntervalChanged();
+}
+
 int KatagoInteractor::getReportIntervalMS() const
 {
     return reportIntervalMS;
@@ -159,7 +172,7 @@ QJsonArray KatagoInteractor::stoneDataListToJsonArray(const QList<StoneData> &st
 
 void KatagoInteractor::emitBestMove()
 {
-    if (m_bestMove.getColor() == StoneData::None || QDateTime::currentMSecsSinceEpoch() - lastMoveTime < 1000)
+    if (m_bestMove.getColor() == StoneData::None || QDateTime::currentMSecsSinceEpoch() - lastMoveTime < minMoveInterval)
     {
         QTimer::singleShot(100, this, &KatagoInteractor::emitBestMove);
         return;

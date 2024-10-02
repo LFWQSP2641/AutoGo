@@ -30,6 +30,9 @@ public:
     int getReportIntervalMS() const;
     void setReportIntervalMS(int newReportIntervalMS);
 
+    qint64 getMinMoveInterval() const;
+    void setMinMoveInterval(qint64 newMinMoveInterval);
+
 public slots:
     virtual void init();
     virtual void clearBoard();
@@ -52,6 +55,7 @@ protected:
     QTimer *timer;
 
     qint64 lastMoveTime = 0;
+    qint64 minMoveInterval = 2000; // ms
 
     virtual QStringList getKataGoArgs() const = 0;
 
@@ -75,9 +79,12 @@ signals:
 
     void reportIntervalMSChanged();
 
+    void minMoveIntervalChanged();
+
 private:
     Q_PROPERTY(KatagoInteractor::TimeMode timeMode READ timeMode WRITE setTimeMode NOTIFY timeModeChanged FINAL)
     Q_PROPERTY(int reportIntervalMS READ getReportIntervalMS WRITE setReportIntervalMS NOTIFY reportIntervalMSChanged FINAL)
+    Q_PROPERTY(qint64 minMoveInterval READ getMinMoveInterval WRITE setMinMoveInterval NOTIFY minMoveIntervalChanged FINAL)
 };
 
 #endif // KATAGOINTERACTOR_H

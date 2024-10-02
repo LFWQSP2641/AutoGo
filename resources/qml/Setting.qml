@@ -159,6 +159,33 @@ Item {
                                     onEditingFinished: Settings.saveToFile()
                                 }
                             }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Label {
+                                    text: "配置文件存在search limit限制(将不会开启计时器):"
+                                }
+                                CheckBox {
+                                    Layout.fillWidth: true
+                                    checked: Settings.kataGoSearchLimit === true
+                                    onClicked: {
+                                        Settings.kataGoSearchLimit = checked
+                                        Settings.saveToFile()
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                enabled: Settings.kataGoSearchLimit
+                                Label {
+                                    text: "基准maxVisits(20s内必下一手):"
+                                }
+                                TextField {
+                                    Layout.fillWidth: true
+                                    text: Settings.kataGoMaxVisits
+                                    onTextChanged: Settings.kataGoMaxVisits = parseInt(text)
+                                    onEditingFinished: Settings.saveToFile()
+                                }
+                            }
                         }
                     }
                     GroupBox {

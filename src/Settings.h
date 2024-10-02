@@ -41,6 +41,12 @@ public:
     QString kataGoMode() const;
     void setKataGoMode(const QString &newKataGoMode);
 
+    bool kataGoSearchLimit() const;
+    void setKataGoSearchLimit(bool newKataGoSearchLimit);
+
+    int kataGoMaxVisits() const;
+    void setKataGoMaxVisits(int newKataGoMaxVisits);
+
 public slots:
     void saveToFile() const;
 
@@ -55,6 +61,8 @@ protected:
     QString m_kataGoAnalysisCommand;
     QString m_kataGoGTPCommand;
     QString m_kataGoMode;
+    bool m_kataGoSearchLimit;
+    int m_kataGoMaxVisits;
 
 signals:
     void mumuEnableChanged();
@@ -77,6 +85,10 @@ signals:
 
     void kataGoModeChanged();
 
+    void kataGoSearchLimitChanged();
+
+    void kataGoMaxVisitsChanged();
+
 private:
     Q_PROPERTY(bool mumuEnable READ mumuEnable WRITE setMumuEnable NOTIFY mumuEnableChanged FINAL)
     Q_PROPERTY(QString mumuPath READ mumuPath WRITE setMumuPath NOTIFY mumuPathChanged FINAL)
@@ -88,6 +100,8 @@ private:
     Q_PROPERTY(QString kataGoAnalysisCommand READ kataGoAnalysisCommand WRITE setKataGoAnalysisCommand NOTIFY kataGoAnalysisCommandChanged FINAL)
     Q_PROPERTY(QString kataGoGTPCommand READ kataGoGTPCommand WRITE setKataGoGTPCommand NOTIFY kataGoGTPCommandChanged FINAL)
     Q_PROPERTY(QString kataGoMode READ kataGoMode WRITE setKataGoMode NOTIFY kataGoModeChanged FINAL)
+    Q_PROPERTY(bool kataGoSearchLimit READ kataGoSearchLimit WRITE setKataGoSearchLimit NOTIFY kataGoSearchLimitChanged FINAL)
+    Q_PROPERTY(int kataGoMaxVisits READ kataGoMaxVisits WRITE setKataGoMaxVisits NOTIFY kataGoMaxVisitsChanged FINAL)
 };
 
 #endif // SETTINGS_H

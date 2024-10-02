@@ -1307,6 +1307,36 @@
                         "type": "QString",
                         "user": false,
                         "write": "setKataGoMode"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 10,
+                        "name": "kataGoSearchLimit",
+                        "notify": "kataGoSearchLimitChanged",
+                        "read": "kataGoSearchLimit",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "bool",
+                        "user": false,
+                        "write": "setKataGoSearchLimit"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 11,
+                        "name": "kataGoMaxVisits",
+                        "notify": "kataGoMaxVisitsChanged",
+                        "read": "kataGoMaxVisits",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "int",
+                        "user": false,
+                        "write": "setKataGoMaxVisits"
                     }
                 ],
                 "qualifiedClassName": "Settings",
@@ -1359,6 +1389,16 @@
                     {
                         "access": "public",
                         "name": "kataGoModeChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "kataGoSearchLimitChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "kataGoMaxVisitsChanged",
                         "returnType": "void"
                     }
                 ],
