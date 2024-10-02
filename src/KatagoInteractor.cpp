@@ -109,7 +109,7 @@ QString KatagoInteractor::pointToGTP(const QPoint &point)
 
     // 构建 GTP 格式的字符串，例如 "A1"
     const auto result(QString("%1%2").arg(columnLetter).arg(gtpRow));
-    // qDebug() << Q_FUNC_INFO << point << result;
+    // qDebug() << point << result;
     return result;
 }
 
@@ -129,7 +129,7 @@ QPoint KatagoInteractor::gptToPoint(const QString &gtpMove)
     int y = 19 - gtpRow;
 
     const QPoint result(x, y);
-    // qDebug() << Q_FUNC_INFO << gtpMove << result;
+    // qDebug() << gtpMove << result;
     return result;
 }
 
@@ -148,7 +148,7 @@ QJsonArray KatagoInteractor::stoneDataListToJsonArray(const QList<StoneData> &st
             stoneJsonArray.append(QStringLiteral("W"));
             break;
         default:
-            qWarning() << Q_FUNC_INFO << QStringLiteral("stone's color is none");
+            qWarning() << QStringLiteral("stone's color is none");
             break;
         }
         stoneJsonArray.append(pointToGTP(i.getPoint()));

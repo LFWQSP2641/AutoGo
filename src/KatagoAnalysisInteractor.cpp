@@ -32,16 +32,16 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
 {
     if (boardData.hasUnexpected())
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("boardData hasUnexpected");
+        qDebug() << QStringLiteral("boardData hasUnexpected");
         return;
     }
     if (boardData.getMyStoneColor() == boardData.getLastMoveStone().getColor())
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("is my turn, not analysis");
+        qDebug() << QStringLiteral("is my turn, not analysis");
         return;
     }
     lastMoveTime = QDateTime::currentMSecsSinceEpoch();
-    qDebug() << Q_FUNC_INFO << boardData.getLastMoveStone();
+    qDebug() << boardData.getLastMoveStone();
     m_boardData = boardData;
     QJsonObject jsonObject;
     jsonObject.insert(QStringLiteral("id"), m_boardData.getUuid());
@@ -89,7 +89,7 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
 #if 1
     if (!bytes.endsWith(10))
     {
-        qDebug() << Q_FUNC_INFO << bytes;
+        qDebug() << bytes;
         return;
     }
     QJsonParseError error;
@@ -104,7 +104,7 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
         }
         if (error.error != QJsonParseError::NoError)
         {
-            qDebug() << Q_FUNC_INFO << error.errorString() << bytes;
+            qDebug() << error.errorString() << bytes;
             bytes.clear();
             return;
         }
@@ -112,17 +112,17 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
     bytes.clear();
     if (jsonObject.value(QStringLiteral("id")).toString() != m_boardData.getUuid())
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("id is not equal");
+        qDebug() << QStringLiteral("id is not equal");
         return;
     }
     const auto bestMoveInfo(jsonObject.value(QStringLiteral("moveInfos")).toArray().at(0).toObject());
     if (bestMoveInfo.isEmpty())
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("bestMoveInfo is empty");
+        qDebug() << QStringLiteral("bestMoveInfo is empty");
         return;
     }
     const auto bestMovePoint(gptToPoint(bestMoveInfo.value(QStringLiteral("move")).toString()));
-    qDebug() << Q_FUNC_INFO << bestMovePoint;
+    qDebug() << bestMovePoint;
     m_bestMove = StoneData(m_boardData.getLastMoveStone().getColor() ==
                                    StoneData::StoneColor::Black
                                ? StoneData::StoneColor::White

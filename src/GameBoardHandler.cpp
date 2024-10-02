@@ -22,16 +22,16 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
 {
     if (Settings::getSingletonSettings()->kataGoMode() == QStringLiteral("Analysis"))
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("Analysis");
+        qDebug() << QStringLiteral("Analysis");
         katagoInteractor = new KatagoAnalysisInteractor;
     }
     else if (Settings::getSingletonSettings()->kataGoMode() == QStringLiteral("GTP"))
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("GTP");
+        qDebug() << QStringLiteral("GTP");
         katagoInteractor = new KatagoGTPInteractor;
     }
     else
-        qFatal() << Q_FUNC_INFO << QStringLiteral("kataGoMode is invalid");
+        qFatal() << QStringLiteral("kataGoMode is invalid");
 
     boardAnalyzer->moveToThread(boardAnalyzerThread);
     boardInteractor->moveToThread(boardInteractorThread);
@@ -118,7 +118,7 @@ void GameBoardHandler::continuousStartGame()
 
 void GameBoardHandler::setTimeMode(int timeMode)
 {
-    qDebug() << Q_FUNC_INFO << timeMode;
+    qDebug() << timeMode;
     emit toSetTimeMode(timeMode);
 }
 
@@ -131,14 +131,14 @@ void GameBoardHandler::init()
 
 void GameBoardHandler::gameStartedHandle(StoneData::StoneColor myStoneColor)
 {
-    qDebug() << Q_FUNC_INFO << myStoneColor;
+    qDebug() << myStoneColor;
     if (myStoneColor == StoneData::StoneColor::Black)
     {
         emit toPlay(QPoint(3, 3));
     }
     else if (myStoneColor == StoneData::StoneColor::None)
     {
-        qWarning() << Q_FUNC_INFO << QStringLiteral("myStoneColor is None");
+        qWarning() << QStringLiteral("myStoneColor is None");
         return;
     }
     emit toStartAnalyzeIndefinitely();

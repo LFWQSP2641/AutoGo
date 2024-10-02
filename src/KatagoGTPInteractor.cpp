@@ -34,7 +34,7 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
 {
     if (boardData.hasUnexpected())
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("boardData hasUnexpected");
+        qDebug() << QStringLiteral("boardData hasUnexpected");
         return;
     }
     lastMoveTime = QDateTime::currentMSecsSinceEpoch();
@@ -50,7 +50,7 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
             data.append(pointToGTP(i.getPoint()).toUtf8());
             data.append(QByteArrayLiteral("\n"));
         }
-        qDebug() << Q_FUNC_INFO << data;
+        qDebug() << data;
         katagoProcess->write(data);
     }
     QByteArray data;
@@ -60,13 +60,13 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
                     : QByteArrayLiteral("W "));
     data.append(pointToGTP(boardData.getLastMoveStone().getPoint()).toUtf8());
     data.append(QByteArrayLiteral("\n"));
-    qDebug() << Q_FUNC_INFO << data;
+    qDebug() << data;
     katagoProcess->write(data);
     m_boardData = boardData;
     if (boardData.getMyStoneColor() != boardData.getLastMoveStone().getColor())
     {
         const QByteArray analyzeData(QByteArrayLiteral("kata-analyze ").append(QByteArray::number(reportIntervalMS / 10)).append(10));
-        qDebug() << Q_FUNC_INFO << analyzeData;
+        qDebug() << analyzeData;
         katagoProcess->write(analyzeData);
         startTimer();
     }

@@ -41,12 +41,12 @@ BoardAnalyzer::BoardAnalyzer(QObject *parent)
 {
     if (Settings::getSingletonSettings()->mumuEnable())
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("mumuEnable");
+        qDebug() << QStringLiteral("mumuEnable");
         screencaptor = new MumuScreencaptor;
     }
     else
     {
-        qDebug() << Q_FUNC_INFO << QStringLiteral("adbEnable");
+        qDebug() << QStringLiteral("adbEnable");
         screencaptor = new AdbScreencaptor;
     }
 }
@@ -103,7 +103,7 @@ BoardAnalyzer::AppNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &
                                         .toString(QUuid::WithoutBraces)
                                         .append(QStringLiteral(".png"))));
     cv::imwrite(filePath.toStdString(), image);
-    qWarning() << Q_FUNC_INFO << "not matching" << filePath;
+    qWarning() << "not matching" << filePath;
     return BoardAnalyzer::unknownPage;
 }
 
@@ -112,7 +112,7 @@ BoardData BoardAnalyzer::analyzeBoard()
     auto image(screencaptor->screencap());
     if (!image)
     {
-        qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
+        qWarning() << QStringLiteral("image is null");
         return m_boardData;
     }
 
@@ -138,7 +138,7 @@ void BoardAnalyzer::resetBoardData()
 
 void BoardAnalyzer::analyzeIndefinitely()
 {
-    qDebug() << Q_FUNC_INFO << QStringLiteral("enter");
+    qDebug() << QStringLiteral("enter");
     toStop = false;
     while (!toStop)
     {
@@ -148,7 +148,7 @@ void BoardAnalyzer::analyzeIndefinitely()
             continue;
         if (m_boardData.getIsMoving())
         {
-            qDebug() << Q_FUNC_INFO << QStringLiteral("Stone is moving");
+            qDebug() << QStringLiteral("Stone is moving");
             continue;
         }
         if (m_boardData.getMyStoneColor() != boardData.getMyStoneColor() &&
@@ -166,11 +166,11 @@ void BoardAnalyzer::analyzeIndefinitely()
             break;
         if (moved)
         {
-            qDebug() << Q_FUNC_INFO << QStringLiteral("LastMoveStone:") << m_boardData.getLastMoveStone();
+            qDebug() << QStringLiteral("LastMoveStone:") << m_boardData.getLastMoveStone();
             emit lastMoveStone(m_boardData.getLastMoveStone());
         }
     }
-    qDebug() << Q_FUNC_INFO << QStringLiteral("exit");
+    qDebug() << QStringLiteral("exit");
     emit analyzeStoped();
 }
 
@@ -187,13 +187,13 @@ void BoardAnalyzer::startGame()
         const auto image(screencaptor->screencap());
         if (!image)
         {
-            qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
+            qWarning() << QStringLiteral("image is null");
             continue;
         }
         const auto result(appNavigationAnalyze(image.value()));
         if (result == AppNavigation::playingPage)
         {
-            qDebug() << Q_FUNC_INFO << "game started";
+            qDebug() << "game started";
             emit gameStarted();
             break;
         }
@@ -211,36 +211,36 @@ void BoardAnalyzer::startGame()
 
 bool BoardAnalyzer::checkGameState(AppNavigation navigation)
 {
-    qDebug() << Q_FUNC_INFO << navigation;
+    qDebug() << navigation;
     switch (navigation)
     {
     case AppNavigation::gameOverDialog:
-        qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseGameOverDialog");
+        qDebug() << QStringLiteral("toCloseGameOverDialog");
         emit toCloseGameOverDialog();
         break;
     case AppNavigation::levelUpDialog:
-        qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseLevelUpDialog");
+        qDebug() << QStringLiteral("toCloseLevelUpDialog");
         emit toCloseLevelUpDialog();
         break;
     case AppNavigation::analysisPage:
     case AppNavigation::pageWithBack:
-        qDebug() << Q_FUNC_INFO << QStringLiteral("toBackToMain");
+        qDebug() << QStringLiteral("toBackToMain");
         emit toBackToMain();
         break;
     case AppNavigation::requestRematchDialog:
-        qDebug() << Q_FUNC_INFO << QStringLiteral("toAcceptRequest");
+        qDebug() << QStringLiteral("toAcceptRequest");
         emit toAcceptRequest();
         break;
     case AppNavigation::requestResumeBattleDialog:
-        qDebug() << Q_FUNC_INFO << QStringLiteral("toRejectRequest");
+        qDebug() << QStringLiteral("toRejectRequest");
         emit toRejectRequest();
         break;
     case AppNavigation::cancelResumeBattleDialog:
-        qDebug() << Q_FUNC_INFO << QStringLiteral("toCloseRequest");
+        qDebug() << QStringLiteral("toCloseRequest");
         emit toCloseRequest();
         break;
     case AppNavigation::mainPage:
-        qDebug() << Q_FUNC_INFO << QStringLiteral("toMatchGame");
+        qDebug() << QStringLiteral("toMatchGame");
         emit toMatchGame();
         return true;
         break;
@@ -252,20 +252,20 @@ bool BoardAnalyzer::checkGameState(AppNavigation navigation)
 
 void BoardAnalyzer::waitForGameMatching()
 {
-    qDebug() << Q_FUNC_INFO << QStringLiteral("enter");
+    qDebug() << QStringLiteral("enter");
     const auto startTime(QDateTime::currentSecsSinceEpoch());
     do
     {
         auto image(screencaptor->screencap());
         if (!image)
         {
-            qWarning() << Q_FUNC_INFO << QStringLiteral("image is null");
+            qWarning() << QStringLiteral("image is null");
             continue;
         }
         if (appNavigationAnalyze(image.value()) == AppNavigation::playingPage)
             break;
     } while (QDateTime::currentSecsSinceEpoch() - startTime < 60);
-    qDebug() << Q_FUNC_INFO << QStringLiteral("exit");
+    qDebug() << QStringLiteral("exit");
 }
 
 StoneData::StoneColor BoardAnalyzer::getMyStoneColor(const cv::Mat &image)
@@ -412,14 +412,14 @@ bool BoardAnalyzer::checkGameStatus(const cv::Mat &image)
             m_boardData.requestUndo = true;
             break;
         case AppNavigation::gameOverDialog:
-            qDebug() << Q_FUNC_INFO << QStringLiteral("gameOver");
+            qDebug() << QStringLiteral("gameOver");
             m_boardData.gameOver = true;
             break;
         case AppNavigation::otherDialog:
             m_boardData.unknownUnexpected = true;
             break;
         default:
-            qDebug() << Q_FUNC_INFO << result;
+            qDebug() << result;
             break;
         }
         return false;

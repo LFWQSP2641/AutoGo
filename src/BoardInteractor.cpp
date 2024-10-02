@@ -20,7 +20,7 @@ void BoardInteractor::init()
 
 void BoardInteractor::setTimeModeFromInt(int newTimeMode)
 {
-    qDebug() << Q_FUNC_INFO << newTimeMode;
+    qDebug() << newTimeMode;
     setTimeMode(BoardInteractor::TimeMode(newTimeMode));
 }
 

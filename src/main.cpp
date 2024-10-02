@@ -10,6 +10,8 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
+    qSetMessagePattern(QStringLiteral("DateTime:%{time [yyyy-MM-dd hh:mm:ss:zzz]} Function:%{function} Message:%{message}\nFile:%{file} Line:%{line} ThreadId:%{threadid}"));
+
     QDir().mkpath(QCoreApplication::applicationDirPath()
                       .append(QStringLiteral("/debug")));
 
