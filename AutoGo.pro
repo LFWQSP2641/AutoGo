@@ -28,6 +28,7 @@ HEADERS += \
     src/GameBoardHandler.h \
     src/Global.h \
     src/GoBoardItem.h \
+    src/InteractiveInterface/AdbScreencaptor.h \
     src/InteractiveInterface/Controller.h \
     src/InteractiveInterface/MaaController.h \
     src/InteractiveInterface/MumuScreencaptor.h \
@@ -46,6 +47,7 @@ SOURCES += \
         src/GameBoardHandler.cpp \
         src/Global.cpp \
         src/GoBoardItem.cpp \
+        src/InteractiveInterface/AdbScreencaptor.cpp \
         src/InteractiveInterface/Controller.cpp \
         src/InteractiveInterface/MaaController.cpp \
         src/InteractiveInterface/MumuScreencaptor.cpp \

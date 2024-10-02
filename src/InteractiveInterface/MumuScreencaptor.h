@@ -17,7 +17,6 @@ public:
 
     virtual bool init() override;
 
-    // bool init(const QString &mumuPath, int mumuIndex);
     bool reload();
     void uninit();
 

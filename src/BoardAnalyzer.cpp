@@ -1,5 +1,8 @@
 #include "BoardAnalyzer.h"
 
+#include "InteractiveInterface/AdbScreencaptor.h"
+#include "InteractiveInterface/MumuScreencaptor.h"
+#include "Settings.h"
 #include "Util.h"
 
 #include <QCoreApplication>
@@ -34,9 +37,18 @@ QHash<QString, QPoint> BoardAnalyzer::templateImagePoints = {
 
 BoardAnalyzer::BoardAnalyzer(QObject *parent)
     : QObject{ parent },
-      screencaptor(new MumuScreencaptor(this)),
       toStop(false)
 {
+    if (Settings::getSingletonSettings()->mumuEnable())
+    {
+        qDebug() << Q_FUNC_INFO << QStringLiteral("mumuEnable");
+        screencaptor = new MumuScreencaptor;
+    }
+    else
+    {
+        qDebug() << Q_FUNC_INFO << QStringLiteral("adbEnable");
+        screencaptor = new AdbScreencaptor;
+    }
 }
 
 BoardAnalyzer::AppNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &image)

@@ -20,9 +20,11 @@ bool MaaController::init()
 {
     QString maatouchPath;
     for (const auto &i :
-         QStringList{QDir::currentPath().append(QStringLiteral("/maatouch")),
-                     Global::dataPath().append(QStringLiteral("/maatouch"))}) {
-        if (QFile(i).exists()) {
+         QStringList{ QDir::currentPath().append(QStringLiteral("/maatouch")),
+                      Global::dataPath().append(QStringLiteral("/maatouch")) })
+    {
+        if (QFile(i).exists())
+        {
             maatouchPath = i;
             break;
         }
@@ -36,10 +38,10 @@ bool MaaController::init()
                            QStringList{ QStringLiteral("connect"),
                                         Settings::getSingletonSettings()->adbSerial() });
     eventLoop.exec();
-    QString result(maaTouchProcess->readAllStandardOutput());
+    QByteArray result(maaTouchProcess->readAllStandardOutput());
     if (result.isEmpty())
         return false;
-    for (const auto &i : QStringList{ QStringLiteral("cannot"), QStringLiteral("failed") })
+    for (const auto &i : QByteArrayList{ QByteArrayLiteral("cannot"), QByteArrayLiteral("failed") })
     {
         if (result.contains(i))
             return false;
@@ -52,7 +54,7 @@ bool MaaController::init()
                                         QStringLiteral("/data/local/tmp/maatouch") });
     eventLoop.exec();
     result = maaTouchProcess->readAllStandardOutput();
-    if (!result.contains(QStringLiteral("1 file pushed")))
+    if (!result.contains(QByteArrayLiteral("1 file pushed")))
         return false;
     connect(maaTouchProcess, &QProcess::started, &eventLoop, &QEventLoop::quit, Qt::SingleShotConnection);
     maaTouchProcess->start(

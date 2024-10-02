@@ -2,6 +2,23 @@
     {
         "classes": [
             {
+                "className": "AdbScreencaptor",
+                "object": true,
+                "qualifiedClassName": "AdbScreencaptor",
+                "superClasses": [
+                    {
+                        "access": "public",
+                        "name": "Screencaptor"
+                    }
+                ]
+            }
+        ],
+        "inputFile": "AdbScreencaptor.h",
+        "outputRevision": 68
+    },
+    {
+        "classes": [
+            {
                 "className": "BoardAnalyzer",
                 "enums": [
                     {
@@ -1146,6 +1163,21 @@
                         "designable": true,
                         "final": true,
                         "index": 0,
+                        "name": "mumuEnable",
+                        "notify": "mumuEnableChanged",
+                        "read": "mumuEnable",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "bool",
+                        "user": false,
+                        "write": "setMumuEnable"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 1,
                         "name": "mumuPath",
                         "notify": "mumuPathChanged",
                         "read": "mumuPath",
@@ -1160,7 +1192,7 @@
                         "constant": false,
                         "designable": true,
                         "final": true,
-                        "index": 1,
+                        "index": 2,
                         "name": "mumuIndex",
                         "notify": "mumuIndexChanged",
                         "read": "mumuIndex",
@@ -1175,7 +1207,7 @@
                         "constant": false,
                         "designable": true,
                         "final": true,
-                        "index": 2,
+                        "index": 3,
                         "name": "mumuDisplayId",
                         "notify": "mumuDisplayIdChanged",
                         "read": "mumuDisplayId",
@@ -1190,7 +1222,7 @@
                         "constant": false,
                         "designable": true,
                         "final": true,
-                        "index": 3,
+                        "index": 4,
                         "name": "adbPath",
                         "notify": "adbPathChanged",
                         "read": "adbPath",
@@ -1205,7 +1237,7 @@
                         "constant": false,
                         "designable": true,
                         "final": true,
-                        "index": 4,
+                        "index": 5,
                         "name": "adbSerial",
                         "notify": "adbSerialChanged",
                         "read": "adbSerial",
@@ -1220,7 +1252,7 @@
                         "constant": false,
                         "designable": true,
                         "final": true,
-                        "index": 5,
+                        "index": 6,
                         "name": "kataGoPath",
                         "notify": "kataGoPathChanged",
                         "read": "kataGoPath",
@@ -1235,7 +1267,7 @@
                         "constant": false,
                         "designable": true,
                         "final": true,
-                        "index": 6,
+                        "index": 7,
                         "name": "kataGoAnalysisCommand",
                         "notify": "kataGoAnalysisCommandChanged",
                         "read": "kataGoAnalysisCommand",
@@ -1250,7 +1282,7 @@
                         "constant": false,
                         "designable": true,
                         "final": true,
-                        "index": 7,
+                        "index": 8,
                         "name": "kataGoGTPCommand",
                         "notify": "kataGoGTPCommandChanged",
                         "read": "kataGoGTPCommand",
@@ -1265,7 +1297,7 @@
                         "constant": false,
                         "designable": true,
                         "final": true,
-                        "index": 8,
+                        "index": 9,
                         "name": "kataGoMode",
                         "notify": "kataGoModeChanged",
                         "read": "kataGoMode",
@@ -1279,6 +1311,11 @@
                 ],
                 "qualifiedClassName": "Settings",
                 "signals": [
+                    {
+                        "access": "public",
+                        "name": "mumuEnableChanged",
+                        "returnType": "void"
+                    },
                     {
                         "access": "public",
                         "name": "mumuPathChanged",

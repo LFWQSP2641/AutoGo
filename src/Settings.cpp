@@ -31,6 +31,7 @@ Settings::Settings(QObject *parent)
 
     const auto settingJsonObject{ QJsonDocument::fromJson(fileData).object() };
 
+    m_mumuEnable = settingJsonObject.value(QStringLiteral("mumuEnable")).toBool(false);
     m_mumuPath = settingJsonObject.value(QStringLiteral("mumuPath")).toString();
     m_mumuIndex = settingJsonObject.value(QStringLiteral("mumuIndex")).toInt(0);
     m_mumuDisplayId = settingJsonObject.value(QStringLiteral("mumuDisplayId")).toInt(0);
@@ -40,6 +41,19 @@ Settings::Settings(QObject *parent)
     m_kataGoAnalysisCommand = settingJsonObject.value(QStringLiteral("kataGoAnalysisCommand")).toString();
     m_kataGoGTPCommand = settingJsonObject.value(QStringLiteral("kataGoGTPCommand")).toString();
     m_kataGoMode = settingJsonObject.value(QStringLiteral("kataGoMode")).toString(QStringLiteral("Analysis"));
+}
+
+bool Settings::mumuEnable() const
+{
+    return m_mumuEnable;
+}
+
+void Settings::setMumuEnable(bool newMumuEnable)
+{
+    if (m_mumuEnable == newMumuEnable)
+        return;
+    m_mumuEnable = newMumuEnable;
+    emit mumuEnableChanged();
 }
 
 QString Settings::mumuPath() const
@@ -133,26 +147,6 @@ void Settings::setKataGoAnalysisCommand(const QString &newKataGoAnalysisCommand)
     emit kataGoAnalysisCommandChanged();
 }
 
-void Settings::saveToFile() const
-{
-    qDebug() << Q_FUNC_INFO;
-    QJsonObject settingJsonObject;
-    settingJsonObject.insert(QStringLiteral("mumuPath"), m_mumuPath);
-    settingJsonObject.insert(QStringLiteral("mumuIndex"), m_mumuIndex);
-    settingJsonObject.insert(QStringLiteral("mumuDisplayId"), m_mumuDisplayId);
-    settingJsonObject.insert(QStringLiteral("adbPath"), m_adbPath);
-    settingJsonObject.insert(QStringLiteral("adbSerial"), m_adbSerial);
-    settingJsonObject.insert(QStringLiteral("kataGoPath"), m_kataGoPath);
-    settingJsonObject.insert(QStringLiteral("kataGoAnalysisCommand"), m_kataGoAnalysisCommand);
-    settingJsonObject.insert(QStringLiteral("kataGoGTPCommand"), m_kataGoGTPCommand);
-    settingJsonObject.insert(QStringLiteral("kataGoMode"), m_kataGoMode);
-
-    QFile file{ Global::configPath().append(QStringLiteral("/setting.json")) };
-    file.open(QFile::WriteOnly);
-    file.write(QJsonDocument(settingJsonObject).toJson(QJsonDocument::Compact));
-    file.close();
-}
-
 QString Settings::kataGoMode() const
 {
     return m_kataGoMode;
@@ -177,4 +171,25 @@ void Settings::setKataGoGTPCommand(const QString &newKataGoGTPCommand)
         return;
     m_kataGoGTPCommand = newKataGoGTPCommand;
     emit kataGoGTPCommandChanged();
+}
+
+void Settings::saveToFile() const
+{
+    qDebug() << Q_FUNC_INFO;
+    QJsonObject settingJsonObject;
+    settingJsonObject.insert(QStringLiteral("mumuEnable"), m_mumuEnable);
+    settingJsonObject.insert(QStringLiteral("mumuPath"), m_mumuPath);
+    settingJsonObject.insert(QStringLiteral("mumuIndex"), m_mumuIndex);
+    settingJsonObject.insert(QStringLiteral("mumuDisplayId"), m_mumuDisplayId);
+    settingJsonObject.insert(QStringLiteral("adbPath"), m_adbPath);
+    settingJsonObject.insert(QStringLiteral("adbSerial"), m_adbSerial);
+    settingJsonObject.insert(QStringLiteral("kataGoPath"), m_kataGoPath);
+    settingJsonObject.insert(QStringLiteral("kataGoAnalysisCommand"), m_kataGoAnalysisCommand);
+    settingJsonObject.insert(QStringLiteral("kataGoGTPCommand"), m_kataGoGTPCommand);
+    settingJsonObject.insert(QStringLiteral("kataGoMode"), m_kataGoMode);
+
+    QFile file{ Global::configPath().append(QStringLiteral("/setting.json")) };
+    file.open(QFile::WriteOnly);
+    file.write(QJsonDocument(settingJsonObject).toJson(QJsonDocument::Compact));
+    file.close();
 }

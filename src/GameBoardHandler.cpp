@@ -18,14 +18,18 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
       boardAnalyzerThread(new QThread),
       boardInteractorThread(new QThread),
       katagoInteractorThread(new QThread),
-      // timer(new QTimer),
-      // timerThread(new QThread),
       inited(false)
 {
     if (Settings::getSingletonSettings()->kataGoMode() == QStringLiteral("Analysis"))
+    {
+        qDebug() << Q_FUNC_INFO << QStringLiteral("Analysis");
         katagoInteractor = new KatagoAnalysisInteractor;
+    }
     else if (Settings::getSingletonSettings()->kataGoMode() == QStringLiteral("GTP"))
+    {
+        qDebug() << Q_FUNC_INFO << QStringLiteral("GTP");
         katagoInteractor = new KatagoGTPInteractor;
+    }
     else
         qFatal() << Q_FUNC_INFO << QStringLiteral("kataGoMode is invalid");
 
@@ -35,11 +39,6 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
     connect(boardAnalyzerThread, &QThread::finished, boardAnalyzer, &BoardAnalyzer::deleteLater);
     connect(boardInteractorThread, &QThread::finished, boardInteractor, &BoardInteractor::deleteLater);
     connect(katagoInteractorThread, &QThread::finished, katagoInteractor, &KatagoInteractor::deleteLater);
-
-    // timer->setSingleShot(true);
-
-    // timer->moveToThread(timerThread);
-    // connect(timerThread, &QThread::finished, timer, &QTimer::deleteLater);
 
     connect(this, &GameBoardHandler::startInit, this, &GameBoardHandler::init);
 
@@ -77,10 +76,6 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
 
     connect(boardInteractor, &BoardInteractor::moveFinished, this, &GameBoardHandler::clearBestPoint);
 
-    // connect(this, &GameBoardHandler::toStartTimer, timer, QOverload<int>::of(&QTimer::start));
-    // connect(timer, &QTimer::timeout, katagoInteractor, &KatagoInteractor::getBestMove);
-    // connect(timer, &QTimer::timeout, timer, []
-    //         { qDebug() << QStringLiteral("time out") << QDateTime::currentMSecsSinceEpoch(); });
     connect(katagoInteractor, &KatagoInteractor::bestMoveUpdate, this, &GameBoardHandler::bestPointUpdate);
     connect(katagoInteractor, &KatagoInteractor::bestMove, boardInteractor, QOverload<const StoneData &>::of(&BoardInteractor::moveStone));
 
@@ -92,7 +87,6 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
 
     connect(this, &GameBoardHandler::gameOver, katagoInteractor, &KatagoInteractor::stopAnalyze);
     connect(this, &GameBoardHandler::gameOver, boardAnalyzer, &BoardAnalyzer::stop);
-    // connect(this, &GameBoardHandler::gameOver, timer, &QTimer::stop);
 
     connect(this, &GameBoardHandler::toReset, boardAnalyzer, &BoardAnalyzer::resetBoardData);
     connect(this, &GameBoardHandler::toReset, katagoInteractor, &KatagoInteractor::clearBoard);
@@ -133,7 +127,6 @@ void GameBoardHandler::init()
     boardAnalyzerThread->start();
     boardInteractorThread->start();
     katagoInteractorThread->start();
-    // timerThread->start();
 }
 
 void GameBoardHandler::gameStartedHandle(StoneData::StoneColor myStoneColor)

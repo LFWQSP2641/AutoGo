@@ -2,9 +2,14 @@
 #define BOARDANALYZER_H
 
 #include "BoardData.h"
-#include "InteractiveInterface/MumuScreencaptor.h"
 
 #include <QObject>
+
+class Screencaptor;
+namespace cv
+{
+class Mat;
+} // namespace cv
 
 class BoardAnalyzer : public QObject
 {
@@ -52,7 +57,7 @@ public slots:
     void startGame();
 
 protected:
-    MumuScreencaptor *screencaptor;
+    Screencaptor *screencaptor;
     BoardData m_boardData;
 
     bool toStop;

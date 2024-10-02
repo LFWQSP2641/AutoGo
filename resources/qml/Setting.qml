@@ -19,42 +19,6 @@ Item {
                     RowLayout {
                         Layout.fillWidth: true
                         Label {
-                            text: "Mumu安装路径:"
-                        }
-                        TextField {
-                            Layout.fillWidth: true
-                            text: Settings.mumuPath
-                            onTextChanged: Settings.mumuPath = text
-                            onEditingFinished: Settings.saveToFile()
-                        }
-                    }
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Label {
-                            text: "Mumu实例号:"
-                        }
-                        TextField {
-                            Layout.fillWidth: true
-                            text: Settings.mumuIndex
-                            onTextChanged: Settings.mumuIndex = parseInt(text)
-                            onEditingFinished: Settings.saveToFile()
-                        }
-                    }
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Label {
-                            text: "Mumu DisplayId:"
-                        }
-                        TextField {
-                            Layout.fillWidth: true
-                            text: Settings.mumuDisplayId
-                            onTextChanged: Settings.mumuDisplayId = parseInt(text)
-                            onEditingFinished: Settings.saveToFile()
-                        }
-                    }
-                    RowLayout {
-                        Layout.fillWidth: true
-                        Label {
                             text: "adb路径:"
                         }
                         TextField {
@@ -74,6 +38,64 @@ Item {
                             text: Settings.adbSerial
                             onTextChanged: Settings.adbSerial = text
                             onEditingFinished: Settings.saveToFile()
+                        }
+                    }
+                    GroupBox {
+                        Layout.fillWidth: true
+                        title: "Mumu增强模式"
+                        ColumnLayout {
+                            anchors.fill: parent
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Label {
+                                    text: "Mumu增强模式:"
+                                }
+                                CheckBox {
+                                    Layout.fillWidth: true
+                                    text: "开启"
+                                    checked: Settings.mumuEnable === true
+                                    onClicked: {
+                                        Settings.mumuEnable = checked
+                                        Settings.saveToFile()
+                                    }
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Label {
+                                    text: "Mumu安装路径:"
+                                }
+                                TextField {
+                                    Layout.fillWidth: true
+                                    text: Settings.mumuPath
+                                    onTextChanged: Settings.mumuPath = text
+                                    onEditingFinished: Settings.saveToFile()
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Label {
+                                    text: "Mumu实例号:"
+                                }
+                                TextField {
+                                    Layout.fillWidth: true
+                                    text: Settings.mumuIndex
+                                    onTextChanged: Settings.mumuIndex = parseInt(text)
+                                    onEditingFinished: Settings.saveToFile()
+                                }
+                            }
+                            RowLayout {
+                                Layout.fillWidth: true
+                                Label {
+                                    text: "Mumu DisplayId:"
+                                }
+                                TextField {
+                                    Layout.fillWidth: true
+                                    text: Settings.mumuDisplayId
+                                    onTextChanged: Settings.mumuDisplayId = parseInt(text)
+                                    onEditingFinished: Settings.saveToFile()
+                                }
+                            }
                         }
                     }
                 }
