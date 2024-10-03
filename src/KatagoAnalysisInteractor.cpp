@@ -54,7 +54,6 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
 
     if (Settings::getSingletonSettings()->kataGoSearchLimit())
     {
-        const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
         double timeScaleFactor;
         switch (m_timeMode)
         {
@@ -70,11 +69,13 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
             break;
         }
 
+        const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
+        int maxVisits(Settings::getSingletonSettings()->kataGoMaxVisits() * timeScaleFactor);
         // 开局加快下棋速度
         if (moveSize < 10)
-            jsonObject.insert(QStringLiteral("maxVisits"), Settings::getSingletonSettings()->kataGoMaxVisits() / moveSize * timeScaleFactor);
-        else
-            jsonObject.insert(QStringLiteral("maxVisits"), Settings::getSingletonSettings()->kataGoMaxVisits() * timeScaleFactor);
+            maxVisits = maxVisits * (10 - moveSize) / 10;
+
+        jsonObject.insert(QStringLiteral("maxVisits"), maxVisits);
     }
     else
     {

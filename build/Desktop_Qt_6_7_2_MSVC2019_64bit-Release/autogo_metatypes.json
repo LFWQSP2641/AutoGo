@@ -983,6 +983,21 @@
                         "type": "int",
                         "user": false,
                         "write": "setReportIntervalMS"
+                    },
+                    {
+                        "constant": false,
+                        "designable": true,
+                        "final": true,
+                        "index": 2,
+                        "name": "minMoveInterval",
+                        "notify": "minMoveIntervalChanged",
+                        "read": "getMinMoveInterval",
+                        "required": false,
+                        "scriptable": true,
+                        "stored": true,
+                        "type": "qint64",
+                        "user": false,
+                        "write": "setMinMoveInterval"
                     }
                 ],
                 "qualifiedClassName": "KatagoInteractor",
@@ -1028,6 +1043,11 @@
                     {
                         "access": "public",
                         "name": "reportIntervalMSChanged",
+                        "returnType": "void"
+                    },
+                    {
+                        "access": "public",
+                        "name": "minMoveIntervalChanged",
                         "returnType": "void"
                     }
                 ],
