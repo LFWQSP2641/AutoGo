@@ -81,6 +81,7 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
 
     connect(this, &GameBoardHandler::toAcceptRequest, boardInteractor, &BoardInteractor::acceptRequest);
     connect(this, &GameBoardHandler::toRejectRequest, boardInteractor, &BoardInteractor::rejectRequest);
+    connect(this, &GameBoardHandler::toAcceptCountingResult, boardInteractor, &BoardInteractor::acceptCountingResult);
 
     connect(this, &GameBoardHandler::toStopGame, katagoInteractor, &KatagoInteractor::stopAnalyze);
     connect(this, &GameBoardHandler::toStopGame, boardAnalyzer, &BoardAnalyzer::stop);
@@ -156,6 +157,10 @@ void GameBoardHandler::onStoneMoved(const BoardData &boardData)
     else if (boardData.getRequestDraw())
     {
         emit toRejectRequest();
+    }
+    else if (boardData.getRequestAcceptCountingResult())
+    {
+        emit toAcceptCountingResult();
     }
     else if (boardData.getGameOver())
     {

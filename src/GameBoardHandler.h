@@ -73,6 +73,7 @@ signals:
 
     void toAcceptRequest();
     void toRejectRequest();
+    void toAcceptCountingResult();
 
     void toReset();
 };

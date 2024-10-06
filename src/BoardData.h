@@ -26,6 +26,8 @@ public:
 
     bool getRequestUndo() const;
 
+    bool getRequestAcceptCountingResult() const;
+
     bool getGameOver() const;
 
     bool getUnknownUnexpected() const;
@@ -51,6 +53,7 @@ protected:
     bool requestCounting;
     bool requestDraw;
     bool requestUndo;
+    bool requestAcceptCountingResult;
     bool gameOver;
     bool unknownUnexpected;
 
@@ -71,6 +74,7 @@ private:
     Q_PROPERTY(bool requestCounting READ getRequestCounting CONSTANT FINAL)
     Q_PROPERTY(bool requestDraw READ getRequestDraw CONSTANT FINAL)
     Q_PROPERTY(bool requestUndo READ getRequestUndo CONSTANT FINAL)
+    Q_PROPERTY(bool requestAcceptCountingResult READ getRequestAcceptCountingResult CONSTANT FINAL)
     Q_PROPERTY(bool gameOver READ getGameOver CONSTANT FINAL)
     Q_PROPERTY(bool unknownUnexpected READ getUnknownUnexpected CONSTANT FINAL)
     Q_PROPERTY(bool needMove READ getNeedMove CONSTANT FINAL)

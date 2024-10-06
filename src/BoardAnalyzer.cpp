@@ -414,6 +414,9 @@ bool BoardAnalyzer::checkGameStatus(const cv::Mat &image)
         case AppNavigation::requestUndoDialog:
             m_boardData.requestUndo = true;
             break;
+        case AppNavigation::acceptCountingResultDialog:
+            m_boardData.requestAcceptCountingResult = true;
+            break;
         case AppNavigation::gameOverDialog:
             qDebug() << QStringLiteral("gameOver");
             m_boardData.gameOver = true;

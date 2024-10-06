@@ -76,6 +76,11 @@ void BoardInteractor::closeRequest()
     controller->Controller::click(QRect(QPoint(372, 1089), QPoint(706, 1172)));
 }
 
+void BoardInteractor::acceptCountingResult()
+{
+    controller->Controller::click(QRect(QPoint(603, 1780), QPoint(938, 1863)));
+}
+
 void BoardInteractor::matchGame()
 {
     matchGame1();

@@ -37,6 +37,7 @@ public slots:
     void acceptRequest();
     void rejectRequest();
     void closeRequest();
+    void acceptCountingResult();
 
     void matchGame();
 

@@ -7,6 +7,7 @@ BoardData::BoardData()
       requestCounting(false),
       requestDraw(false),
       requestUndo(false),
+      requestAcceptCountingResult(false),
       gameOver(false),
       unknownUnexpected(false),
       needMove(false),
@@ -47,6 +48,11 @@ bool BoardData::getRequestDraw() const
 bool BoardData::getRequestUndo() const
 {
     return requestUndo;
+}
+
+bool BoardData::getRequestAcceptCountingResult() const
+{
+    return requestAcceptCountingResult;
 }
 
 bool BoardData::getGameOver() const
