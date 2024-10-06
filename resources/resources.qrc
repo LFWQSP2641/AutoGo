@@ -4,4 +4,28 @@
         <file>qml/Setting.qml</file>
         <file>qml/AutoGo.qml</file>
     </qresource>
+    <qresource prefix="/">
+        <file>data/TemplateImage/AcceptCountingResult.png</file>
+        <file>data/TemplateImage/AnalysisPage.png</file>
+        <file>data/TemplateImage/AnalysisPage2.png</file>
+        <file>data/TemplateImage/Backutton.png</file>
+        <file>data/TemplateImage/Backutton2.png</file>
+        <file>data/TemplateImage/CancelResumeBattleDialog.png</file>
+        <file>data/TemplateImage/ConfirmDefeatDialog.png</file>
+        <file>data/TemplateImage/DurationChoiceDialog.png</file>
+        <file>data/TemplateImage/GameOverDialogCloseButton.png</file>
+        <file>data/TemplateImage/LevelUpDialogCloseButton.png</file>
+        <file>data/TemplateImage/MainPage.png</file>
+        <file>data/TemplateImage/MatchDialog.png</file>
+        <file>data/TemplateImage/PlayingPage.png</file>
+        <file>data/TemplateImage/PlayingPageWithMove.png</file>
+        <file>data/TemplateImage/PlayingPageWithMove2.png</file>
+        <file>data/TemplateImage/RequestCountingDialog.png</file>
+        <file>data/TemplateImage/RequestDrawDialog.png</file>
+        <file>data/TemplateImage/RequestRematchDialog.png</file>
+        <file>data/TemplateImage/RequestResumeBattleDialog.png</file>
+        <file>data/TemplateImage/RequestUndoDialog.png</file>
+        <file>data/TemplateImage/TipDialogWithButton.png</file>
+        <file>data/maatouch</file>
+    </qresource>
 </RCC>

@@ -30,7 +30,10 @@ bool MaaController::init()
         }
     }
     if (maatouchPath.isEmpty())
-        return false;
+    {
+        maatouchPath = Global::tempPath().append(QStringLiteral("/maatouch"));
+        QFile::copy(QStringLiteral(":/data/maatouch"), maatouchPath);
+    }
     QEventLoop eventLoop;
     maaTouchProcess->setProcessChannelMode(QProcess::MergedChannels);
     connect(maaTouchProcess, &QProcess::finished, &eventLoop, &QEventLoop::quit);

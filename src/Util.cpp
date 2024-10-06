@@ -1,8 +1,7 @@
 #include "Util.h"
 
-#include "Global.h"
-
 #include <QDebug>
+#include <QFile>
 #include <QPoint>
 #include <QRandomGenerator>
 #include <cmath>
@@ -44,13 +43,22 @@ int Util::generateTanhRandom(int minValue, int maxValue)
 
 bool Util::isRegionEqual(const cv::Mat &image, const QString &templateImageName, const QPoint &topLeft)
 {
-    return isRegionEqual(image,
-                         cv::imread(Global::dataPath()
-                                        .append(QStringLiteral("/TemplateImage/"))
-                                        .append(templateImageName)
-                                        .append(QStringLiteral(".png"))
-                                        .toStdString()),
-                         topLeft);
+    QFile file(QStringLiteral(":/data/TemplateImage/")
+                   .append(templateImageName)
+                   .append(QStringLiteral(".png")));
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qFatal() << QStringLiteral("无法打开模板图片文件: ")
+                 << file.fileName();
+        return false;
+    }
+    cv::Mat mat;
+    qint64 sz = file.size();
+    std::vector<uchar> buf(sz);
+    file.read((char *)buf.data(), sz);
+    mat = imdecode(buf, cv::IMREAD_COLOR);
+    file.close();
+    return isRegionEqual(image, mat, topLeft);
 }
 
 bool Util::isRegionEqual(const cv::Mat &image, const cv::Mat &templateImage, const QPoint &topLeft)

@@ -13,7 +13,8 @@
 #include <opencv2/opencv.hpp>
 
 QHash<QString, QPoint> BoardAnalyzer::templateImagePoints = {
-    {QStringLiteral("AnalysisPage"),               QPoint(0,   1770)},
+    {QStringLiteral("AcceptCountingResult"),       QPoint(141, 1780)},
+    { QStringLiteral("AnalysisPage"),              QPoint(0,   1770)},
     { QStringLiteral("AnalysisPage2"),             QPoint(0,   1770)},
     { QStringLiteral("CancelResumeBattleDialog"),  QPoint(200, 850) },
     { QStringLiteral("GameOverDialogCloseButton"), QPoint(975, 330) },
@@ -74,6 +75,8 @@ BoardAnalyzer::AppNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &
             return BoardAnalyzer::cancelResumeBattleDialog;
         return BoardAnalyzer::otherDialog;
     }
+    if (funcEqual(QStringLiteral("AcceptCountingResult")))
+        return BoardAnalyzer::acceptCountingResultDialog;
     if (funcEqual(QStringLiteral("DurationChoiceDialog")))
         return BoardAnalyzer::durationChoiceDialog;
     if (funcEqual(QStringLiteral("MatchDialog")))
