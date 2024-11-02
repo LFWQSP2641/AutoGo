@@ -274,9 +274,9 @@ void BoardAnalyzer::waitForGameMatching()
 StoneData::StoneColor BoardAnalyzer::getMyStoneColor(const cv::Mat &image)
 {
     const cv::Vec3b pixelValue = image.at<cv::Vec3b>(200, 150);
-    if (pixelValue == cv::Vec3b(31, 30, 26))
+    if (pixelValue[0] < 50 && pixelValue[1] < 50 && pixelValue[2] < 50)
         return StoneData::StoneColor::Black;
-    else if (pixelValue == cv::Vec3b(229, 225, 221))
+    else if (pixelValue[0] > 200 && pixelValue[1] > 200 && pixelValue[2] > 200)
         return StoneData::StoneColor::White;
     else
     {

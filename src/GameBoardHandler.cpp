@@ -18,6 +18,7 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
       boardAnalyzerThread(new QThread),
       boardInteractorThread(new QThread),
       katagoInteractorThread(new QThread),
+      checkTimer(new QTimer(this)),
       inited(false)
 {
     if (Settings::getSingletonSettings()->kataGoMode() == QStringLiteral("Analysis"))
@@ -32,6 +33,11 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
     }
     else
         qFatal() << QStringLiteral("kataGoMode is invalid");
+
+    checkTimer->setInterval(1000);
+    checkTimer->setSingleShot(true);
+
+    connect(checkTimer, &QTimer::timeout, this, &GameBoardHandler::checkStoneMoved);
 
     boardAnalyzer->moveToThread(boardAnalyzerThread);
     boardInteractor->moveToThread(boardInteractorThread);
@@ -72,12 +78,12 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
     connect(boardAnalyzer, &BoardAnalyzer::myStoneColorUpdate, this, &GameBoardHandler::gameStartedHandle);
 
     connect(boardAnalyzer, &BoardAnalyzer::analyzeIndefinitelyData, this, &GameBoardHandler::onStoneMoved);
-    connect(boardAnalyzer, &BoardAnalyzer::analyzeIndefinitelyData, katagoInteractor, &KatagoInteractor::move);
+    connect(this, &GameBoardHandler::toKatagoMoveStone, katagoInteractor, &KatagoInteractor::move);
 
     connect(boardInteractor, &BoardInteractor::moveFinished, this, &GameBoardHandler::clearBestPoint);
 
     connect(katagoInteractor, &KatagoInteractor::bestMoveUpdate, this, &GameBoardHandler::bestPointUpdate);
-    connect(katagoInteractor, &KatagoInteractor::bestMove, boardInteractor, QOverload<const StoneData &>::of(&BoardInteractor::moveStone));
+    connect(katagoInteractor, &KatagoInteractor::bestMove, this, &GameBoardHandler::onBestPoint);
 
     connect(this, &GameBoardHandler::toAcceptRequest, boardInteractor, &BoardInteractor::acceptRequest);
     connect(this, &GameBoardHandler::toRejectRequest, boardInteractor, &BoardInteractor::rejectRequest);
@@ -147,6 +153,7 @@ void GameBoardHandler::gameStartedHandle(StoneData::StoneColor myStoneColor)
 
 void GameBoardHandler::onStoneMoved(const BoardData &boardData)
 {
+    checkTimer->stop();
     if (!boardData.hasUnexpected())
         emit boardDataArrayUpdate(boardData.getBoardDataArray());
 
@@ -166,6 +173,8 @@ void GameBoardHandler::onStoneMoved(const BoardData &boardData)
     {
         emit gameOver();
     }
+    lastBoardData = boardData.getLastMoveStone();
+    emit toKatagoMoveStone(boardData);
 }
 
 void GameBoardHandler::analyzeIndefinitelyDelay()
@@ -178,4 +187,20 @@ void GameBoardHandler::onInitFinished()
 {
     inited = true;
     emit toStartGame();
+}
+
+void GameBoardHandler::onBestPoint(const StoneData &stoneData)
+{
+    lastBestPoint = stoneData;
+    emit toPlay(lastBestPoint.getPoint());
+    checkTimer->start();
+}
+
+void GameBoardHandler::checkStoneMoved()
+{
+    if (lastBoardData != lastBestPoint)
+    {
+        qDebug() << QStringLiteral("lastBoardData != lastBestPoint");
+        emit toPlay(lastBestPoint.getPoint());
+    }
 }

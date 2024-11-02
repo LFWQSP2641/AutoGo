@@ -73,7 +73,7 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
         int maxVisits(Settings::getSingletonSettings()->kataGoMaxVisits() * timeScaleFactor);
         // 开局加快下棋速度
         if (moveSize < 10)
-            maxVisits = maxVisits * (10 - moveSize) / 10;
+            maxVisits = maxVisits * moveSize / 10;
 
         jsonObject.insert(QStringLiteral("maxVisits"), maxVisits);
     }

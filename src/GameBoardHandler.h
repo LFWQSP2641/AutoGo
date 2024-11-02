@@ -34,8 +34,10 @@ protected:
     QThread *boardInteractorThread;
     QThread *katagoInteractorThread;
 
-    // QTimer *timer;
-    // QThread *timerThread;
+    QTimer *checkTimer;
+
+    StoneData lastBoardData;
+    StoneData lastBestPoint;
 
     bool inited;
 
@@ -47,6 +49,10 @@ protected slots:
     void analyzeIndefinitelyDelay();
 
     void onInitFinished();
+
+    void onBestPoint(const StoneData &stoneData);
+
+    void checkStoneMoved();
 
 signals:
     void boardDataArrayUpdate(const QList<QList<int>> boardDataArray);
@@ -76,6 +82,8 @@ signals:
     void toAcceptCountingResult();
 
     void toReset();
+
+    void toKatagoMoveStone(const BoardData &boardData);
 };
 
 #endif // GAMEBOARDHANDLER_H
