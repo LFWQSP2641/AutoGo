@@ -1,7 +1,10 @@
 #include "GameBoardHandler.h"
 
-#include "BoardAnalyzer.h"
-#include "BoardInteractor.h"
+#include "GameAnalyzer.h"
+#include "GameInteractor.h"
+#include "InteractiveInterface/AdbScreencaptor.h"
+#include "InteractiveInterface/MaaController.h"
+#include "InteractiveInterface/MumuScreencaptor.h"
 #include "KatagoAnalysisInteractor.h"
 #include "KatagoGTPInteractor.h"
 #include "Settings.h"
@@ -13,169 +16,342 @@
 
 GameBoardHandler::GameBoardHandler(QObject *parent)
     : QObject{ parent },
-      boardAnalyzer(new BoardAnalyzer),
-      boardInteractor(new BoardInteractor),
-      boardAnalyzerThread(new QThread),
-      boardInteractorThread(new QThread),
-      katagoInteractorThread(new QThread),
-      inited(false)
+      m_gameAnalyzer(nullptr),
+      m_gameInteractor(nullptr),
+      m_katagoInteractor(nullptr),
+      m_gameAnalyzerThread(nullptr),
+      m_katagoInteractorThread(nullptr),
+      m_inited(false),
+      m_state(State::Stopped),
+      m_task(Task::NoTask),
+      m_checkTimer(nullptr),
+      gameCount(0),
+      gameStarted(false),
+      continuousPlayGame(false),
+      m_timeMode(0),
+      m_pauseReception(false)
 {
+}
+
+bool GameBoardHandler::inited() const
+{
+    return m_inited;
+}
+
+GameBoardHandler::State GameBoardHandler::state() const
+{
+    return m_state;
+}
+
+GameBoardHandler::Task GameBoardHandler::task() const
+{
+    return m_task;
+}
+
+void GameBoardHandler::setTask(GameBoardHandler::Task newTask)
+{
+    if (m_task == newTask)
+        return;
+    m_task = newTask;
+    emit taskChanged();
+}
+
+void GameBoardHandler::init()
+{
+    if (m_inited)
+        return;
+
+    m_checkTimer = new QTimer(this);
+    m_checkTimer->setInterval(1000);
+    m_checkTimer->setSingleShot(true);
+
+    m_gameAnalyzerThread = new QThread(this);
+    m_katagoInteractorThread = new QThread(this);
+
+    m_gameAnalyzer = new GameAnalyzer;
+    m_gameInteractor = new GameInteractor(this);
+
     if (Settings::getSingletonSettings()->kataGoMode() == QStringLiteral("Analysis"))
     {
         qDebug() << QStringLiteral("Analysis");
-        katagoInteractor = new KatagoAnalysisInteractor;
+        m_katagoInteractor = new KatagoAnalysisInteractor;
     }
     else if (Settings::getSingletonSettings()->kataGoMode() == QStringLiteral("GTP"))
     {
         qDebug() << QStringLiteral("GTP");
-        katagoInteractor = new KatagoGTPInteractor;
+        m_katagoInteractor = new KatagoGTPInteractor;
     }
     else
         qFatal() << QStringLiteral("kataGoMode is invalid");
 
-    boardAnalyzer->moveToThread(boardAnalyzerThread);
-    boardInteractor->moveToThread(boardInteractorThread);
-    katagoInteractor->moveToThread(katagoInteractorThread);
-    connect(boardAnalyzerThread, &QThread::finished, boardAnalyzer, &BoardAnalyzer::deleteLater);
-    connect(boardInteractorThread, &QThread::finished, boardInteractor, &BoardInteractor::deleteLater);
-    connect(katagoInteractorThread, &QThread::finished, katagoInteractor, &KatagoInteractor::deleteLater);
+    m_gameInteractor->setController(new MaaController(m_gameInteractor));
 
-    connect(this, &GameBoardHandler::startInit, this, &GameBoardHandler::init);
+    Screencaptor *screencaptor;
+    if (Settings::getSingletonSettings()->mumuEnable())
+    {
+        screencaptor = new MumuScreencaptor(m_gameAnalyzer);
+    }
+    else
+    {
+        screencaptor = new AdbScreencaptor(m_gameAnalyzer);
+    }
+    m_gameAnalyzer->setScreencaptor(screencaptor);
 
-    connect(boardAnalyzerThread, &QThread::started, boardAnalyzer, &BoardAnalyzer::init);
-    connect(boardInteractorThread, &QThread::started, boardInteractor, &BoardInteractor::init);
-    connect(katagoInteractorThread, &QThread::started, katagoInteractor, &KatagoInteractor::init);
+    m_gameInteractor->setTimeModeFromInt(m_timeMode);
+    m_katagoInteractor->setTimeModeFromInt(m_timeMode);
 
-    connect(katagoInteractor, &KatagoInteractor::initFinished, this, &GameBoardHandler::startInitFinished);
+    m_gameAnalyzer->moveToThread(m_gameAnalyzerThread);
+    m_katagoInteractor->moveToThread(m_katagoInteractorThread);
 
-    connect(this, &GameBoardHandler::startInitFinished, this, &GameBoardHandler::onInitFinished);
+    connectSignals();
 
-    connect(this, &GameBoardHandler::toStartGame, boardAnalyzer, &BoardAnalyzer::startGame);
-    connect(this, &GameBoardHandler::toStartGame, this, &GameBoardHandler::checkingAppNavigation);
+    m_gameAnalyzerThread->start();
+    m_katagoInteractorThread->start();
 
-    connect(this, &GameBoardHandler::toSetTimeMode, katagoInteractor, &KatagoInteractor::setTimeModeFromInt);
-    connect(this, &GameBoardHandler::toSetTimeMode, boardInteractor, &BoardInteractor::setTimeModeFromInt);
-
-    connect(boardAnalyzer, &BoardAnalyzer::toMatchGame, boardInteractor, &BoardInteractor::matchGame);
-    connect(boardAnalyzer, &BoardAnalyzer::toAcceptRequest, boardInteractor, &BoardInteractor::acceptRequest);
-    connect(boardAnalyzer, &BoardAnalyzer::toRejectRequest, boardInteractor, &BoardInteractor::rejectRequest);
-    connect(boardAnalyzer, &BoardAnalyzer::toCloseGameOverDialog, boardInteractor, &BoardInteractor::closeGameOverDialog);
-    connect(boardAnalyzer, &BoardAnalyzer::toCloseLevelUpDialog, boardInteractor, &BoardInteractor::closeLevelUpDialog);
-    connect(boardAnalyzer, &BoardAnalyzer::toBackToMain, boardInteractor, &BoardInteractor::backToMain);
-    connect(boardAnalyzer, &BoardAnalyzer::toCloseRequest, boardInteractor, &BoardInteractor::closeRequest);
-
-    connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::analyzeIndefinitelyDelay);
-    connect(boardAnalyzer, &BoardAnalyzer::gameStarted, this, &GameBoardHandler::gameStarted);
-
-    connect(this, &GameBoardHandler::toPlay, boardInteractor, QOverload<const QPoint &>::of(&BoardInteractor::moveStone));
-    connect(this, &GameBoardHandler::toStartAnalyzeIndefinitely, boardAnalyzer, &BoardAnalyzer::analyzeIndefinitely);
-    connect(boardAnalyzer, &BoardAnalyzer::myStoneColorUpdate, this, &GameBoardHandler::gameStartedHandle);
-
-    connect(boardAnalyzer, &BoardAnalyzer::analyzeIndefinitelyData, this, &GameBoardHandler::onStoneMoved);
-    connect(boardAnalyzer, &BoardAnalyzer::analyzeIndefinitelyData, katagoInteractor, &KatagoInteractor::move);
-
-    connect(boardInteractor, &BoardInteractor::moveFinished, this, &GameBoardHandler::clearBestPoint);
-
-    connect(katagoInteractor, &KatagoInteractor::bestMoveUpdate, this, &GameBoardHandler::bestPointUpdate);
-    connect(katagoInteractor, &KatagoInteractor::bestMove, boardInteractor, QOverload<const StoneData &>::of(&BoardInteractor::moveStone));
-
-    connect(this, &GameBoardHandler::toAcceptRequest, boardInteractor, &BoardInteractor::acceptRequest);
-    connect(this, &GameBoardHandler::toRejectRequest, boardInteractor, &BoardInteractor::rejectRequest);
-    connect(this, &GameBoardHandler::toAcceptCountingResult, boardInteractor, &BoardInteractor::acceptCountingResult);
-
-    connect(this, &GameBoardHandler::toStopGame, katagoInteractor, &KatagoInteractor::stopAnalyze);
-    connect(this, &GameBoardHandler::toStopGame, boardAnalyzer, &BoardAnalyzer::stop);
-
-    connect(this, &GameBoardHandler::gameOver, katagoInteractor, &KatagoInteractor::stopAnalyze);
-    connect(this, &GameBoardHandler::gameOver, boardAnalyzer, &BoardAnalyzer::stop);
-
-    connect(this, &GameBoardHandler::toReset, boardAnalyzer, &BoardAnalyzer::resetBoardData);
-    connect(this, &GameBoardHandler::toReset, katagoInteractor, &KatagoInteractor::clearBoard);
+    emit toStartInit();
+    emit initStarting();
 }
 
 void GameBoardHandler::startGame()
 {
-    if (inited)
-    {
-        emit toReset();
-        emit toStartGame();
-    }
-    else
-    {
-        emit startInit();
-    }
+    m_task = Task::StartGame;
+    startTask();
 }
 
 void GameBoardHandler::stopGame()
 {
-    qDebug() << Q_FUNC_INFO;
-    emit toStopGame();
+    m_task = Task::StopGame;
+    startTask();
 }
 
 void GameBoardHandler::continuousStartGame()
 {
-    QTimer::singleShot(3000, this, &GameBoardHandler::startGame);
+    m_task = Task::StartGame;
+    QTimer::singleShot(3000, this, &GameBoardHandler::startTask);
 }
 
 void GameBoardHandler::setTimeMode(int timeMode)
 {
     qDebug() << timeMode;
-    emit toSetTimeMode(timeMode);
+    m_timeMode = timeMode;
+    emit toSetTimeMode(m_timeMode);
 }
 
-void GameBoardHandler::init()
+bool GameBoardHandler::getContinuousPlayGame() const
 {
-    boardAnalyzerThread->start();
-    boardInteractorThread->start();
-    katagoInteractorThread->start();
+    return continuousPlayGame;
 }
 
-void GameBoardHandler::gameStartedHandle(StoneData::StoneColor myStoneColor)
+void GameBoardHandler::setContinuousPlayGame(bool newContinuousPlayGame)
 {
-    qDebug() << myStoneColor;
-    if (myStoneColor == StoneData::StoneColor::Black)
+    if (continuousPlayGame == newContinuousPlayGame)
+        return;
+    continuousPlayGame = newContinuousPlayGame;
+    emit continuousPlayGameChanged();
+}
+
+bool GameBoardHandler::getGameStarted() const
+{
+    return gameStarted;
+}
+
+int GameBoardHandler::getGameCount() const
+{
+    return gameCount;
+}
+
+void GameBoardHandler::connectSignals()
+{
+    connect(m_checkTimer, &QTimer::timeout, this, &GameBoardHandler::checkStoneMove);
+
+    connect(this, &GameBoardHandler::toStartInit, m_gameAnalyzer, &GameAnalyzer::init);
+    connect(this, &GameBoardHandler::toStartInit, m_katagoInteractor, &KatagoInteractor::init);
+    connect(this, &GameBoardHandler::toStartInit, m_gameInteractor, &GameInteractor::init);
+
+    connect(m_katagoInteractor, &KatagoInteractor::initFinished, this, &GameBoardHandler::onInitFinished);
+    connect(m_gameAnalyzerThread, &QThread::finished, m_gameAnalyzer, &QObject::deleteLater);
+    connect(m_katagoInteractorThread, &QThread::finished, m_katagoInteractor, &QObject::deleteLater);
+
+    connect(m_gameAnalyzer, &GameAnalyzer::analysisDataUpdated, this, &GameBoardHandler::onGameAnalyzerDataUpdated);
+    connect(m_katagoInteractor, &KatagoInteractor::bestMove, this, &GameBoardHandler::onKatagoBestMove);
+
+    connect(this, &GameBoardHandler::toSetTimeMode, m_gameInteractor, &GameInteractor::setTimeModeFromInt);
+    connect(this, &GameBoardHandler::toSetTimeMode, m_katagoInteractor, &KatagoInteractor::setTimeModeFromInt);
+
+    connect(this, &GameBoardHandler::toAnalyzeGameBoard, m_gameAnalyzer, &GameAnalyzer::analyzeIndefinitely);
+    connect(this, &GameBoardHandler::toStopGame, m_katagoInteractor, &KatagoInteractor::stopAnalyze);
+    connect(this, &GameBoardHandler::toStopGame, m_gameAnalyzer, &GameAnalyzer::stopAnalyze);
+
+    connect(this, &GameBoardHandler::toKatagoMove, m_katagoInteractor, &KatagoInteractor::move);
+    connect(this, &GameBoardHandler::toPauseAnalyze, m_gameAnalyzer, &GameAnalyzer::pause);
+}
+
+void GameBoardHandler::startTask()
+{
+    if (!m_inited)
     {
-        emit toPlay(QPoint(3, 3));
-    }
-    else if (myStoneColor == StoneData::StoneColor::None)
-    {
-        qWarning() << QStringLiteral("myStoneColor is None");
+        qWarning() << QStringLiteral("GameBoardHandler has not been inited");
         return;
     }
-    emit toStartAnalyzeIndefinitely();
+    m_pauseReception = false;
+    switch (m_task)
+    {
+    case StopGame:
+        emit toStopGame();
+        break;
+    case StartGame:
+        gameStarted = false;
+        emit toAnalyzeGameBoard();
+        break;
+    case NoTask:
+    default:
+        break;
+    }
 }
 
-void GameBoardHandler::onStoneMoved(const BoardData &boardData)
+void GameBoardHandler::handleGamePage(GameData::AppNavigation appNavigation)
 {
-    if (!boardData.hasUnexpected())
-        emit boardDataArrayUpdate(boardData.getBoardDataArray());
+    switch (appNavigation)
+    {
+    case GameData::AppNavigation::gameOverDialog:
+        m_gameInteractor->closeGameOverDialog();
+        break;
+    case GameData::AppNavigation::levelUpDialog:
+        m_gameInteractor->closeLevelUpDialog();
+        break;
+    case GameData::AppNavigation::mainPage:
+        m_gameInteractor->openMatchDialog();
+        break;
+    case GameData::AppNavigation::durationChoiceDialog:
+        m_gameInteractor->choiceGameMode();
+        break;
+    case GameData::AppNavigation::analysisPage:
+    case GameData::AppNavigation::pageWithBack:
+        m_gameInteractor->backToMain();
+        break;
+    case GameData::AppNavigation::requestCountingDialog:
+    case GameData::AppNavigation::requestRematchDialog:
+    case GameData::AppNavigation::otherDialog:
+        m_gameInteractor->acceptRequest();
+        break;
+    case GameData::AppNavigation::requestUndoDialog:
+    case GameData::AppNavigation::requestDrawDialog:
+    case GameData::AppNavigation::requestResumeBattleDialog:
+    case GameData::AppNavigation::confirmDefeatDialog:
+        m_gameInteractor->rejectRequest();
+        break;
+    case GameData::AppNavigation::cancelResumeBattleDialog:
+        m_gameInteractor->closeRequest();
+        break;
+    case GameData::AppNavigation::acceptCountingResultDialog:
+        m_gameInteractor->acceptCountingResult();
+        break;
+    case GameData::AppNavigation::matchDialog:
+        emit toPauseAnalyze(500);
+        break;
+    case GameData::AppNavigation::tipDialog:
+    default:
+        break;
+    }
+}
 
-    if (boardData.getRequestCounting() || boardData.getRequestUndo())
+void GameBoardHandler::checkStoneMove()
+{
+    if (m_state != State::Playing)
+        return;
+    if (lastMoveStone != lastBestMoveStone)
     {
-        emit toAcceptRequest();
+        m_gameInteractor->moveStone(lastBestMoveStone);
     }
-    else if (boardData.getRequestDraw())
+}
+
+void GameBoardHandler::handleGameOpening(const GameData &gameData)
+{
+    const auto myStoneColor(gameData.myStoneColor());
+    qDebug() << myStoneColor;
+    switch (myStoneColor)
     {
-        emit toRejectRequest();
+    case StoneData::StoneColor::Black:
+        qDebug() << QStringLiteral("Black");
+        m_gameInteractor->moveStone(QPoint(3, 3));
+        break;
+    case StoneData::StoneColor::None:
+        qWarning() << QStringLiteral("myStoneColor is None");
+        break;
+    default:
+        break;
     }
-    else if (boardData.getRequestAcceptCountingResult())
+    m_pauseReception = false;
+}
+
+void GameBoardHandler::onInitFinished(bool success)
+{
+    m_inited = success;
+    emit startInitFinished(success);
+}
+
+void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
+{
+    if (m_pauseReception)
+        return;
+    qDebug() << gameData.appNavigation();
+    if (m_task != Task::StartGame)
+        return;
+    // 第一局结束
+    if (gameStarted && gameData.appNavigation() == GameData::AppNavigation::gameOverDialog)
     {
-        emit toAcceptCountingResult();
-    }
-    else if (boardData.getGameOver())
-    {
+        gameStarted = false;
+        gameCount++;
         emit gameOver();
+        if (continuousPlayGame)
+        {
+            m_gameInteractor->closeGameOverDialog();
+        }
+        else
+        {
+            m_pauseReception = true;
+            m_state = State::Stopped;
+            emit toStopGame();
+        }
+        return;
+    }
+    handleGamePage(gameData.appNavigation());
+    if (gameData.appNavigation() == GameData::AppNavigation::playingPage)
+    {
+        if (!gameStarted)
+        {
+            m_pauseReception = true;
+            emit toPauseAnalyze(2500);
+            QTimer::singleShot(2000, this, [this, gameData]
+                               { this->handleGameOpening(gameData); });
+            gameStarted = true;
+            m_state = State::Playing;
+            emit gameStarting();
+            return;
+        }
+        lastMoveStone = gameData.boardData().lastMoveStone();
+        emit boardDataArrayUpdate(gameData.boardData().boardDataArray());
+        if (gameData.needMove())
+            emit toKatagoMove(gameData.boardData());
+    }
+    else if (gameData.appNavigation() == GameData::AppNavigation::mainPage ||
+             gameData.appNavigation() == GameData::AppNavigation::durationChoiceDialog ||
+             gameData.appNavigation() == GameData::AppNavigation::matchDialog)
+    {
+        m_state = State::WaitingMatching;
+    }
+    else
+    {
+        m_state = State::NavigatingToMain;
     }
 }
 
-void GameBoardHandler::analyzeIndefinitelyDelay()
+void GameBoardHandler::onKatagoBestMove(const StoneData &stoneData)
 {
-    qDebug() << Q_FUNC_INFO;
-    QTimer::singleShot(2000, this, &::GameBoardHandler::toStartAnalyzeIndefinitely);
-}
-
-void GameBoardHandler::onInitFinished()
-{
-    inited = true;
-    emit toStartGame();
+    if (lastBestMoveStone == stoneData)
+        return;
+    lastBestMoveStone = stoneData;
+    emit bestPointUpdate(stoneData);
+    m_gameInteractor->moveStone(stoneData);
+    m_checkTimer->start();
 }

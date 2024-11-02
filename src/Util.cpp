@@ -55,7 +55,7 @@ bool Util::isRegionEqual(const cv::Mat &image, const QString &templateImageName,
     cv::Mat mat;
     qint64 sz = file.size();
     std::vector<uchar> buf(sz);
-    file.read((char *)buf.data(), sz);
+    file.read(reinterpret_cast<char *>(buf.data()), sz);
     mat = imdecode(buf, cv::IMREAD_COLOR);
     file.close();
     return isRegionEqual(image, mat, topLeft);

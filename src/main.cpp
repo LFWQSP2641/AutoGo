@@ -1,10 +1,10 @@
 #include "Global.h"
 #include "Settings.h"
 
-#include <QDir>
+#include <QFile>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-#include <opencv2/opencv.hpp>
+#include <QQuickStyle>
 
 int main(int argc, char *argv[])
 {
@@ -12,10 +12,9 @@ int main(int argc, char *argv[])
 
     qSetMessagePattern(QStringLiteral("DateTime:%{time [yyyy-MM-dd hh:mm:ss:zzz]} Function:%{function} Message:%{message}\nFile:%{file} Line:%{line} ThreadId:%{threadid}"));
 
-    QDir().mkpath(QCoreApplication::applicationDirPath()
-                      .append(QStringLiteral("/debug")));
-
     Global::initOnce();
+
+    QQuickStyle::setStyle(QStringLiteral("Material"));
 
     qmlRegisterSingletonInstance("Settings", 1, 0, "Settings", Settings::getSingletonSettings());
 

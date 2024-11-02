@@ -1,11 +1,10 @@
 #ifndef ADBSCREENCAPTOR_H
 #define ADBSCREENCAPTOR_H
 
+#include "AdbInteractor.h"
 #include "Screencaptor.h"
 
-class QProcess;
-
-class AdbScreencaptor : public Screencaptor
+class AdbScreencaptor : public Screencaptor, public AdbInteractor
 {
     Q_OBJECT
 
@@ -15,9 +14,6 @@ public:
     virtual bool init() override;
 
     virtual std::optional<cv::Mat> screencap() override;
-
-protected:
-    QProcess *adbProcess;
 };
 
 #endif // ADBSCREENCAPTOR_H

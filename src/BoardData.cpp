@@ -3,105 +3,76 @@
 #include <QDateTime>
 
 BoardData::BoardData()
-    : boardDataArray(QList<QList<int>>(19, QList<int>(19, 0))),
-      requestCounting(false),
-      requestDraw(false),
-      requestUndo(false),
-      requestAcceptCountingResult(false),
-      gameOver(false),
-      unknownUnexpected(false),
-      needMove(false),
-      myStoneColor(StoneData::StoneColor::None),
-      lastMoveStone(StoneData()),
-      isMoving(false),
-      uuid(QString::number(QDateTime::currentMSecsSinceEpoch()))
+    : BoardData{ QString::number(QDateTime::currentMSecsSinceEpoch()) }
 {
+}
+
+BoardData::BoardData(QStringView uuid)
+    : m_uuid(uuid),
+      m_boardDataArray(QList<QList<int>>(19, QList<int>(19, 0))),
+      m_lastMoveStone(StoneData()),
+      m_myStoneColor(StoneData::StoneColor::None)
+{
+}
+
+BoardData::BoardData(const BoardData &other)
+    : m_uuid(other.m_uuid),
+      m_boardDataArray(other.m_boardDataArray),
+      m_lastMoveStone(other.m_lastMoveStone),
+      m_initialStonesArray(other.m_initialStonesArray),
+      m_moveStonesArray(other.m_moveStonesArray),
+      m_myStoneColor(other.m_myStoneColor)
+{
+}
+
+BoardData &BoardData::operator=(const BoardData &other)
+{
+    m_uuid = other.m_uuid;
+    m_boardDataArray = other.m_boardDataArray;
+    m_lastMoveStone = other.m_lastMoveStone;
+    m_initialStonesArray = other.m_initialStonesArray;
+    m_moveStonesArray = other.m_moveStonesArray;
+    m_myStoneColor = other.m_myStoneColor;
+    return *this;
 }
 
 bool BoardData::operator==(const BoardData &other) const
 {
-    return boardDataArray == other.boardDataArray &&
-           requestCounting == other.requestCounting &&
-           requestDraw == other.requestDraw &&
-           requestUndo == other.requestUndo &&
-           gameOver == other.gameOver &&
-           needMove == other.needMove &&
-           myStoneColor == other.myStoneColor &&
-           lastMoveStone == other.lastMoveStone;
+    return m_boardDataArray == other.m_boardDataArray &&
+           m_lastMoveStone == other.m_lastMoveStone;
 }
 
-QList<QList<int>> BoardData::getBoardDataArray() const
+bool BoardData::operator!=(const BoardData &other) const
 {
-    return boardDataArray;
+    return !(*this == other);
 }
 
-bool BoardData::getRequestCounting() const
+QString BoardData::uuid() const
 {
-    return requestCounting;
+    return m_uuid;
 }
 
-bool BoardData::getRequestDraw() const
+QList<QList<int>> BoardData::boardDataArray() const
 {
-    return requestDraw;
+    return m_boardDataArray;
 }
 
-bool BoardData::getRequestUndo() const
+StoneData BoardData::lastMoveStone() const
 {
-    return requestUndo;
+    return m_lastMoveStone;
 }
 
-bool BoardData::getRequestAcceptCountingResult() const
+QList<StoneData> BoardData::initialStonesArray() const
 {
-    return requestAcceptCountingResult;
+    return m_initialStonesArray;
 }
 
-bool BoardData::getGameOver() const
+QList<StoneData> BoardData::moveStonesArray() const
 {
-    return gameOver;
+    return m_moveStonesArray;
 }
 
-bool BoardData::getUnknownUnexpected() const
+StoneData::StoneColor BoardData::myStoneColor() const
 {
-    return unknownUnexpected;
-}
-
-bool BoardData::getNeedMove() const
-{
-    return needMove;
-}
-
-StoneData::StoneColor BoardData::getMyStoneColor() const
-{
-    return myStoneColor;
-}
-
-StoneData BoardData::getLastMoveStone() const
-{
-    return lastMoveStone;
-}
-
-bool BoardData::hasUnexpected() const
-{
-    return requestCounting || requestDraw || requestUndo || gameOver ||
-           unknownUnexpected;
-}
-
-bool BoardData::getIsMoving() const
-{
-    return isMoving;
-}
-
-QString BoardData::getUuid() const
-{
-    return uuid;
-}
-
-QList<StoneData> BoardData::getInitialStonesArray() const
-{
-    return initialStonesArray;
-}
-
-QList<StoneData> BoardData::getMoveStonesArray() const
-{
-    return moveStonesArray;
+    return m_myStoneColor;
 }

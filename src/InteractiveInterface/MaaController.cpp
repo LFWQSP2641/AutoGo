@@ -14,6 +14,7 @@ MaaController::MaaController(QObject *parent)
     : Controller{ parent },
       maaTouchProcess(new QProcess(this))
 {
+    maaTouchProcess->setProcessChannelMode(QProcess::MergedChannels);
 }
 
 bool MaaController::init()
@@ -34,31 +35,15 @@ bool MaaController::init()
         maatouchPath = Global::tempPath().append(QStringLiteral("/maatouch"));
         QFile::copy(QStringLiteral(":/data/maatouch"), maatouchPath);
     }
-    QEventLoop eventLoop;
-    maaTouchProcess->setProcessChannelMode(QProcess::MergedChannels);
-    connect(maaTouchProcess, &QProcess::finished, &eventLoop, &QEventLoop::quit);
-    maaTouchProcess->start(Settings::getSingletonSettings()->adbPath(),
-                           QStringList{ QStringLiteral("connect"),
-                                        Settings::getSingletonSettings()->adbSerial() });
-    eventLoop.exec();
-    QByteArray result(maaTouchProcess->readAllStandardOutput());
-    if (result.isEmpty())
+    if (!adbConnect())
         return false;
-    for (const auto &i : QByteArrayList{ QByteArrayLiteral("cannot"), QByteArrayLiteral("failed") })
-    {
-        if (result.contains(i))
-            return false;
-    }
-    maaTouchProcess->start(Settings::getSingletonSettings()->adbPath(),
-                           QStringList{ QStringLiteral("-s"),
-                                        Settings::getSingletonSettings()->adbSerial(),
-                                        QStringLiteral("push"),
-                                        maatouchPath,
-                                        QStringLiteral("/data/local/tmp/maatouch") });
-    eventLoop.exec();
-    result = maaTouchProcess->readAllStandardOutput();
+    const auto result(m_adbHandle->executeAdbCommand(
+        QStringList{ QStringLiteral("push"),
+                     maatouchPath,
+                     QStringLiteral("/data/local/tmp/maatouch") }));
     if (!result.contains(QByteArrayLiteral("1 file pushed")))
         return false;
+    QEventLoop eventLoop;
     connect(maaTouchProcess, &QProcess::started, &eventLoop, &QEventLoop::quit, Qt::SingleShotConnection);
     maaTouchProcess->start(
         Settings::getSingletonSettings()->adbPath(),

@@ -3,7 +3,7 @@
 
 #include "Screencaptor.h"
 
-class QLibrary;
+class MumuHandle;
 
 class MumuScreencaptor : public Screencaptor
 {
@@ -11,25 +11,13 @@ class MumuScreencaptor : public Screencaptor
 
 public:
     explicit MumuScreencaptor(QObject *parent = nullptr);
-    ~MumuScreencaptor();
 
     virtual std::optional<cv::Mat> screencap() override;
 
     virtual bool init() override;
 
-    bool reload();
-    void uninit();
-
 protected:
-    QString m_mumuPath;
-    QLibrary *library;
-    typedef int (*NemuCaptureDisplayType)(int, unsigned int, int, int *, int *, unsigned char *);
-    NemuCaptureDisplayType m_nemuCaptureDisplayFunction = nullptr;
-    int m_MumuInstIndex = 0;
-
-    int m_mumuHandle = 0;
-    int m_displayWidth = 0;
-    int m_displayHeight = 0;
+    MumuHandle *m_mumuHandle;
     std::vector<unsigned char> m_displayBuffer;
 };
 

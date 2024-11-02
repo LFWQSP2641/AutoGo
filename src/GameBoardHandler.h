@@ -1,14 +1,14 @@
 #ifndef GAMEBOARDHANDLER_H
 #define GAMEBOARDHANDLER_H
 
-#include "BoardData.h"
+#include "GameData.h"
 #include "StoneData.h"
 
 #include <QObject>
 #include <QtQml/qqmlregistration.h>
 
-class BoardAnalyzer;
-class BoardInteractor;
+class GameAnalyzer;
+class GameInteractor;
 class KatagoInteractor;
 
 class GameBoardHandler : public QObject
@@ -19,63 +19,121 @@ class GameBoardHandler : public QObject
 public:
     explicit GameBoardHandler(QObject *parent = nullptr);
 
+    enum State
+    {
+        Stopped = 0,
+        Playing,
+        NavigatingToMain,
+        WaitingMatching
+    };
+    Q_ENUM(State)
+
+    enum Task
+    {
+        StopGame = -1,
+        NoTask = 0,
+        StartGame
+    };
+    Q_ENUM(Task)
+
+    bool inited() const;
+
+    GameBoardHandler::State state() const;
+
+    GameBoardHandler::Task task() const;
+    void setTask(GameBoardHandler::Task newTask);
+
+    int getGameCount() const;
+
+    bool getGameStarted() const;
+
+    bool getContinuousPlayGame() const;
+    void setContinuousPlayGame(bool newContinuousPlayGame);
+
 public slots:
+    void init();
     void startGame();
     void stopGame();
     void continuousStartGame();
     void setTimeMode(int timeMode);
 
 protected:
-    BoardAnalyzer *boardAnalyzer;
-    BoardInteractor *boardInteractor;
-    KatagoInteractor *katagoInteractor;
+    GameAnalyzer *m_gameAnalyzer;
+    GameInteractor *m_gameInteractor;
+    KatagoInteractor *m_katagoInteractor;
 
-    QThread *boardAnalyzerThread;
-    QThread *boardInteractorThread;
-    QThread *katagoInteractorThread;
+    QThread *m_gameAnalyzerThread;
+    QThread *m_katagoInteractorThread;
 
-    // QTimer *timer;
-    // QThread *timerThread;
+    bool m_inited;
+    GameBoardHandler::State m_state;
+    GameBoardHandler::Task m_task;
 
-    bool inited;
+    StoneData lastMoveStone;
+    StoneData lastBestMoveStone;
+    QTimer *m_checkTimer;
+
+    int gameCount;
+    bool gameStarted;
+
+    bool continuousPlayGame;
+
+    int m_timeMode;
+
+    bool m_pauseReception;
 
 protected slots:
-    void init();
+    void connectSignals();
 
-    void gameStartedHandle(StoneData::StoneColor myStoneColor);
-    void onStoneMoved(const BoardData &boardData);
-    void analyzeIndefinitelyDelay();
+    void startTask();
 
-    void onInitFinished();
+    void handleGamePage(GameData::AppNavigation appNavigation);
+
+    void checkStoneMove();
+
+    void handleGameOpening(const GameData &gameData);
+
+protected slots:
+    void onInitFinished(bool success);
+
+    void onGameAnalyzerDataUpdated(const GameData &gameData);
+    void onKatagoBestMove(const StoneData &stoneData);
 
 signals:
     void boardDataArrayUpdate(const QList<QList<int>> boardDataArray);
     void bestPointUpdate(const StoneData &stoneData);
 
-    void startInit();
+    void initStarting();
 
     void clearBestPoint();
 
-    void gameStarted();
+    void gameStarting();
     void gameOver();
 
     void startInitFinished(bool success);
 
     void checkingAppNavigation();
 
-    // 所有to字辈的用于多线程传递
-    void toStartGame();
-    void toStopGame();
-    void toPlay(const QPoint &stonePoint);
-    void toStartAnalyzeIndefinitely();
-    void toStartTimer(int msec);
+signals:
+    void toStartInit();
     void toSetTimeMode(int timeMode);
+    void toAnalyzeGameBoard();
+    void toStopGame();
+    void toKatagoMove(const BoardData &boardData);
+    void toPauseAnalyze(const unsigned long &duration);
 
-    void toAcceptRequest();
-    void toRejectRequest();
-    void toAcceptCountingResult();
+signals:
+    void taskChanged();
 
-    void toReset();
+    void continuousPlayGameChanged();
+
+private:
+    Q_PROPERTY(bool inited READ inited CONSTANT FINAL)
+    Q_PROPERTY(GameBoardHandler::State state READ state CONSTANT FINAL)
+    Q_PROPERTY(GameBoardHandler::Task task READ task WRITE setTask NOTIFY taskChanged FINAL)
+    Q_PROPERTY(int gameCount READ getGameCount CONSTANT FINAL)
+    Q_PROPERTY(bool gameStarted READ getGameStarted CONSTANT FINAL)
+    Q_PROPERTY(bool continuousPlayGame READ getContinuousPlayGame WRITE setContinuousPlayGame NOTIFY continuousPlayGameChanged FINAL)
 };
 
 #endif // GAMEBOARDHANDLER_H

@@ -53,15 +53,23 @@ Item {
                     id: continuousPlaySwitch
                     Layout.fillWidth: true
                     text: "连续对弈"
+                    onCheckedChanged: {
+                        handler.setContinuousPlayGame(checked)
+                    }
                 }
                 Button {
                     id: startGameButton
                     Layout.fillWidth: true
                     text: "AI对弈"
                     onClicked: {
-                        handler.startGame()
                         startGameButton.enabled = false
                         durationComboBox.enabled = false
+                        if (!handler.inited)
+                        {
+                            handler.init()
+                            return
+                        }
+                        handler.startGame()
                     }
                 }
                 Button {
@@ -94,7 +102,6 @@ Item {
             if(continuousPlaySwitch.checked)
             {
                 gameLogArea.append("连续对弈")
-                handler.continuousStartGame()
             }
             else
             {
@@ -102,18 +109,14 @@ Item {
                 durationComboBox.enabled = true
             }
         }
-        onToReset: {
-            gameLogArea.append("清空棋盘")
-            goBoard.clearBestMove()
-            goBoard.clearBoardData()
-        }
-        onStartInit: {
+        onInitStarting: {
             gameLogArea.append("开始初始化")
         }
         onStartInitFinished: function(success) {
             if(success)
             {
                 gameLogArea.append("初始化成功")
+                handler.startGame()
             }
             else
             {
@@ -125,7 +128,10 @@ Item {
         onCheckingAppNavigation: {
             gameLogArea.append("检查所处位置")
         }
-        onGameStarted: {
+        onGameStarting: {
+            gameLogArea.append("清空棋盘")
+            goBoard.clearBestMove()
+            goBoard.clearBoardData()
             gameLogArea.append("开始对弈")
         }
     }

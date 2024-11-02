@@ -1,18 +1,17 @@
 #ifndef BOARDINTERACTOR_H
 #define BOARDINTERACTOR_H
 
+#include "InteractiveInterface/Controller.h"
 #include "StoneData.h"
 
 #include <QObject>
 
-class MaaController;
-
-class BoardInteractor : public QObject
+class GameInteractor : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit BoardInteractor(QObject *parent = nullptr);
+    explicit GameInteractor(QObject *parent = nullptr);
 
     // 对局模式时长
     enum TimeMode
@@ -23,8 +22,11 @@ public:
     };
     Q_ENUM(TimeMode)
 
-    BoardInteractor::TimeMode timeMode() const;
-    void setTimeMode(BoardInteractor::TimeMode newTimeMode);
+    GameInteractor::TimeMode timeMode() const;
+    void setTimeMode(GameInteractor::TimeMode newTimeMode);
+
+    Controller *getController() const;
+    void setController(Controller *newController);
 
 public slots:
     void init();
@@ -41,26 +43,30 @@ public slots:
 
     void matchGame();
 
+    void openMatchDialog();
+    void choiceGameMode();
+
     void closeGameOverDialog();
     void closeLevelUpDialog();
 
     void backToMain();
 
 protected:
-    MaaController *controller;
-    BoardInteractor::TimeMode m_timeMode;
+    Controller *controller;
+    GameInteractor::TimeMode m_timeMode;
 
 protected slots:
-    void matchGame1();
-    void matchGame2();
     void clickConfirmMove();
 
 signals:
     void moveFinished();
     void timeModeChanged();
 
+    void controllerChanged();
+
 private:
-    Q_PROPERTY(BoardInteractor::TimeMode timeMode READ timeMode WRITE setTimeMode NOTIFY timeModeChanged FINAL)
+    Q_PROPERTY(GameInteractor::TimeMode timeMode READ timeMode WRITE setTimeMode NOTIFY timeModeChanged FINAL)
+    Q_PROPERTY(Controller *controller READ getController WRITE setController NOTIFY controllerChanged FINAL)
 };
 
 #endif // BOARDINTERACTOR_H

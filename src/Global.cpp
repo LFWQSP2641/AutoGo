@@ -2,9 +2,11 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <opencv2/opencv.hpp>
 
 QString Global::appConfigPath;
 QString Global::appDataPath;
+QString Global::appDebugPath;
 QString Global::appTempPath;
 
 void Global::initOnce()
@@ -13,16 +15,19 @@ void Global::initOnce()
     Global::appConfigPath = QCoreApplication::applicationDirPath().append(QStringLiteral("/Config"));
     Global::appDataPath = QCoreApplication::applicationDirPath().append(QStringLiteral("/Data"));
     Global::appTempPath = QCoreApplication::applicationDirPath().append(QStringLiteral("/Temp"));
+    Global::appDebugPath = QCoreApplication::applicationDirPath().append(QStringLiteral("/Debug"));
 #else
     Global::appConfigPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
     Global::appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     Global::appTempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    Global::appDebugPath = QString(appTempPath).append(QStringLiteral("/Debug"));
 #endif // Q_OS_WINDOWS
 
     QDir dir;
     dir.mkpath(Global::configPath());
     dir.mkpath(Global::dataPath());
     dir.mkpath(Global::tempPath());
+    dir.mkpath(Global::debugPath());
 }
 
 QString Global::configPath()
@@ -33,6 +38,11 @@ QString Global::configPath()
 QString Global::dataPath()
 {
     return Global::appDataPath;
+}
+
+QString Global::debugPath()
+{
+    return Global::appDebugPath;
 }
 
 QString Global::tempPath()
@@ -96,4 +106,14 @@ qint64 Global::getDirSize(const QString &filePath)
                            { return getDirSize(QString(filePath).append(QStringLiteral("/")).append(subDir)) + value; });
 
     return size;
+}
+
+QString Global::saveDebugImage(const cv::Mat &image)
+{
+    static qint64 appRunTime{ QDateTime::currentDateTime().toMSecsSinceEpoch() };
+    static int count{ 0 };
+
+    QString filePath{ Global::debugPath().append(QStringLiteral("/%1_%2.png").arg(appRunTime).arg(count++)) };
+    cv::imwrite(filePath.toStdString(), image);
+    return filePath;
 }

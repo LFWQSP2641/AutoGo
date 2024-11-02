@@ -6,84 +6,47 @@
 #include <QObject>
 #include <QPoint>
 
-class BoardAnalyzer;
+class GameAnalyzer;
 
 class BoardData
 {
     Q_GADGET
-    friend BoardAnalyzer;
+    friend GameAnalyzer;
 
 public:
     BoardData();
+    explicit BoardData(QStringView uuid);
+    BoardData(const BoardData &other);
+    BoardData &operator=(const BoardData &other);
 
     bool operator==(const BoardData &other) const;
+    bool operator!=(const BoardData &other) const;
 
-    QList<QList<int>> getBoardDataArray() const;
+    QString uuid() const;
+    QList<QList<int>> boardDataArray() const;
+    StoneData lastMoveStone() const;
+    QList<StoneData> initialStonesArray() const;
+    QList<StoneData> moveStonesArray() const;
 
-    bool getRequestCounting() const;
-
-    bool getRequestDraw() const;
-
-    bool getRequestUndo() const;
-
-    bool getRequestAcceptCountingResult() const;
-
-    bool getGameOver() const;
-
-    bool getUnknownUnexpected() const;
-
-    bool getNeedMove() const;
-
-    StoneData::StoneColor getMyStoneColor() const;
-
-    StoneData getLastMoveStone() const;
-
-    bool hasUnexpected() const;
-
-    bool getIsMoving() const;
-
-    QString getUuid() const;
-
-    QList<StoneData> getInitialStonesArray() const;
-
-    QList<StoneData> getMoveStonesArray() const;
+    StoneData::StoneColor myStoneColor() const;
 
 protected:
-    QList<QList<int>> boardDataArray;
-    bool requestCounting;
-    bool requestDraw;
-    bool requestUndo;
-    bool requestAcceptCountingResult;
-    bool gameOver;
-    bool unknownUnexpected;
+    QString m_uuid;
+    QList<QList<int>> m_boardDataArray;
+    StoneData m_lastMoveStone;
+    QList<StoneData> m_initialStonesArray;
+    QList<StoneData> m_moveStonesArray;
 
-    bool needMove;
-
-    StoneData::StoneColor myStoneColor;
-
-    StoneData lastMoveStone;
-
-    bool isMoving;
-
-    QString uuid;
-    QList<StoneData> initialStonesArray;
-    QList<StoneData> moveStonesArray;
+    // TODO 优化
+    StoneData::StoneColor m_myStoneColor;
 
 private:
-    Q_PROPERTY(QList<QList<int>> boardDataArray READ getBoardDataArray CONSTANT FINAL)
-    Q_PROPERTY(bool requestCounting READ getRequestCounting CONSTANT FINAL)
-    Q_PROPERTY(bool requestDraw READ getRequestDraw CONSTANT FINAL)
-    Q_PROPERTY(bool requestUndo READ getRequestUndo CONSTANT FINAL)
-    Q_PROPERTY(bool requestAcceptCountingResult READ getRequestAcceptCountingResult CONSTANT FINAL)
-    Q_PROPERTY(bool gameOver READ getGameOver CONSTANT FINAL)
-    Q_PROPERTY(bool unknownUnexpected READ getUnknownUnexpected CONSTANT FINAL)
-    Q_PROPERTY(bool needMove READ getNeedMove CONSTANT FINAL)
-    Q_PROPERTY(StoneData::StoneColor myStoneColor READ getMyStoneColor CONSTANT FINAL)
-    Q_PROPERTY(StoneData lastMoveStone READ getLastMoveStone CONSTANT FINAL)
-    Q_PROPERTY(bool isMoving READ getIsMoving CONSTANT FINAL)
-    Q_PROPERTY(QString uuid READ getUuid CONSTANT FINAL)
-    Q_PROPERTY(QList<StoneData> initialStonesArray READ getInitialStonesArray CONSTANT FINAL)
-    Q_PROPERTY(QList<StoneData> moveStonesArray READ getMoveStonesArray CONSTANT FINAL)
+    Q_PROPERTY(QString uuid READ uuid CONSTANT FINAL)
+    Q_PROPERTY(QList<QList<int>> boardDataArray READ boardDataArray CONSTANT FINAL)
+    Q_PROPERTY(StoneData lastMoveStone READ lastMoveStone CONSTANT FINAL)
+    Q_PROPERTY(QList<StoneData> initialStonesArray READ initialStonesArray CONSTANT FINAL)
+    Q_PROPERTY(QList<StoneData> moveStonesArray READ moveStonesArray CONSTANT FINAL)
+    Q_PROPERTY(StoneData::StoneColor myStoneColor READ myStoneColor CONSTANT FINAL)
 };
 
 Q_DECLARE_METATYPE(BoardData)

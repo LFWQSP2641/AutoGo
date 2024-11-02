@@ -32,16 +32,11 @@ void KatagoGTPInteractor::stopAnalyze()
 
 void KatagoGTPInteractor::move(const BoardData &boardData)
 {
-    if (boardData.hasUnexpected())
-    {
-        qDebug() << QStringLiteral("boardData hasUnexpected");
-        return;
-    }
     lastMoveTime = QDateTime::currentMSecsSinceEpoch();
-    if ((!boardData.getInitialStonesArray().isEmpty()) && m_boardData.getInitialStonesArray() != boardData.getInitialStonesArray())
+    if ((!boardData.initialStonesArray().isEmpty()) && m_boardData.initialStonesArray() != boardData.initialStonesArray())
     {
         QByteArray data;
-        for (const auto &i : boardData.getInitialStonesArray())
+        for (const auto &i : boardData.initialStonesArray())
         {
             data.append(QByteArrayLiteral("play "));
             data.append(i.getColor() == StoneData::StoneColor::Black
@@ -55,15 +50,15 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
     }
     QByteArray data;
     data.append(QByteArrayLiteral("play "));
-    data.append(boardData.getLastMoveStone().getColor() == StoneData::StoneColor::Black
+    data.append(boardData.lastMoveStone().getColor() == StoneData::StoneColor::Black
                     ? QByteArrayLiteral("B ")
                     : QByteArrayLiteral("W "));
-    data.append(pointToGTP(boardData.getLastMoveStone().getPoint()).toUtf8());
+    data.append(pointToGTP(boardData.lastMoveStone().getPoint()).toUtf8());
     data.append(QByteArrayLiteral("\n"));
     qDebug() << data;
     katagoProcess->write(data);
     m_boardData = boardData;
-    if (boardData.getMyStoneColor() != boardData.getLastMoveStone().getColor())
+    if (boardData.myStoneColor() != boardData.lastMoveStone().getColor())
     {
         const QByteArray analyzeData(QByteArrayLiteral("kata-analyze ").append(QByteArray::number(reportIntervalMS / 10)).append(10));
         qDebug() << analyzeData;
@@ -105,7 +100,7 @@ void KatagoGTPInteractor::analyzeKatagoOutput()
 
         // 设置最佳下法的点和颜色
         m_bestMove.setPoint(gptToPoint(gtp));
-        m_bestMove.setColor(m_boardData.getLastMoveStone().getColor() == StoneData::StoneColor::Black
+        m_bestMove.setColor(m_boardData.lastMoveStone().getColor() == StoneData::StoneColor::Black
                                 ? StoneData::StoneColor::White
                                 : StoneData::StoneColor::Black);
 

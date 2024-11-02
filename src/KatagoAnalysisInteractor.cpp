@@ -30,23 +30,15 @@ void KatagoAnalysisInteractor::stopAnalyze()
 
 void KatagoAnalysisInteractor::move(const BoardData &boardData)
 {
-    if (boardData.hasUnexpected())
-    {
-        qDebug() << QStringLiteral("boardData hasUnexpected");
+    qDebug() << boardData.lastMoveStone();
+    if (boardData.lastMoveStone().getColor() == StoneData::StoneColor::None)
         return;
-    }
-    if (boardData.getMyStoneColor() == boardData.getLastMoveStone().getColor())
-    {
-        qDebug() << QStringLiteral("is my turn, not analysis");
-        return;
-    }
     lastMoveTime = QDateTime::currentMSecsSinceEpoch();
-    qDebug() << boardData.getLastMoveStone();
     m_boardData = boardData;
     QJsonObject jsonObject;
-    jsonObject.insert(QStringLiteral("id"), m_boardData.getUuid());
-    jsonObject.insert(QStringLiteral("initialStones"), stoneDataListToJsonArray(m_boardData.getInitialStonesArray()));
-    jsonObject.insert(QStringLiteral("moves"), stoneDataListToJsonArray(m_boardData.getMoveStonesArray()));
+    jsonObject.insert(QStringLiteral("id"), m_boardData.uuid());
+    jsonObject.insert(QStringLiteral("initialStones"), stoneDataListToJsonArray(m_boardData.initialStonesArray()));
+    jsonObject.insert(QStringLiteral("moves"), stoneDataListToJsonArray(m_boardData.moveStonesArray()));
     jsonObject.insert(QStringLiteral("rules"), QStringLiteral("chinese-ogs"));
     jsonObject.insert(QStringLiteral("komi"), 7.5);
     jsonObject.insert(QStringLiteral("boardXSize"), 19);
@@ -69,11 +61,11 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
             break;
         }
 
-        const auto moveSize(m_boardData.getInitialStonesArray().size() + m_boardData.getMoveStonesArray().size());
+        const auto moveSize(m_boardData.initialStonesArray().size() + m_boardData.moveStonesArray().size());
         int maxVisits(Settings::getSingletonSettings()->kataGoMaxVisits() * timeScaleFactor);
         // 开局加快下棋速度
         if (moveSize < 10)
-            maxVisits = maxVisits * (10 - moveSize) / 10;
+            maxVisits = qRound(double(maxVisits) * double(moveSize) / double(10));
 
         jsonObject.insert(QStringLiteral("maxVisits"), maxVisits);
     }
@@ -120,7 +112,7 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
         }
     }
     bytes.clear();
-    if (jsonObject.value(QStringLiteral("id")).toString() != m_boardData.getUuid())
+    if (jsonObject.value(QStringLiteral("id")).toString() != m_boardData.uuid())
     {
         qDebug() << QStringLiteral("id is not equal");
         return;
@@ -133,7 +125,7 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
     }
     const auto bestMovePoint(gptToPoint(bestMoveInfo.value(QStringLiteral("move")).toString()));
     qDebug() << bestMovePoint;
-    m_bestMove = StoneData(m_boardData.getLastMoveStone().getColor() ==
+    m_bestMove = StoneData(m_boardData.lastMoveStone().getColor() ==
                                    StoneData::StoneColor::Black
                                ? StoneData::StoneColor::White
                                : StoneData::StoneColor::Black,
