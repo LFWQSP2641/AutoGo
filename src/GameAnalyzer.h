@@ -56,6 +56,8 @@ protected:
 protected slots:
     void handleImage(const cv::Mat &image, GameData &gameData);
 
+    void doAnalyze();
+
 signals:
     void screencaptorChanged();
 

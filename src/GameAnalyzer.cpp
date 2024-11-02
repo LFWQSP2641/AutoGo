@@ -7,6 +7,7 @@
 #include <QHash>
 #include <QPoint>
 #include <QThread>
+#include <QTimer>
 #include <opencv2/opencv.hpp>
 
 QHash<QString, QPoint> GameAnalyzer::templateImagePoints = {
@@ -246,34 +247,11 @@ GameData GameAnalyzer::analyze(const cv::Mat &image)
 
 void GameAnalyzer::analyzeIndefinitely()
 {
-    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO << "enter";
     m_stop = false;
     reset();
-    while (!m_stop)
-    {
-        if (m_pauseDuration > 0)
-        {
-            QThread::sleep(m_pauseDuration);
-            setPauseDuration(0);
-        }
-        auto image = screencap();
-        if (!image)
-        {
-            qWarning() << QStringLiteral("image is null");
-            return;
-        }
-        GameData gameData(m_data);
-        handleImage(image.value(), gameData);
-        if (m_stop)
-        {
-            break;
-        }
-        if (gameData != m_data)
-        {
-            m_data = gameData;
-            emit analysisDataUpdated(gameData);
-        }
-    }
+    QTimer::singleShot(0, this, &GameAnalyzer::doAnalyze);
+    qDebug() << Q_FUNC_INFO << "exit";
 }
 
 void GameAnalyzer::init()
@@ -289,6 +267,7 @@ void GameAnalyzer::reset()
 
 void GameAnalyzer::stopAnalyze()
 {
+    qDebug() << Q_FUNC_INFO;
     m_stop = true;
 }
 
@@ -331,4 +310,35 @@ void GameAnalyzer::handleImage(const cv::Mat &image, GameData &gameData)
         gameData.m_needMove = isTurnToPlay(image);
     }
     emit analysisCompleted(gameData);
+}
+
+void GameAnalyzer::doAnalyze()
+{
+    if (m_pauseDuration > 0)
+    {
+        QThread::sleep(m_pauseDuration);
+        setPauseDuration(0);
+    }
+    auto image = screencap();
+    if (!image)
+    {
+        qWarning() << QStringLiteral("image is null");
+        return;
+    }
+    GameData gameData(m_data);
+    if (m_stop)
+    {
+        return;
+    }
+    handleImage(image.value(), gameData);
+    if (m_stop)
+    {
+        return;
+    }
+    if (gameData != m_data)
+    {
+        m_data = gameData;
+        emit analysisDataUpdated(gameData);
+    }
+    QTimer::singleShot(0, this, &GameAnalyzer::doAnalyze);
 }

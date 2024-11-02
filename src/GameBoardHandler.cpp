@@ -184,10 +184,13 @@ void GameBoardHandler::connectSignals()
 
     connect(this, &GameBoardHandler::toKatagoMove, m_katagoInteractor, &KatagoInteractor::move);
     connect(this, &GameBoardHandler::toPauseAnalyze, m_gameAnalyzer, &GameAnalyzer::pause);
+
+    connect(this, &GameBoardHandler::toAnalyzeReset, m_gameAnalyzer, &GameAnalyzer::reset);
 }
 
 void GameBoardHandler::startTask()
 {
+    qDebug() << Q_FUNC_INFO << m_task;
     if (!m_inited)
     {
         qWarning() << QStringLiteral("GameBoardHandler has not been inited");
@@ -292,9 +295,9 @@ void GameBoardHandler::onInitFinished(bool success)
 
 void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
 {
+    qDebug() << gameData.appNavigation();
     if (m_pauseReception)
         return;
-    qDebug() << gameData.appNavigation();
     if (m_task != Task::StartGame)
         return;
     // 第一局结束
@@ -318,12 +321,13 @@ void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
     handleGamePage(gameData.appNavigation());
     if (gameData.appNavigation() == GameData::AppNavigation::playingPage)
     {
-        if (!gameStarted)
+        if ((!gameStarted) && gameData.boardData().initialStonesArray().size() < 4)
         {
             m_pauseReception = true;
-            emit toPauseAnalyze(2500);
+            m_gameAnalyzer->stopAnalyze();
             QTimer::singleShot(2000, this, [this, gameData]
-                               { this->handleGameOpening(gameData); });
+                               { this->handleGameOpening(gameData);
+                emit this->toAnalyzeGameBoard(); });
             gameStarted = true;
             m_state = State::Playing;
             emit gameStarting();

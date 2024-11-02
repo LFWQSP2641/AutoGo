@@ -121,6 +121,7 @@ signals:
     void toStopGame();
     void toKatagoMove(const BoardData &boardData);
     void toPauseAnalyze(const unsigned long &duration);
+    void toAnalyzeReset();
 
 signals:
     void taskChanged();
