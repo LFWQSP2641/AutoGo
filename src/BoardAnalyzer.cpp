@@ -13,27 +13,31 @@
 #include <opencv2/opencv.hpp>
 
 QHash<QString, QPoint> BoardAnalyzer::templateImagePoints = {
-    {QStringLiteral("AcceptCountingResult"),       QPoint(141, 1780)},
-    { QStringLiteral("AnalysisPage"),              QPoint(0,   1770)},
-    { QStringLiteral("AnalysisPage2"),             QPoint(0,   1770)},
-    { QStringLiteral("CancelResumeBattleDialog"),  QPoint(200, 850) },
-    { QStringLiteral("GameOverDialogCloseButton"), QPoint(975, 330) },
-    { QStringLiteral("LevelUpDialogCloseButton"),  QPoint(935, 205) },
-    { QStringLiteral("Backutton"),                 QPoint(30,  110) },
-    { QStringLiteral("Backutton2"),                QPoint(30,  110) },
-    { QStringLiteral("ConfirmDefeatDialog"),       QPoint(200, 850) },
-    { QStringLiteral("DurationChoiceDialog"),      QPoint(440, 250) },
-    { QStringLiteral("MainPage"),                  QPoint(0,   1520)},
-    { QStringLiteral("MatchDialog"),               QPoint(450, 510) },
-    { QStringLiteral("PlayingPage"),               QPoint(0,   1770)},
-    { QStringLiteral("PlayingPageWithMove"),       QPoint(400, 1640)},
-    { QStringLiteral("PlayingPageWithMove2"),      QPoint(400, 1640)},
-    { QStringLiteral("RequestCountingDialog"),     QPoint(200, 850) },
-    { QStringLiteral("RequestDrawDialog"),         QPoint(200, 850) },
-    { QStringLiteral("RequestRematchDialog"),      QPoint(200, 850) },
-    { QStringLiteral("RequestResumeBattleDialog"), QPoint(200, 850) },
-    { QStringLiteral("RequestUndoDialog"),         QPoint(200, 850) },
-    { QStringLiteral("TipDialogWithButton"),       QPoint(490, 710) }
+    {QStringLiteral("AcceptCountingResult"),        QPoint(141, 1780)},
+    { QStringLiteral("AnalysisPage"),               QPoint(0,   1770)},
+    { QStringLiteral("AnalysisPage2"),              QPoint(0,   1770)},
+    { QStringLiteral("CancelResumeBattleDialog"),   QPoint(200, 850) },
+    { QStringLiteral("GameOverDialogCloseButton"),  QPoint(975, 330) },
+    { QStringLiteral("GameOverDialogCloseButton2"), QPoint(975, 330) },
+    { QStringLiteral("LevelUpDialogCloseButton"),   QPoint(935, 205) },
+    { QStringLiteral("Backutton"),                  QPoint(30,  110) },
+    { QStringLiteral("Backutton2"),                 QPoint(30,  110) },
+    { QStringLiteral("Backutton3"),                 QPoint(30,  110) },
+    { QStringLiteral("ConfirmDefeatDialog"),        QPoint(200, 850) },
+    { QStringLiteral("ConfirmDefeatDialog2"),       QPoint(200, 850) },
+    { QStringLiteral("DurationChoiceDialog"),       QPoint(440, 250) },
+    { QStringLiteral("MainPage"),                   QPoint(0,   1520)},
+    { QStringLiteral("MatchDialog"),                QPoint(450, 510) },
+    { QStringLiteral("PlayingPage"),                QPoint(0,   1770)},
+    { QStringLiteral("PlayingPage2"),               QPoint(0,   1770)},
+    { QStringLiteral("PlayingPageWithMove"),        QPoint(400, 1640)},
+    { QStringLiteral("PlayingPageWithMove2"),       QPoint(400, 1640)},
+    { QStringLiteral("RequestCountingDialog"),      QPoint(200, 850) },
+    { QStringLiteral("RequestDrawDialog"),          QPoint(200, 850) },
+    { QStringLiteral("RequestRematchDialog"),       QPoint(200, 850) },
+    { QStringLiteral("RequestResumeBattleDialog"),  QPoint(200, 850) },
+    { QStringLiteral("RequestUndoDialog"),          QPoint(200, 850) },
+    { QStringLiteral("TipDialogWithButton"),        QPoint(490, 710) }
 };
 
 BoardAnalyzer::BoardAnalyzer(QObject *parent)
@@ -69,7 +73,7 @@ BoardAnalyzer::AppNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &
             return BoardAnalyzer::requestResumeBattleDialog;
         if (funcEqual(QStringLiteral("RequestUndoDialog")))
             return BoardAnalyzer::requestUndoDialog;
-        if (funcEqual(QStringLiteral("ConfirmDefeatDialog")))
+        if (funcEqual(QStringLiteral("ConfirmDefeatDialog")) || funcEqual(QStringLiteral("ConfirmDefeatDialog2")))
             return BoardAnalyzer::confirmDefeatDialog;
         if (funcEqual(QStringLiteral("CancelResumeBattleDialog")))
             return BoardAnalyzer::cancelResumeBattleDialog;
@@ -81,11 +85,11 @@ BoardAnalyzer::AppNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &
         return BoardAnalyzer::durationChoiceDialog;
     if (funcEqual(QStringLiteral("MatchDialog")))
         return BoardAnalyzer::matchDialog;
-    if (funcEqual(QStringLiteral("GameOverDialogCloseButton")))
+    if (funcEqual(QStringLiteral("GameOverDialogCloseButton")) || funcEqual(QStringLiteral("GameOverDialogCloseButton2")))
         return BoardAnalyzer::gameOverDialog;
     if (funcEqual(QStringLiteral("LevelUpDialogCloseButton")))
         return BoardAnalyzer::levelUpDialog;
-    if (funcEqual(QStringLiteral("PlayingPage")))
+    if (funcEqual(QStringLiteral("PlayingPage")) || funcEqual(QStringLiteral("PlayingPage2")))
     {
         if (image.at<cv::Vec3b>(946, 288) == cv::Vec3b(78, 111, 80))
             return BoardAnalyzer::tipDialog;
@@ -97,7 +101,7 @@ BoardAnalyzer::AppNavigation BoardAnalyzer::appNavigationAnalyze(const cv::Mat &
         return BoardAnalyzer::analysisPage;
     if (funcEqual(QStringLiteral("MainPage")))
         return BoardAnalyzer::mainPage;
-    if (funcEqual(QStringLiteral("Backutton")) || funcEqual(QStringLiteral("Backutton2")))
+    if (funcEqual(QStringLiteral("Backutton")) || funcEqual(QStringLiteral("Backutton2")) || funcEqual(QStringLiteral("Backutton3")))
         return BoardAnalyzer::pageWithBack;
 
     const auto filePath(QCoreApplication::applicationDirPath()

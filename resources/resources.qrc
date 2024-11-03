@@ -27,5 +27,9 @@
         <file>data/TemplateImage/RequestUndoDialog.png</file>
         <file>data/TemplateImage/TipDialogWithButton.png</file>
         <file>data/maatouch</file>
+        <file>data/TemplateImage/Backutton3.png</file>
+        <file>data/TemplateImage/ConfirmDefeatDialog2.png</file>
+        <file>data/TemplateImage/GameOverDialogCloseButton2.png</file>
+        <file>data/TemplateImage/PlayingPage2.png</file>
     </qresource>
 </RCC>
