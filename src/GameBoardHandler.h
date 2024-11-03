@@ -5,7 +5,6 @@
 #include "StoneData.h"
 
 #include <QObject>
-#include <QtQml/qqmlregistration.h>
 
 class GameAnalyzer;
 class GameInteractor;
@@ -14,10 +13,10 @@ class KatagoInteractor;
 class GameBoardHandler : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
 
 public:
     explicit GameBoardHandler(QObject *parent = nullptr);
+    ~GameBoardHandler();
 
     enum State
     {

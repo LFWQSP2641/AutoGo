@@ -52,6 +52,11 @@ void KatagoInteractor::startTimer()
     }
 }
 
+void KatagoInteractor::quit()
+{
+    katagoProcess->close();
+}
+
 void KatagoInteractor::setTimeModeFromInt(int newTimeMode)
 {
     setTimeMode(KatagoInteractor::TimeMode(newTimeMode));

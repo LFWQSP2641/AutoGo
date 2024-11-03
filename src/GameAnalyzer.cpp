@@ -38,8 +38,9 @@ QHash<QString, QPoint> GameAnalyzer::templateImagePoints = {
 GameAnalyzer::GameAnalyzer(QObject *parent)
     : QObject{ parent },
       m_screencaptor{ nullptr },
+      m_stop{ false },
       m_pauseDuration{ 0 },
-      m_stop{ false }
+      m_analyzeInterval{ 10 }
 {
 }
 
@@ -64,6 +65,7 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
             return GameData::confirmDefeatDialog;
         if (funcEqual(QStringLiteral("CancelResumeBattleDialog")))
             return GameData::cancelResumeBattleDialog;
+        qWarning() << "not matching" << Global::saveDebugImage(image);
         return GameData::otherDialog;
     }
     if (funcEqual(QStringLiteral("AcceptCountingResult")))
@@ -80,13 +82,6 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
     {
         if (image.at<cv::Vec3b>(946, 288) == cv::Vec3b(78, 111, 80))
             return GameData::tipDialog;
-        // TODO debug
-        const auto vec(image.at<cv::Vec3b>(1020, 270));
-        if (vec[1] - 20 > vec[0] && vec[1] - 20 > vec[2] && vec[1] < 100)
-        {
-            qWarning() << "tipDialog but not matching";
-            return GameData::tipDialog;
-        }
         return GameData::playingPage;
     }
     if (funcEqual(QStringLiteral("PlayingPageWithMove")) || funcEqual(QStringLiteral("PlayingPageWithMove2")))
@@ -276,6 +271,19 @@ void GameAnalyzer::pause(const unsigned long &duration)
     setPauseDuration(duration);
 }
 
+unsigned long GameAnalyzer::analyzeInterval() const
+{
+    return m_analyzeInterval;
+}
+
+void GameAnalyzer::setAnalyzeInterval(unsigned long newAnalyzeInterval)
+{
+    if (m_analyzeInterval == newAnalyzeInterval)
+        return;
+    m_analyzeInterval = newAnalyzeInterval;
+    emit analyzeIntervalChanged();
+}
+
 unsigned long GameAnalyzer::pauseDuration() const
 {
     return m_pauseDuration;
@@ -316,8 +324,9 @@ void GameAnalyzer::doAnalyze()
 {
     if (m_pauseDuration > 0)
     {
-        QThread::sleep(m_pauseDuration);
+        QTimer::singleShot(m_pauseDuration, this, &GameAnalyzer::doAnalyze);
         setPauseDuration(0);
+        return;
     }
     auto image = screencap();
     if (!image)
@@ -340,5 +349,5 @@ void GameAnalyzer::doAnalyze()
         m_data = gameData;
         emit analysisDataUpdated(gameData);
     }
-    QTimer::singleShot(0, this, &GameAnalyzer::doAnalyze);
+    QTimer::singleShot(m_analyzeInterval, this, &GameAnalyzer::doAnalyze);
 }

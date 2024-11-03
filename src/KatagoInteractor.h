@@ -41,6 +41,8 @@ public slots:
 
     virtual void startTimer();
 
+    virtual void quit();
+
     void setTimeModeFromInt(int newTimeMode);
 
 protected:

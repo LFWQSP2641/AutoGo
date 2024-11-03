@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    qSetMessagePattern(QStringLiteral("DateTime:%{time [yyyy-MM-dd hh:mm:ss:zzz]} Function:%{function} Message:%{message}\nFile:%{file} Line:%{line} ThreadId:%{threadid}"));
+    qSetMessagePattern(QStringLiteral("File:%{file} Line:%{line} ThreadId:%{threadid}\nDateTime:%{time [yyyy-MM-dd hh:mm:ss:zzz]} Function:%{function} Message:%{message}"));
 
     Global::initOnce();
 

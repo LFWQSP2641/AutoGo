@@ -43,7 +43,7 @@ Item {
                     model: ["短(1分钟)", "中(5分钟)", "长(20分钟)"]
                     currentIndex: 0
                     onCurrentIndexChanged: {
-                        handler.setTimeMode(currentIndex)
+                        interactor.setTimeMode(currentIndex)
                     }
                 }
             }
@@ -54,7 +54,7 @@ Item {
                     Layout.fillWidth: true
                     text: "连续对弈"
                     onCheckedChanged: {
-                        handler.setContinuousPlayGame(checked)
+                        interactor.gameBoardHandler.continuousPlayGame = checked
                     }
                 }
                 Button {
@@ -64,12 +64,12 @@ Item {
                     onClicked: {
                         startGameButton.enabled = false
                         durationComboBox.enabled = false
-                        if (!handler.inited)
+                        if (!interactor.gameBoardHandler.inited)
                         {
-                            handler.init()
+                            interactor.init()
                             return
                         }
-                        handler.startGame()
+                        interactor.startGame()
                     }
                 }
                 Button {
@@ -77,7 +77,7 @@ Item {
                     Layout.fillWidth: true
                     text: "停止"
                     onClicked: {
-                        handler.stopGame()
+                        interactor.stopGame()
                         startGameButton.enabled = true
                         startGameButton.enabled = true
                     }
@@ -86,8 +86,8 @@ Item {
         }
     }
 
-    GameBoardHandler {
-        id: handler
+    AutoGoInteractor {
+        id: interactor
         onBoardDataArrayUpdate: function(boardDataArray) {
             goBoard.setBoardData(boardDataArray)
         }
@@ -116,7 +116,7 @@ Item {
             if(success)
             {
                 gameLogArea.append("初始化成功")
-                handler.startGame()
+                interactor.startGame()
             }
             else
             {

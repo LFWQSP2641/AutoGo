@@ -33,6 +33,18 @@ GameBoardHandler::GameBoardHandler(QObject *parent)
 {
 }
 
+GameBoardHandler::~GameBoardHandler()
+{
+    if (!m_inited)
+        return;
+    m_gameAnalyzer->stopAnalyze();
+    m_katagoInteractor->quit();
+    m_gameAnalyzerThread->quit();
+    m_katagoInteractorThread->quit();
+    m_gameAnalyzerThread->wait();
+    m_katagoInteractorThread->wait();
+}
+
 bool GameBoardHandler::inited() const
 {
     return m_inited;
@@ -54,6 +66,29 @@ void GameBoardHandler::setTask(GameBoardHandler::Task newTask)
         return;
     m_task = newTask;
     emit taskChanged();
+}
+
+int GameBoardHandler::getGameCount() const
+{
+    return gameCount;
+}
+
+bool GameBoardHandler::getGameStarted() const
+{
+    return gameStarted;
+}
+
+bool GameBoardHandler::getContinuousPlayGame() const
+{
+    return continuousPlayGame;
+}
+
+void GameBoardHandler::setContinuousPlayGame(bool newContinuousPlayGame)
+{
+    if (continuousPlayGame == newContinuousPlayGame)
+        return;
+    continuousPlayGame = newContinuousPlayGame;
+    emit continuousPlayGameChanged();
 }
 
 void GameBoardHandler::init()
@@ -135,29 +170,6 @@ void GameBoardHandler::setTimeMode(int timeMode)
     qDebug() << timeMode;
     m_timeMode = timeMode;
     emit toSetTimeMode(m_timeMode);
-}
-
-bool GameBoardHandler::getContinuousPlayGame() const
-{
-    return continuousPlayGame;
-}
-
-void GameBoardHandler::setContinuousPlayGame(bool newContinuousPlayGame)
-{
-    if (continuousPlayGame == newContinuousPlayGame)
-        return;
-    continuousPlayGame = newContinuousPlayGame;
-    emit continuousPlayGameChanged();
-}
-
-bool GameBoardHandler::getGameStarted() const
-{
-    return gameStarted;
-}
-
-int GameBoardHandler::getGameCount() const
-{
-    return gameCount;
 }
 
 void GameBoardHandler::connectSignals()
