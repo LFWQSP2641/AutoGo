@@ -23,7 +23,9 @@ public:
         Stopped = 0,
         Playing,
         NavigatingToMain,
-        WaitingMatching
+        WaitingMatching,
+        WaitingCounterpartyMove,
+        WaitingCounterpartyAccept
     };
     Q_ENUM(State)
 

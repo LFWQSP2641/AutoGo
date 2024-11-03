@@ -30,6 +30,8 @@ public:
 
     StoneData::StoneColor myStoneColor() const;
 
+    qsizetype stoneCount() const;
+
 protected:
     QString m_uuid;
     QList<QList<int>> m_boardDataArray;

@@ -249,13 +249,14 @@ void GameBoardHandler::handleGamePage(GameData::AppNavigation appNavigation)
         break;
     case GameData::AppNavigation::requestCountingDialog:
     case GameData::AppNavigation::requestRematchDialog:
-    case GameData::AppNavigation::otherDialog:
+    case GameData::AppNavigation::requestIntelligentRefereeDialog:
         m_gameInteractor->acceptRequest();
         break;
     case GameData::AppNavigation::requestUndoDialog:
     case GameData::AppNavigation::requestDrawDialog:
     case GameData::AppNavigation::requestResumeBattleDialog:
     case GameData::AppNavigation::confirmDefeatDialog:
+    case GameData::AppNavigation::otherDialog:
         m_gameInteractor->rejectRequest();
         break;
     case GameData::AppNavigation::cancelResumeBattleDialog:
@@ -350,6 +351,7 @@ void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
     handleGamePage(gameData.appNavigation());
     if (gameData.appNavigation() == GameData::AppNavigation::playingPage)
     {
+        m_state = State::Playing;
         if (!gameStarted)
         {
             // 对局开始
@@ -357,13 +359,17 @@ void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
             QTimer::singleShot(2000, this, [this, gameData]
                                { this->handleGameOpening(gameData); });
             gameStarted = true;
-            m_state = State::Playing;
             emit gameStarting();
             return;
         }
         lastMoveStone = gameData.boardData().lastMoveStone();
         emit boardDataArrayUpdate(gameData.boardData().boardDataArray());
-        if (gameData.needMove())
+        if (gameData.boardData().stoneCount() == 300 || gameData.boardData().stoneCount() == 325)
+        {
+            m_state = State::WaitingCounterpartyAccept;
+            m_gameInteractor->requestIntelligentReferee();
+        }
+        else if (gameData.needMove())
             emit toKatagoMove(gameData.boardData());
     }
     else if (gameData.appNavigation() == GameData::AppNavigation::mainPage ||
@@ -386,4 +392,5 @@ void GameBoardHandler::onKatagoBestMove(const StoneData &stoneData)
     emit bestPointUpdate(stoneData);
     m_gameInteractor->moveStone(stoneData);
     m_checkTimer->start();
+    m_state = State::WaitingCounterpartyMove;
 }

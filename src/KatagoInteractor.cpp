@@ -30,7 +30,7 @@ void KatagoInteractor::clearBoard()
 
 void KatagoInteractor::startTimer()
 {
-    const auto moveSize(m_boardData.initialStonesArray().size() + m_boardData.moveStonesArray().size());
+    const auto moveSize(m_boardData.stoneCount());
     if (moveSize < 10)
     {
         timer->start(Util::generateTanhRandom(1000, 3000));

@@ -61,7 +61,7 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
             break;
         }
 
-        const auto moveSize(m_boardData.initialStonesArray().size() + m_boardData.moveStonesArray().size());
+        const auto moveSize(m_boardData.stoneCount());
         int maxVisits(Settings::getSingletonSettings()->kataGoMaxVisits() * timeScaleFactor);
         // 开局加快下棋速度
         if (moveSize < 10)
@@ -112,14 +112,14 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
         }
     }
     bytes.clear();
-    if (jsonObject.value(QStringLiteral("id")).toString() != m_boardData.uuid())
-    {
-        qDebug() << QStringLiteral("id is not equal");
-        return;
-    }
     if (jsonObject.value(QStringLiteral("id")).toString() == QStringLiteral("stopAnalyze"))
     {
         qDebug() << QStringLiteral("stopAnalyze");
+        return;
+    }
+    if (jsonObject.value(QStringLiteral("id")).toString() != m_boardData.uuid())
+    {
+        qDebug() << QStringLiteral("id is not equal");
         return;
     }
     const auto bestMoveInfo(jsonObject.value(QStringLiteral("moveInfos")).toArray().at(0).toObject());

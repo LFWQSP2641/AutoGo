@@ -76,3 +76,8 @@ StoneData::StoneColor BoardData::myStoneColor() const
 {
     return m_myStoneColor;
 }
+
+qsizetype BoardData::stoneCount() const
+{
+    return m_initialStonesArray.size() + m_moveStonesArray.size();
+}

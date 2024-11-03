@@ -55,6 +55,9 @@ public slots:
 
     void backToMain();
 
+    void requestCounting();
+    void requestIntelligentReferee();
+
 protected:
     Controller *controller;
     GameInteractor::TimeMode m_timeMode;

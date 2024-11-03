@@ -133,6 +133,16 @@ void GameInteractor::backToMain()
     controller->Controller::click(QRect(QPoint(40, 125), QPoint(100, 150)));
 }
 
+void GameInteractor::requestCounting()
+{
+    controller->Controller::click(QRect(QPoint(294, 1793), QPoint(464, 1863)));
+}
+
+void GameInteractor::requestIntelligentReferee()
+{
+    controller->Controller::click(QRect(QPoint(514, 1793), QPoint(684, 1863)));
+}
+
 Controller *GameInteractor::getController() const
 {
     return controller;
