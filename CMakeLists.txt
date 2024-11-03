@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # 设置项目名称和版本
-project(AutoGo VERSION 2.0 LANGUAGES CXX)
+project(AutoGo VERSION 2.1.0 LANGUAGES CXX)
 
 # 指定 C++ 版本
 set(CMAKE_CXX_STANDARD 17)
@@ -17,9 +17,7 @@ qt_standard_project_setup()
 # 设置源文件和头文件
 # 添加头文件和源文件
 set(SOURCES
-
     src/AutoGoInteractor.cpp
-
     src/BoardData.cpp
     src/GameAnalyzer.cpp
     src/GameBoardHandler.cpp
@@ -28,6 +26,7 @@ set(SOURCES
     src/Global.cpp
     src/GoBoardItem.cpp
     src/InteractiveInterface/AdbHandle.cpp
+    src/InteractiveInterface/AdbInteractor.cpp
     src/InteractiveInterface/AdbScreencaptor.cpp
     src/InteractiveInterface/Controller.cpp
     src/InteractiveInterface/MaaController.cpp
@@ -44,9 +43,7 @@ set(SOURCES
 )
 
 set(HEADERS
-
     src/AutoGoInteractor.h
-
     src/BoardData.h
     src/GameAnalyzer.h
     src/GameBoardHandler.h
@@ -55,6 +52,7 @@ set(HEADERS
     src/Global.h
     src/GoBoardItem.h
     src/InteractiveInterface/AdbHandle.h
+    src/InteractiveInterface/AdbInteractor.h
     src/InteractiveInterface/AdbScreencaptor.h
     src/InteractiveInterface/Controller.h
     src/InteractiveInterface/MaaController.h
@@ -75,8 +73,7 @@ set(RESOURCES resources/resources.qrc)
 qt_add_resources(RESOURCES ${RESOURCES})
 
 # 创建可执行文件
-qt_add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES}
-    src/InteractiveInterface/AdbInteractor.h src/InteractiveInterface/AdbInteractor.cpp)
+qt_add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 
 include_directories(src)
 include_directories(${CMAKE_SOURCE_DIR})
