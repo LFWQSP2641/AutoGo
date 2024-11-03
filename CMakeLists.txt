@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # 设置项目名称和版本
-project(AutoGo VERSION 2.1.0 LANGUAGES CXX)
+project(AutoGo VERSION 2.1.1 LANGUAGES CXX)
 
 # 指定 C++ 版本
 set(CMAKE_CXX_STANDARD 17)
