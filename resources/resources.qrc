@@ -6,14 +6,18 @@
     </qresource>
     <qresource prefix="/">
         <file>data/TemplateImage/AcceptCountingResult.png</file>
+        <file>data/TemplateImage/AIPKClose.png</file>
         <file>data/TemplateImage/AnalysisPage.png</file>
         <file>data/TemplateImage/AnalysisPage2.png</file>
         <file>data/TemplateImage/Backutton.png</file>
         <file>data/TemplateImage/Backutton2.png</file>
+        <file>data/TemplateImage/Backutton3.png</file>
         <file>data/TemplateImage/CancelResumeBattleDialog.png</file>
         <file>data/TemplateImage/ConfirmDefeatDialog.png</file>
+        <file>data/TemplateImage/ConfirmDefeatDialog2.png</file>
         <file>data/TemplateImage/DurationChoiceDialog.png</file>
         <file>data/TemplateImage/GameOverDialogCloseButton.png</file>
+        <file>data/TemplateImage/GameOverDialogCloseButton2.png</file>
         <file>data/TemplateImage/LevelUpDialogCloseButton.png</file>
         <file>data/TemplateImage/MainPage.png</file>
         <file>data/TemplateImage/MatchDialog.png</file>

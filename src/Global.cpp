@@ -110,6 +110,26 @@ qint64 Global::getDirSize(const QString &filePath)
 
 QString Global::saveDebugImage(const cv::Mat &image)
 {
+    static cv::Mat preImage;
+    if (preImage.empty())
+    {
+        preImage = image;
+    }
+    else
+    {
+        cv::Mat diffImage;
+        cv::absdiff(preImage, image, diffImage);
+
+        preImage = image;
+
+        cv::Mat grayImage;
+        cv::cvtColor(diffImage, grayImage, cv::COLOR_BGR2GRAY);
+
+        if (cv::countNonZero(grayImage) == 0)
+        {
+            return QString();
+        }
+    }
     static qint64 appRunTime{ QDateTime::currentDateTime().toMSecsSinceEpoch() };
     static int count{ 0 };
 

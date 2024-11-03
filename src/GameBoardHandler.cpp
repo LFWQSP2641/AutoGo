@@ -228,6 +228,9 @@ void GameBoardHandler::handleGamePage(GameData::AppNavigation appNavigation)
 {
     switch (appNavigation)
     {
+    case GameData::AppNavigation::playingPageWithMove:
+        m_gameInteractor->clickConfirmMove();
+        break;
     case GameData::AppNavigation::gameOverDialog:
         m_gameInteractor->closeGameOverDialog();
         break;
@@ -264,6 +267,9 @@ void GameBoardHandler::handleGamePage(GameData::AppNavigation appNavigation)
     case GameData::AppNavigation::matchDialog:
         emit toPauseAnalyze(500);
         break;
+    case GameData::AppNavigation::AIPKDialog:
+        m_gameInteractor->closeAIPKDialog();
+        break;
     case GameData::AppNavigation::tipDialog:
     default:
         break;
@@ -296,7 +302,16 @@ void GameBoardHandler::handleGameOpening(const GameData &gameData)
     default:
         break;
     }
-    m_pauseReception = false;
+}
+
+void GameBoardHandler::pauseGameAnalyze(const unsigned long &duration)
+{
+    m_pauseReception = true;
+    m_gameAnalyzer->stopAnalyze();
+    QTimer::singleShot(duration, this, [this]
+                       {
+                           this->m_pauseReception = false;
+                           emit this->toAnalyzeGameBoard(); });
 }
 
 void GameBoardHandler::onInitFinished(bool success)
@@ -312,7 +327,7 @@ void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
         return;
     if (m_task != Task::StartGame)
         return;
-    // 第一局结束
+    // 对局结束
     if (gameStarted && gameData.appNavigation() == GameData::AppNavigation::gameOverDialog)
     {
         gameStarted = false;
@@ -321,6 +336,8 @@ void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
         if (continuousPlayGame)
         {
             m_gameInteractor->closeGameOverDialog();
+            // 等待界面反应
+            pauseGameAnalyze(2000);
         }
         else
         {
@@ -333,13 +350,12 @@ void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
     handleGamePage(gameData.appNavigation());
     if (gameData.appNavigation() == GameData::AppNavigation::playingPage)
     {
-        if ((!gameStarted) && gameData.boardData().initialStonesArray().size() < 4)
+        if (!gameStarted)
         {
-            m_pauseReception = true;
-            m_gameAnalyzer->stopAnalyze();
+            // 对局开始
+            pauseGameAnalyze(2000);
             QTimer::singleShot(2000, this, [this, gameData]
-                               { this->handleGameOpening(gameData);
-                emit this->toAnalyzeGameBoard(); });
+                               { this->handleGameOpening(gameData); });
             gameStarted = true;
             m_state = State::Playing;
             emit gameStarting();

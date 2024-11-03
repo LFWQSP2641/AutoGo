@@ -30,6 +30,10 @@ Item {
                     width: parent.width
                     placeholderText: "日志"
                     readOnly: true
+
+                    function log(text) {
+                        gameLogArea.append(Qt.formatDateTime(new Date(), "hh:mm:ss.zzz") + " " + text)
+                    }
                 }
             }
             RowLayout {
@@ -98,10 +102,11 @@ Item {
             goBoard.clearBestMove()
         }
         onGameOver: {
-            gameLogArea.append("对弈结束")
+            gameLogArea.log("对弈结束")
+            gameLogArea.log("对弈次数: " + interactor.gameBoardHandler.gameCount)
             if(continuousPlaySwitch.checked)
             {
-                gameLogArea.append("连续对弈")
+                gameLogArea.log("连续对弈")
             }
             else
             {
@@ -110,29 +115,29 @@ Item {
             }
         }
         onInitStarting: {
-            gameLogArea.append("开始初始化")
+            gameLogArea.log("开始初始化")
         }
         onStartInitFinished: function(success) {
             if(success)
             {
-                gameLogArea.append("初始化成功")
+                gameLogArea.log("初始化成功")
                 interactor.startGame()
             }
             else
             {
                 startGameButton.enabled = true
                 durationComboBox.enabled = true
-                gameLogArea.append("初始化失败")
+                gameLogArea.log("初始化失败")
             }
         }
         onCheckingAppNavigation: {
-            gameLogArea.append("检查所处位置")
+            gameLogArea.log("检查所处位置")
         }
         onGameStarting: {
-            gameLogArea.append("清空棋盘")
+            gameLogArea.log("清空棋盘")
             goBoard.clearBestMove()
             goBoard.clearBoardData()
-            gameLogArea.append("开始对弈")
+            gameLogArea.log("开始对弈")
         }
     }
 }

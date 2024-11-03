@@ -40,6 +40,7 @@ public:
         requestRematchDialog,       // 请求重新匹配
         requestResumeBattleDialog,  // 请求续战
         cancelResumeBattleDialog,   // 取消续战
+        AIPKDialog,                 // AI PK
         otherDialog                 // 其他具有按钮的对话框
     };
     Q_ENUM(AppNavigation)

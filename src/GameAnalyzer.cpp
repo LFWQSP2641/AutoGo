@@ -11,28 +11,32 @@
 #include <opencv2/opencv.hpp>
 
 QHash<QString, QPoint> GameAnalyzer::templateImagePoints = {
-    {QStringLiteral("AcceptCountingResult"),       QPoint(141, 1780)},
-    { QStringLiteral("AnalysisPage"),              QPoint(0,   1770)},
-    { QStringLiteral("AnalysisPage2"),             QPoint(0,   1770)},
-    { QStringLiteral("CancelResumeBattleDialog"),  QPoint(200, 850) },
-    { QStringLiteral("GameOverDialogCloseButton"), QPoint(975, 330) },
-    { QStringLiteral("LevelUpDialogCloseButton"),  QPoint(935, 205) },
-    { QStringLiteral("Backutton"),                 QPoint(30,  110) },
-    { QStringLiteral("Backutton2"),                QPoint(30,  110) },
-    { QStringLiteral("ConfirmDefeatDialog"),       QPoint(200, 850) },
-    { QStringLiteral("DurationChoiceDialog"),      QPoint(440, 250) },
-    { QStringLiteral("MainPage"),                  QPoint(0,   1520)},
-    { QStringLiteral("MatchDialog"),               QPoint(450, 510) },
-    { QStringLiteral("PlayingPage"),               QPoint(0,   1770)},
-    { QStringLiteral("PlayingPage2"),              QPoint(0,   1770)},
-    { QStringLiteral("PlayingPageWithMove"),       QPoint(400, 1640)},
-    { QStringLiteral("PlayingPageWithMove2"),      QPoint(400, 1640)},
-    { QStringLiteral("RequestCountingDialog"),     QPoint(200, 850) },
-    { QStringLiteral("RequestDrawDialog"),         QPoint(200, 850) },
-    { QStringLiteral("RequestRematchDialog"),      QPoint(200, 850) },
-    { QStringLiteral("RequestResumeBattleDialog"), QPoint(200, 850) },
-    { QStringLiteral("RequestUndoDialog"),         QPoint(200, 850) },
-    { QStringLiteral("TipDialogWithButton"),       QPoint(490, 710) }
+    {QStringLiteral("AcceptCountingResult"),        QPoint(141, 1780)},
+    { QStringLiteral("AIPKClose"),                  QPoint(980, 325) },
+    { QStringLiteral("AnalysisPage"),               QPoint(0,   1770)},
+    { QStringLiteral("AnalysisPage2"),              QPoint(0,   1770)},
+    { QStringLiteral("CancelResumeBattleDialog"),   QPoint(200, 850) },
+    { QStringLiteral("GameOverDialogCloseButton"),  QPoint(975, 330) },
+    { QStringLiteral("GameOverDialogCloseButton2"), QPoint(975, 330) },
+    { QStringLiteral("LevelUpDialogCloseButton"),   QPoint(935, 205) },
+    { QStringLiteral("Backutton"),                  QPoint(30,  110) },
+    { QStringLiteral("Backutton2"),                 QPoint(30,  110) },
+    { QStringLiteral("Backutton3"),                 QPoint(30,  110) },
+    { QStringLiteral("ConfirmDefeatDialog"),        QPoint(200, 850) },
+    { QStringLiteral("ConfirmDefeatDialog2"),       QPoint(200, 850) },
+    { QStringLiteral("DurationChoiceDialog"),       QPoint(440, 250) },
+    { QStringLiteral("MainPage"),                   QPoint(0,   1520)},
+    { QStringLiteral("MatchDialog"),                QPoint(450, 510) },
+    { QStringLiteral("PlayingPage"),                QPoint(0,   1770)},
+    { QStringLiteral("PlayingPage2"),               QPoint(0,   1770)},
+    { QStringLiteral("PlayingPageWithMove"),        QPoint(400, 1640)},
+    { QStringLiteral("PlayingPageWithMove2"),       QPoint(400, 1640)},
+    { QStringLiteral("RequestCountingDialog"),      QPoint(200, 850) },
+    { QStringLiteral("RequestDrawDialog"),          QPoint(200, 850) },
+    { QStringLiteral("RequestRematchDialog"),       QPoint(200, 850) },
+    { QStringLiteral("RequestResumeBattleDialog"),  QPoint(200, 850) },
+    { QStringLiteral("RequestUndoDialog"),          QPoint(200, 850) },
+    { QStringLiteral("TipDialogWithButton"),        QPoint(490, 710) }
 };
 
 GameAnalyzer::GameAnalyzer(QObject *parent)
@@ -40,7 +44,8 @@ GameAnalyzer::GameAnalyzer(QObject *parent)
       m_screencaptor{ nullptr },
       m_stop{ false },
       m_pauseDuration{ 0 },
-      m_analyzeInterval{ 10 }
+      m_analyzeInterval{ 10 },
+      m_running{ false }
 {
 }
 
@@ -61,7 +66,7 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
             return GameData::requestResumeBattleDialog;
         if (funcEqual(QStringLiteral("RequestUndoDialog")))
             return GameData::requestUndoDialog;
-        if (funcEqual(QStringLiteral("ConfirmDefeatDialog")))
+        if (funcEqual(QStringLiteral("ConfirmDefeatDialog")) || funcEqual(QStringLiteral("ConfirmDefeatDialog2")))
             return GameData::confirmDefeatDialog;
         if (funcEqual(QStringLiteral("CancelResumeBattleDialog")))
             return GameData::cancelResumeBattleDialog;
@@ -74,7 +79,7 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
         return GameData::durationChoiceDialog;
     if (funcEqual(QStringLiteral("MatchDialog")))
         return GameData::matchDialog;
-    if (funcEqual(QStringLiteral("GameOverDialogCloseButton")))
+    if (funcEqual(QStringLiteral("GameOverDialogCloseButton")) || funcEqual(QStringLiteral("GameOverDialogCloseButton2")))
         return GameData::gameOverDialog;
     if (funcEqual(QStringLiteral("LevelUpDialogCloseButton")))
         return GameData::levelUpDialog;
@@ -90,8 +95,11 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
         return GameData::analysisPage;
     if (funcEqual(QStringLiteral("MainPage")))
         return GameData::mainPage;
-    if (funcEqual(QStringLiteral("Backutton")) || funcEqual(QStringLiteral("Backutton2")))
+    if (funcEqual(QStringLiteral("Backutton")) || funcEqual(QStringLiteral("Backutton2")) || funcEqual(QStringLiteral("Backutton3")))
         return GameData::pageWithBack;
+
+    if (funcEqual(QStringLiteral("AIPKClose")))
+        return GameData::AIPKDialog;
 
     qWarning() << "not matching" << Global::saveDebugImage(image);
     return GameData::unknownPage;
@@ -271,6 +279,11 @@ void GameAnalyzer::pause(const unsigned long &duration)
     setPauseDuration(duration);
 }
 
+bool GameAnalyzer::running() const
+{
+    return m_running;
+}
+
 unsigned long GameAnalyzer::analyzeInterval() const
 {
     return m_analyzeInterval;
@@ -328,20 +341,26 @@ void GameAnalyzer::doAnalyze()
         setPauseDuration(0);
         return;
     }
+    m_running = true;
     auto image = screencap();
     if (!image)
     {
         qWarning() << QStringLiteral("image is null");
+        m_running = false;
         return;
     }
     GameData gameData(m_data);
     if (m_stop)
     {
+        qDebug() << Q_FUNC_INFO << QStringLiteral("stopped");
+        m_running = false;
         return;
     }
     handleImage(image.value(), gameData);
     if (m_stop)
     {
+        qDebug() << Q_FUNC_INFO << QStringLiteral("stopped");
+        m_running = false;
         return;
     }
     if (gameData != m_data)

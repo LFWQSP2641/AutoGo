@@ -92,6 +92,8 @@ protected slots:
 
     void handleGameOpening(const GameData &gameData);
 
+    void pauseGameAnalyze(const unsigned long &duration);
+
 protected slots:
     void onInitFinished(bool success);
 

@@ -117,6 +117,11 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
         qDebug() << QStringLiteral("id is not equal");
         return;
     }
+    if (jsonObject.value(QStringLiteral("id")).toString() == QStringLiteral("stopAnalyze"))
+    {
+        qDebug() << QStringLiteral("stopAnalyze");
+        return;
+    }
     const auto bestMoveInfo(jsonObject.value(QStringLiteral("moveInfos")).toArray().at(0).toObject());
     if (bestMoveInfo.isEmpty())
     {

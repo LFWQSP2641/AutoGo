@@ -36,6 +36,8 @@ public slots:
     void moveStone(const StoneData &stoneData);
     void moveStone(const QPoint &stonePoint);
 
+    void clickConfirmMove();
+
     void acceptRequest();
     void rejectRequest();
     void closeRequest();
@@ -49,17 +51,15 @@ public slots:
     void closeGameOverDialog();
     void closeLevelUpDialog();
 
+    void closeAIPKDialog();
+
     void backToMain();
 
 protected:
     Controller *controller;
     GameInteractor::TimeMode m_timeMode;
 
-protected slots:
-    void clickConfirmMove();
-
 signals:
-    void moveFinished();
     void timeModeChanged();
 
     void controllerChanged();

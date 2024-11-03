@@ -57,8 +57,11 @@ void GameInteractor::moveStone(const QPoint &stonePoint)
     const int rectY = centerPoint.y() - rectHeight / 2;
 
     controller->Controller::click(QRect(rectX, rectY, rectWidth, rectHeight));
-    QTimer::singleShot(100, this, &GameInteractor::clickConfirmMove);
-    QTimer::singleShot(200, this, &GameInteractor::moveFinished);
+}
+
+void GameInteractor::clickConfirmMove()
+{
+    controller->Controller::click(QRect(QPoint(378, 1595), QPoint(700, 1767)));
 }
 
 void GameInteractor::acceptRequest()
@@ -120,6 +123,11 @@ void GameInteractor::closeLevelUpDialog()
     controller->Controller::click(QRect(QPoint(935, 205), QPoint(980, 260)));
 }
 
+void GameInteractor::closeAIPKDialog()
+{
+    controller->Controller::click(QRect(QPoint(980, 325), QPoint(1030, 375)));
+}
+
 void GameInteractor::backToMain()
 {
     controller->Controller::click(QRect(QPoint(40, 125), QPoint(100, 150)));
@@ -149,9 +157,4 @@ void GameInteractor::setTimeMode(GameInteractor::TimeMode newTimeMode)
         return;
     m_timeMode = newTimeMode;
     emit timeModeChanged();
-}
-
-void GameInteractor::clickConfirmMove()
-{
-    controller->Controller::click(QRect(QPoint(378, 1595), QPoint(700, 1767)));
 }

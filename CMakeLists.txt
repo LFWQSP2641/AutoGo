@@ -100,3 +100,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Quick Qt6::Gui Qt6::Qml Qt6::
 
 # 安装目标
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+
+if(!${DEVELOPMENT_MODE})
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE ON
+        MACOSX_BUNDLE ON
+    )
+    add_compile_definitions(QT_NO_DEBUG_OUTPUT)
+endif()

@@ -82,8 +82,17 @@ bool Util::isRegionEqual(const cv::Mat &image, const cv::Mat &templateImage, con
         cv::cvtColor(imageRegion, grayImageRegion, cv::COLOR_BGR2GRAY);
         cv::cvtColor(templateImage, grayTemplateImage, cv::COLOR_BGR2GRAY);
 
-        // 进行逐像素比较
-        return cv::countNonZero(grayImageRegion != grayTemplateImage) == 0;
+        // 进行逐像素比较获取差值
+        cv::Mat diff;
+        cv::absdiff(grayImageRegion, grayTemplateImage, diff);
+
+        // 计算差值的总和
+        double sumDiff = cv::sum(diff)[0];
+        // 计算差值的平均值
+        double meanDiff = sumDiff / (diff.rows * diff.cols);
+
+        return meanDiff < 1.0;
+        // return cv::countNonZero(grayImageRegion != grayTemplateImage) == 0;
     }
     return false;
 }

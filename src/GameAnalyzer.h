@@ -31,6 +31,8 @@ public:
     unsigned long analyzeInterval() const;
     void setAnalyzeInterval(unsigned long newAnalyzeInterval);
 
+    bool running() const;
+
 public slots:
     GameData analyze();
     GameData analyze(const cv::Mat &image);
@@ -54,6 +56,8 @@ protected:
     unsigned long m_pauseDuration;
     unsigned long m_analyzeInterval;
 
+    bool m_running;
+
 protected:
     std::optional<cv::Mat> screencap();
 
@@ -73,6 +77,7 @@ private:
     Q_PROPERTY(Screencaptor *screencaptor READ screencaptor WRITE setScreencaptor NOTIFY screencaptorChanged FINAL)
     Q_PROPERTY(unsigned long pauseDuration READ pauseDuration WRITE setPauseDuration NOTIFY pauseDurationChanged FINAL)
     Q_PROPERTY(unsigned long analyzeInterval READ analyzeInterval WRITE setAnalyzeInterval NOTIFY analyzeIntervalChanged FINAL)
+    Q_PROPERTY(bool running READ running CONSTANT FINAL)
 };
 
 #endif // GAMEANALYZER_H
