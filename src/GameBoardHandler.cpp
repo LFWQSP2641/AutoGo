@@ -261,6 +261,7 @@ void GameBoardHandler::handleGamePage(GameData::AppNavigation appNavigation)
         break;
     case GameData::AppNavigation::cancelResumeBattleDialog:
     case GameData::AppNavigation::intelligentRefereeDialogFailed:
+    case GameData::AppNavigation::ReconnectSuccessAndFinishDialog:
         m_gameInteractor->closeRequest();
         break;
     case GameData::AppNavigation::acceptCountingResultDialog:

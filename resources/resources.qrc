@@ -35,5 +35,6 @@
         <file>data/TemplateImage/RequestCountingDialogMS.png</file>
         <file>data/TemplateImage/RequestIntelligentRefereeDialogMS.png</file>
         <file>data/TemplateImage/IntelligentRefereeDialogFailed.png</file>
+        <file>data/TemplateImage/ReconnectSFDialog.png</file>
     </qresource>
 </RCC>

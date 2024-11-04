@@ -39,6 +39,7 @@ QHash<QString, QPoint> GameAnalyzer::templateImagePoints = {
     { QStringLiteral("RequestRematchDialog"),              QPoint(200, 850) },
     { QStringLiteral("RequestResumeBattleDialog"),         QPoint(200, 850) },
     { QStringLiteral("RequestUndoDialog"),                 QPoint(200, 850) },
+    { QStringLiteral("ReconnectSFDialog"),                 QPoint(200, 850) },
     { QStringLiteral("TipDialogWithButton"),               QPoint(490, 710) }
 };
 
@@ -79,7 +80,9 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
             return GameData::requestIntelligentRefereeDialog;
         if (funcEqual(QStringLiteral("IntelligentRefereeDialogFailed")))
             return GameData::intelligentRefereeDialogFailed;
-        qWarning() << "not matching" << Global::saveDebugImage(image);
+        if (funcEqual(QStringLiteral("ReconnectSFDialog")))
+            return GameData::ReconnectSuccessAndFinishDialog;
+        qWarning() << "dialog not matching" << Global::saveDebugImage(image);
         return GameData::otherDialog;
     }
     if (funcEqual(QStringLiteral("AcceptCountingResult")))

@@ -42,6 +42,7 @@ public:
         requestRematchDialog,            // 请求重新匹配
         requestResumeBattleDialog,       // 请求续战
         cancelResumeBattleDialog,        // 取消续战
+        ReconnectSuccessAndFinishDialog, // 重连成功并结束对局
         AIPKDialog,                      // AI PK
         otherDialog                      // 其他具有按钮的对话框
     };
