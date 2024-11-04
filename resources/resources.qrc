@@ -34,5 +34,6 @@
         <file>data/maatouch</file>
         <file>data/TemplateImage/RequestCountingDialogMS.png</file>
         <file>data/TemplateImage/RequestIntelligentRefereeDialogMS.png</file>
+        <file>data/TemplateImage/IntelligentRefereeDialogFailed.png</file>
     </qresource>
 </RCC>

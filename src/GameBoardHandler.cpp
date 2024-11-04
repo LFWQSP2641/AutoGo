@@ -260,6 +260,7 @@ void GameBoardHandler::handleGamePage(GameData::AppNavigation appNavigation)
         m_gameInteractor->rejectRequest();
         break;
     case GameData::AppNavigation::cancelResumeBattleDialog:
+    case GameData::AppNavigation::intelligentRefereeDialogFailed:
         m_gameInteractor->closeRequest();
         break;
     case GameData::AppNavigation::acceptCountingResultDialog:
@@ -349,7 +350,7 @@ void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
         return;
     }
     handleGamePage(gameData.appNavigation());
-    if (gameData.appNavigation() == GameData::AppNavigation::playingPage)
+    if (gameData.appNavigation() == GameData::AppNavigation::playingPage && m_state != State::WaitingCounterpartyAccept)
     {
         m_state = State::Playing;
         if (!gameStarted)
@@ -364,19 +365,33 @@ void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
         }
         lastMoveStone = gameData.boardData().lastMoveStone();
         emit boardDataArrayUpdate(gameData.boardData().boardDataArray());
-        if (gameData.boardData().stoneCount() == 300 || gameData.boardData().stoneCount() == 325)
+
+        if (gameData.needMove())
         {
-            m_state = State::WaitingCounterpartyAccept;
-            m_gameInteractor->requestIntelligentReferee();
+            // 340 341 350 351
+            if (gameData.boardData().stoneCount() / 2 == 170 || gameData.boardData().stoneCount() / 2 == 175)
+            {
+                // TODO 请求智能裁判后, 会有一个对话框, 需要处理
+                m_state = State::WaitingCounterpartyAccept;
+                m_gameInteractor->requestIntelligentReferee();
+            }
+            else
+                emit toKatagoMove(gameData.boardData());
         }
-        else if (gameData.needMove())
-            emit toKatagoMove(gameData.boardData());
     }
     else if (gameData.appNavigation() == GameData::AppNavigation::mainPage ||
              gameData.appNavigation() == GameData::AppNavigation::durationChoiceDialog ||
              gameData.appNavigation() == GameData::AppNavigation::matchDialog)
     {
         m_state = State::WaitingMatching;
+    }
+    else if (gameData.appNavigation() == GameData::AppNavigation::intelligentRefereeDialogFailed)
+    {
+        m_state = State::Playing;
+    }
+    else if (gameData.appNavigation() == GameData::AppNavigation::gameOverDialog)
+    {
+        m_state = State::Stopped;
     }
     else
     {

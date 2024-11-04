@@ -34,6 +34,7 @@ QHash<QString, QPoint> GameAnalyzer::templateImagePoints = {
     { QStringLiteral("RequestCountingDialog"),             QPoint(200, 850) },
     { QStringLiteral("RequestCountingDialogMS"),           QPoint(200, 850) },
     { QStringLiteral("RequestIntelligentRefereeDialogMS"), QPoint(200, 850) },
+    { QStringLiteral("IntelligentRefereeDialogFailed"),    QPoint(200, 850) },
     { QStringLiteral("RequestDrawDialog"),                 QPoint(200, 850) },
     { QStringLiteral("RequestRematchDialog"),              QPoint(200, 850) },
     { QStringLiteral("RequestResumeBattleDialog"),         QPoint(200, 850) },
@@ -47,7 +48,9 @@ GameAnalyzer::GameAnalyzer(QObject *parent)
       m_stop{ false },
       m_pauseDuration{ 0 },
       m_analyzeInterval{ 10 },
-      m_running{ false }
+      m_running{ false },
+      m_pauseGameAnalyze{ false },
+      m_pauseBoardAnalyze{ false }
 {
 }
 
@@ -74,6 +77,8 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
             return GameData::cancelResumeBattleDialog;
         if (funcEqual(QStringLiteral("RequestIntelligentRefereeDialogMS")))
             return GameData::requestIntelligentRefereeDialog;
+        if (funcEqual(QStringLiteral("IntelligentRefereeDialogFailed")))
+            return GameData::intelligentRefereeDialogFailed;
         qWarning() << "not matching" << Global::saveDebugImage(image);
         return GameData::otherDialog;
     }
@@ -255,8 +260,12 @@ GameData GameAnalyzer::analyze(const cv::Mat &image)
 void GameAnalyzer::analyzeIndefinitely()
 {
     qDebug() << Q_FUNC_INFO << "enter";
-    m_stop = false;
-    reset();
+    if (m_running)
+    {
+        qWarning() << QStringLiteral("already running");
+        return;
+    }
+    resetData();
     QTimer::singleShot(0, this, &GameAnalyzer::doAnalyze);
     qDebug() << Q_FUNC_INFO << "exit";
 }
@@ -269,7 +278,10 @@ void GameAnalyzer::init()
 void GameAnalyzer::reset()
 {
     qDebug() << Q_FUNC_INFO;
-    m_data = {};
+    resetData();
+    m_pauseDuration = 0;
+    m_pauseGameAnalyze = false;
+    m_pauseBoardAnalyze = false;
 }
 
 void GameAnalyzer::stopAnalyze()
@@ -281,6 +293,32 @@ void GameAnalyzer::stopAnalyze()
 void GameAnalyzer::pause(const unsigned long &duration)
 {
     setPauseDuration(duration);
+}
+
+bool GameAnalyzer::pauseBoardAnalyze() const
+{
+    return m_pauseBoardAnalyze;
+}
+
+void GameAnalyzer::setPauseBoardAnalyze(bool newPauseBoardAnalyze)
+{
+    if (m_pauseBoardAnalyze == newPauseBoardAnalyze)
+        return;
+    m_pauseBoardAnalyze = newPauseBoardAnalyze;
+    emit pauseBoardAnalyzeChanged();
+}
+
+bool GameAnalyzer::pauseGameAnalyze() const
+{
+    return m_pauseGameAnalyze;
+}
+
+void GameAnalyzer::setPauseGameAnalyze(bool newPauseGameAnalyze)
+{
+    if (m_pauseGameAnalyze == newPauseGameAnalyze)
+        return;
+    m_pauseGameAnalyze = newPauseGameAnalyze;
+    emit pauseGameAnalyzeChanged();
 }
 
 bool GameAnalyzer::running() const
@@ -329,7 +367,10 @@ void GameAnalyzer::handleImage(const cv::Mat &image, GameData &gameData)
     gameData.m_appNavigation = appNavigationAnalyze(image);
     if (gameData.m_appNavigation == GameData::playingPage)
     {
-        getBoardArray(image, gameData.m_boardData);
+        if (m_pauseBoardAnalyze)
+            gameData.m_boardData = m_data.m_boardData;
+        else
+            getBoardArray(image, gameData.m_boardData);
         gameData.m_myStoneColor = getMyStoneColor(image);
         gameData.m_boardData.m_myStoneColor = gameData.m_myStoneColor;
         gameData.m_needMove = isTurnToPlay(image);
@@ -339,6 +380,17 @@ void GameAnalyzer::handleImage(const cv::Mat &image, GameData &gameData)
 
 void GameAnalyzer::doAnalyze()
 {
+    if (m_pauseGameAnalyze)
+    {
+        QTimer::singleShot(m_analyzeInterval, this, &GameAnalyzer::doAnalyze);
+        return;
+    }
+    if (m_stop)
+    {
+        qDebug() << Q_FUNC_INFO << QStringLiteral("stopped");
+        m_running = false;
+        return;
+    }
     if (m_pauseDuration > 0)
     {
         QTimer::singleShot(m_pauseDuration, this, &GameAnalyzer::doAnalyze);
@@ -373,4 +425,11 @@ void GameAnalyzer::doAnalyze()
         emit analysisDataUpdated(gameData);
     }
     QTimer::singleShot(m_analyzeInterval, this, &GameAnalyzer::doAnalyze);
+}
+
+void GameAnalyzer::resetData()
+{
+    qDebug() << Q_FUNC_INFO;
+    m_stop = false;
+    m_data = {};
 }

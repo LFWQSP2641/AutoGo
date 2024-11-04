@@ -37,6 +37,7 @@ public:
         requestDrawDialog,               // 请求和棋
         requestCountingDialog,           // 请求数子
         requestIntelligentRefereeDialog, // 请求智能裁判
+        intelligentRefereeDialogFailed,  // 智能裁判失败
         requestUndoDialog,               // 请求悔棋
         requestRematchDialog,            // 请求重新匹配
         requestResumeBattleDialog,       // 请求续战
