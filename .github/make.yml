@@ -1,0 +1,31 @@
+name: Compile Qt project
+
+on: push
+
+env:
+  BUILD_TYPE: Release
+  QT_VERSION: '6.8.0'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: TheMrMilchmann/setup-msvc-dev@v3
+      with:
+        arch: x64
+
+    - name: Set up Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        qt-version: ${{ env.QT_VERSION }}
+        host: windows
+        target: desktop
+
+    - name: Configure CMake
+      run: cmake -B build -S . -G "Visual Studio 2022 17.9" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -B ${{github.workspace}}/build
+
+    - name: Build
+      run: cd ${GITHUB_WORKSPACE}/build && make
