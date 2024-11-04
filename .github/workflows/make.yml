@@ -20,7 +20,7 @@ jobs:
     - name: Set up Qt
       uses: jurplel/install-qt-action@v4
       with:
-        qt-version: ${{ env.QT_VERSION }}
+        version: ${{ env.QT_VERSION }}
         host: windows
         target: desktop
 
