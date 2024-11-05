@@ -21,11 +21,15 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         aqtversion: '==3.1.*'
-        version: '6.8.0'
+        version: ${{ env.QT_VERSION }}
         host: 'windows'
         target: 'desktop'
         arch: 'win64_msvc2022_64'
         tools: 'tools_ninja tools_cmake tools_vcredist,qt.tools.vcredist_msvc2022_x64'
+
+    - uses: Dovyski/setup-opencv-action@v1.1
+      with:
+        opencv-version: '4.10.0'
 
     - name: Configure CMake
       run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -B ${{github.workspace}}/build
