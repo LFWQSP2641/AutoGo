@@ -17,11 +17,6 @@ jobs:
     - name: Get cmake
       uses: lukka/get-cmake@latest
 
-    - name: Cache OpenCV
-      uses: Sid220/opencv-cache-action@V3
-      with:
-        branch: 4.x
-
     - uses: TheMrMilchmann/setup-msvc-dev@v3
       with:
         arch: x64
@@ -37,7 +32,7 @@ jobs:
         tools: 'tools_ninja tools_cmake tools_vcredist,qt.tools.vcredist_msvc2022_x64'
 
     - name: Configure CMake
-      run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DOpenCV_DIR=${{ github.workspace }}/build -B ${{github.workspace}}/build
+      run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -B ${{github.workspace}}/build
 
     # 编译解决方案
     - name: Build Solution

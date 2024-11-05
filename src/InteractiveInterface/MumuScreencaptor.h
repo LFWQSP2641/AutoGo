@@ -12,7 +12,7 @@ class MumuScreencaptor : public Screencaptor
 public:
     explicit MumuScreencaptor(QObject *parent = nullptr);
 
-    virtual std::optional<cv::Mat> screencap() override;
+    virtual std::optional<QImage> screencap() override;
 
     virtual bool init() override;
 

@@ -1,8 +1,8 @@
 #ifndef SCREENCAPTOR_H
 #define SCREENCAPTOR_H
 
+#include <QImage>
 #include <QObject>
-#include <opencv2/core/core.hpp>
 #include <optional>
 
 class Screencaptor : public QObject
@@ -14,7 +14,7 @@ public:
 
     virtual bool init() = 0;
 
-    virtual std::optional<cv::Mat> screencap() = 0;
+    virtual std::optional<QImage> screencap() = 0;
 
 signals:
 };

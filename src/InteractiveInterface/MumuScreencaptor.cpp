@@ -6,7 +6,6 @@
 #include <QDir>
 #include <QFile>
 #include <QLibrary>
-#include <opencv2/opencv.hpp>
 
 MumuScreencaptor::MumuScreencaptor(QObject *parent)
     : Screencaptor{ parent },
@@ -14,7 +13,7 @@ MumuScreencaptor::MumuScreencaptor(QObject *parent)
 {
 }
 
-std::optional<cv::Mat> MumuScreencaptor::screencap()
+std::optional<QImage> MumuScreencaptor::screencap()
 {
     if (m_mumuHandle->m_nemuCaptureDisplayFunction == nullptr)
         return std::nullopt;
@@ -28,13 +27,10 @@ std::optional<cv::Mat> MumuScreencaptor::screencap()
     if (ret)
         return std::nullopt;
 
-    cv::Mat raw(m_mumuHandle->m_displayHeight, m_mumuHandle->m_displayWidth, CV_8UC4, m_displayBuffer.data());
-    cv::Mat bgr;
-    cv::cvtColor(raw, bgr, cv::COLOR_RGBA2BGR);
-    cv::Mat dst;
-    cv::flip(bgr, dst, 0);
+    QImage img(m_displayBuffer.data(), m_mumuHandle->m_displayWidth, m_mumuHandle->m_displayHeight, QImage::Format_RGBA8888);
+    img.mirror();
 
-    return dst;
+    return img;
 }
 
 bool MumuScreencaptor::init()

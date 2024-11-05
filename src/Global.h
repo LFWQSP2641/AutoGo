@@ -1,11 +1,7 @@
 #pragma once
 
+#include <QImage>
 #include <QString>
-
-namespace cv
-{
-class Mat;
-} // namespace cv
 
 // 全局变量以及不足以成一个类的成员都会放到这
 namespace Global
@@ -25,5 +21,5 @@ extern QString tempPath();
 
 extern bool deleteDir(const QString &path);
 extern qint64 getDirSize(const QString &filePath);
-extern QString saveDebugImage(const cv::Mat &image);
+extern QString saveDebugImage(const QImage &image);
 }; // namespace Global

@@ -2,7 +2,6 @@
 
 #include <QCoreApplication>
 #include <QDir>
-#include <opencv2/opencv.hpp>
 
 QString Global::appConfigPath;
 QString Global::appDataPath;
@@ -108,25 +107,18 @@ qint64 Global::getDirSize(const QString &filePath)
     return size;
 }
 
-QString Global::saveDebugImage(const cv::Mat &image)
+QString Global::saveDebugImage(const QImage &image)
 {
-    static cv::Mat preImage;
-    if (preImage.empty())
+    static QImage preImage;
+    if (preImage.isNull())
     {
         preImage = image;
     }
     else
     {
-        cv::Mat diffImage;
-        cv::absdiff(preImage, image, diffImage);
-
-        preImage = image;
-
-        cv::Mat grayImage;
-        cv::cvtColor(diffImage, grayImage, cv::COLOR_BGR2GRAY);
-
-        if (cv::countNonZero(grayImage) == 0)
+        if (preImage == image)
         {
+            preImage = image;
             return QString();
         }
     }
@@ -134,6 +126,6 @@ QString Global::saveDebugImage(const cv::Mat &image)
     static int count{ 0 };
 
     QString filePath{ Global::debugPath().append(QStringLiteral("/%1_%2.png").arg(appRunTime).arg(count++)) };
-    cv::imwrite(filePath.toStdString(), image);
+    image.save(filePath);
     return filePath;
 }

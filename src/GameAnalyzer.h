@@ -13,12 +13,12 @@ public:
 
     static QHash<QString, QPoint> templateImagePoints;
 
-    static GameData::AppNavigation appNavigationAnalyze(const cv::Mat &image);
+    static GameData::AppNavigation appNavigationAnalyze(const QImage &image);
 
-    static bool isTurnToPlay(const cv::Mat &image);
-    static StoneData::StoneColor getMyStoneColor(const cv::Mat &image);
+    static bool isTurnToPlay(const QImage &image);
+    static StoneData::StoneColor getMyStoneColor(const QImage &image);
 
-    static void getBoardArray(const cv::Mat &image, BoardData &boardData);
+    static void getBoardArray(const QImage &image, BoardData &boardData);
 
     Screencaptor *screencaptor() const;
     void setScreencaptor(Screencaptor *newScreencaptor);
@@ -39,7 +39,7 @@ public:
 
 public slots:
     GameData analyze();
-    GameData analyze(const cv::Mat &image);
+    GameData analyze(const QImage &image);
     void analyzeIndefinitely();
     void init();
     void reset();
@@ -66,10 +66,10 @@ protected:
     volatile bool m_pauseBoardAnalyze;
 
 protected:
-    std::optional<cv::Mat> screencap();
+    std::optional<QImage> screencap();
 
 protected slots:
-    void handleImage(const cv::Mat &image, GameData &gameData);
+    void handleImage(const QImage &image, GameData &gameData);
 
     void doAnalyze();
 

@@ -88,13 +88,6 @@ qt_add_qml_module(${PROJECT_NAME}
         src/GoBoardItem.cpp
 )
 
-# 添加 OpenCV 库
-if(WIN32)
-    find_package(OpenCV REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
-    include_directories(${OpenCV_INCLUDE_DIRS})
-endif()
-
 # 包含 Qt6 的头文件和库
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Quick Qt6::Gui Qt6::Qml Qt6::QuickControls2)
 

@@ -8,7 +8,6 @@
 #include <QPoint>
 #include <QThread>
 #include <QTimer>
-#include <opencv2/opencv.hpp>
 
 QHash<QString, QPoint> GameAnalyzer::templateImagePoints = {
     {QStringLiteral("AcceptCountingResult"),               QPoint(141, 1780)},
@@ -55,7 +54,7 @@ GameAnalyzer::GameAnalyzer(QObject *parent)
 {
 }
 
-GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
+GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const QImage &image)
 {
     auto funcEqual([image](const QString &name) -> bool
                    { return Util::isRegionEqual(image, name, templateImagePoints.value(name)); });
@@ -97,7 +96,7 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
         return GameData::levelUpDialog;
     if (funcEqual(QStringLiteral("PlayingPage")) || funcEqual(QStringLiteral("PlayingPage2")))
     {
-        if (image.at<cv::Vec3b>(946, 288) == cv::Vec3b(78, 111, 80))
+        if (image.pixel(288, 946) == qRgb(80, 111, 78))
             return GameData::tipDialog;
         return GameData::playingPage;
     }
@@ -117,30 +116,30 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const cv::Mat &image)
     return GameData::unknownPage;
 }
 
-bool GameAnalyzer::isTurnToPlay(const cv::Mat &image)
+bool GameAnalyzer::isTurnToPlay(const QImage &image)
 {
-    const cv::Vec3b pixelValue = image.at<cv::Vec3b>(305, 305);
-    return pixelValue == cv::Vec3b(118, 254, 255);
+    const QRgb pixelValue = image.pixel(305, 305);
+    return pixelValue == qRgb(255, 254, 118);
 }
 
-StoneData::StoneColor GameAnalyzer::getMyStoneColor(const cv::Mat &image)
+StoneData::StoneColor GameAnalyzer::getMyStoneColor(const QImage &image)
 {
-    const cv::Vec3b pixelValue = image.at<cv::Vec3b>(200, 150);
-    if (pixelValue[0] < 50 && pixelValue[1] < 50 && pixelValue[2] < 50)
+    const QColor pixelValue = image.pixel(150, 200);
+    if (pixelValue.lightness() < 50)
         return StoneData::StoneColor::Black;
-    else if (pixelValue[0] > 200 && pixelValue[1] > 200 && pixelValue[2] > 200)
+    else if (pixelValue.lightness() > 200)
         return StoneData::StoneColor::White;
     else
     {
         qWarning() << Q_FUNC_INFO
                    << QStringLiteral("myStoneColor check failed, rgb:")
-                   << pixelValue[2] << pixelValue[1] << pixelValue[0]
+                   << pixelValue.rgb()
                    << Global::saveDebugImage(image);
         return StoneData::StoneColor::None;
     }
 }
 
-void GameAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
+void GameAnalyzer::getBoardArray(const QImage &image, BoardData &boardData)
 {
     // WARNING:
     // 未处理悔棋情况
@@ -148,22 +147,22 @@ void GameAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
     // initialStonesArray与lastMoveStone和moveStonesArray冲突(影响Analysis)
 
     // 棋盘大小为19x19
-    const int rows = 19;
-    const int cols = 19;
+    constexpr int rows = 19;
+    constexpr int cols = 19;
 
     // 棋盘的四个已知角坐标
-    const cv::Point2f topLeft(37, 361);        // 左上角
-    const cv::Point2f bottomRight(1041, 1365); // 右下角
+    constexpr QPointF topLeft(37, 361);        // 左上角
+    constexpr QPointF bottomRight(1041, 1364); // 右下角
 
     // 计算每个格子的宽度和高度
-    const float cellWidth = (bottomRight.x - topLeft.x) / (cols - 1);
-    const float cellHeight = (bottomRight.y - topLeft.y) / (rows - 1);
+    const double cellWidth = double(bottomRight.x() - topLeft.x()) / double(cols - 1);
+    const double cellHeight = double(bottomRight.y() - topLeft.y()) / double(rows - 1);
 
     // 用于略微调整棋子检测点的位置，避免棋盘线干扰
-    const int offsetX = 15; // x轴偏移量
-    const int offsetY = 15; // y轴偏移量
-    const int offsetCX = 8; // 监测点x轴偏移量
-    const int offsetCY = 8; // 监测点y轴偏移量
+    constexpr double offsetX = -10; // x轴偏移量
+    constexpr double offsetY = -10; // y轴偏移量
+    constexpr double offsetCX = 8;  // 监测点x轴偏移量
+    constexpr double offsetCY = 8;  // 监测点y轴偏移量
 
     const auto needInitialStones(boardData.m_initialStonesArray.isEmpty() && boardData.m_moveStonesArray.isEmpty());
 
@@ -173,27 +172,27 @@ void GameAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
         for (int j = 0; j < cols; ++j)
         {
             // 计算当前格子的中心坐标
-            const int centerX = static_cast<int>(topLeft.x + j * cellWidth);
-            const int centerY = static_cast<int>(topLeft.y + i * cellHeight);
+            const double centerX = topLeft.x() + (double(j) * cellWidth);
+            const double centerY = topLeft.y() + (double(i) * cellHeight);
 
             // 调整检测点的坐标，避免棋盘线影响
-            const int checkX = centerX - offsetX;
-            const int checkY = centerY - offsetY;
+            const int checkX = qRound(centerX + offsetX);
+            const int checkY = qRound(centerY + offsetY);
 
-            // 偏左下15像素的点，用于进一步检测（如果需要）
-            const int checkCX = centerX + offsetCX;
-            const int checkCY = centerY + offsetCY;
+            // 偏左下15像素的点，用于进一步检测
+            const int checkCX = qRound(centerX + offsetCX);
+            const int checkCY = qRound(centerY + offsetCY);
 
-            const cv::Vec3b pixelValue = image.at<cv::Vec3b>(checkY, checkX);
+            const QColor pixelValue = image.pixel(checkX, checkY);
 
             int currentPiece(0);
 
             // 根据检测到的棋子颜色绘制相应的圆点
-            if (pixelValue[0] < 100) // 黑子
+            if (pixelValue.lightness() < 100) // 黑子
             {
                 currentPiece = 1;
             }
-            else if (pixelValue[0] > 200) // 白子
+            else if (pixelValue.lightness() > 240) // 白子
             {
                 currentPiece = 2;
             }
@@ -202,11 +201,11 @@ void GameAnalyzer::getBoardArray(const cv::Mat &image, BoardData &boardData)
             if (currentPiece == 0)
                 continue;
 
-            const QList<cv::Vec3b> pixelCValues{ image.at<cv::Vec3b>(checkCY, checkCX),
-                                                 image.at<cv::Vec3b>(checkCY + 5, checkCX),
-                                                 image.at<cv::Vec3b>(checkCY, checkCX + 5) };
+            const QList<QColor> pixelCValues{ image.pixel(checkCX, checkCY),
+                                              image.pixel(checkCX + 5, checkCY),
+                                              image.pixel(checkCX, checkCY + 5) };
             const unsigned char lastMovePixelValue(currentPiece == 1 ? 255 : 0);
-            const auto isLastMove(pixelCValues.at(0)[0] == lastMovePixelValue && pixelCValues.at(1)[0] == lastMovePixelValue && pixelCValues.at(2)[0] == lastMovePixelValue);
+            const auto isLastMove(pixelCValues.at(0).lightness() == lastMovePixelValue && pixelCValues.at(1).lightness() == lastMovePixelValue && pixelCValues.at(2).lightness() == lastMovePixelValue);
             const StoneData::StoneColor lastMoveColor(currentPiece == 1 ? StoneData::StoneColor::Black : StoneData::StoneColor::White);
             if (isLastMove)
             {
@@ -252,7 +251,7 @@ GameData GameAnalyzer::analyze()
     return analyze(image.value());
 }
 
-GameData GameAnalyzer::analyze(const cv::Mat &image)
+GameData GameAnalyzer::analyze(const QImage &image)
 {
     qDebug() << Q_FUNC_INFO;
     GameData gameData;
@@ -355,7 +354,7 @@ void GameAnalyzer::setPauseDuration(const unsigned long &newPauseDuration)
     emit pauseDurationChanged();
 }
 
-std::optional<cv::Mat> GameAnalyzer::screencap()
+std::optional<QImage> GameAnalyzer::screencap()
 {
     if (m_screencaptor == nullptr)
     {
@@ -365,7 +364,7 @@ std::optional<cv::Mat> GameAnalyzer::screencap()
     return m_screencaptor->screencap();
 }
 
-void GameAnalyzer::handleImage(const cv::Mat &image, GameData &gameData)
+void GameAnalyzer::handleImage(const QImage &image, GameData &gameData)
 {
     gameData.m_appNavigation = appNavigationAnalyze(image);
     if (gameData.m_appNavigation == GameData::playingPage)

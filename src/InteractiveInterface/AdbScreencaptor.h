@@ -13,7 +13,7 @@ public:
 
     virtual bool init() override;
 
-    virtual std::optional<cv::Mat> screencap() override;
+    virtual std::optional<QImage> screencap() override;
 };
 
 #endif // ADBSCREENCAPTOR_H
