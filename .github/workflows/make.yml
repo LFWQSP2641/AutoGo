@@ -17,35 +17,10 @@ jobs:
     - name: Get cmake
       uses: lukka/get-cmake@latest
 
-    - name: Restore vcpkg and its artifacts.
-      uses: actions/cache@v2
-      id: vcpkg-cache
+    - name: Cache OpenCV
+      uses: Sid220/opencv-cache-action@V3
       with:
-        path: |
-          ${{ env.VCPKG_ROOT }}
-          ${{ github.workspace }}/build/vcpkg_installed
-          !${{ env.VCPKG_ROOT }}/.git
-          !${{ env.VCPKG_ROOT }}/buildtrees
-          !${{ env.VCPKG_ROOT }}/packages
-          !${{ env.VCPKG_ROOT }}/downloads
-        key: |
-          ${{ hashFiles( 'vcpkg.json' ) }}-cache-key-v1
-
-    - name: Get vcpkg(windows)
-        # 平台为windows且未缓存
-      if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
-      run: |
-        cd ${{ github.workspace }}
-        mkdir build -force
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        .\bootstrap-vcpkg.bat
-
-    - name: install opencv
-      if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
-      run: |
-        cd ${{ github.workspace }}
-        vcpkg install opencv:x64-windows
+        branch: 4.x
 
     - uses: TheMrMilchmann/setup-msvc-dev@v3
       with:
@@ -62,7 +37,7 @@ jobs:
         tools: 'tools_ninja tools_cmake tools_vcredist,qt.tools.vcredist_msvc2022_x64'
 
     - name: Configure CMake
-      run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -B ${{github.workspace}}/build
+      run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DOpenCV_DIR=${{ github.workspace }}/build -B ${{github.workspace}}/build
 
     # 编译解决方案
     - name: Build Solution
