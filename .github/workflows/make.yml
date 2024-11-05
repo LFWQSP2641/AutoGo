@@ -5,6 +5,7 @@ on: push
 env:
   BUILD_TYPE: Release
   QT_VERSION: '6.8.0'
+  VCPKG_ROOT: '${{ github.workspace }}/vcpkg'
 
 jobs:
   build:
@@ -12,6 +13,39 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Get cmake
+      uses: lukka/get-cmake@latest
+
+    - name: Restore vcpkg and its artifacts.
+      uses: actions/cache@v2
+      id: vcpkg-cache
+      with:
+        path: |
+          ${{ env.VCPKG_ROOT }}
+          ${{ github.workspace }}/build/vcpkg_installed
+          !${{ env.VCPKG_ROOT }}/.git
+          !${{ env.VCPKG_ROOT }}/buildtrees
+          !${{ env.VCPKG_ROOT }}/packages
+          !${{ env.VCPKG_ROOT }}/downloads
+        key: |
+          ${{ hashFiles( 'vcpkg.json' ) }}-cache-key-v1
+
+    - name: Get vcpkg(windows)
+        # 平台为windows且未缓存
+      if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
+      run: |
+        cd ${{ github.workspace }}
+        mkdir build -force
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+
+    - name: install opencv
+      if: ${{ steps.vcpkg-cache.outputs.cache-hit != 'true' }}
+      run: |
+        cd ${{ github.workspace }}
+        vcpkg install opencv:x64-windows
 
     - uses: TheMrMilchmann/setup-msvc-dev@v3
       with:
@@ -27,12 +61,12 @@ jobs:
         arch: 'win64_msvc2022_64'
         tools: 'tools_ninja tools_cmake tools_vcredist,qt.tools.vcredist_msvc2022_x64'
 
-    - uses: Dovyski/setup-opencv-action@v1.1
-      with:
-        opencv-version: '4.10.0'
-
     - name: Configure CMake
-      run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -B ${{github.workspace}}/build
+      run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake -B ${{github.workspace}}/build
 
-    - name: Build
-      run: cd ${GITHUB_WORKSPACE}/build && make
+    # 编译解决方案
+    - name: Build Solution
+      run: |
+        cd ${{ github.workspace }}
+        cd build
+        cmake --build . --parallel --config Release
