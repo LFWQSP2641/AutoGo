@@ -23,6 +23,7 @@ jobs:
         version: ${{ env.QT_VERSION }}
         host: 'windows'
         target: 'desktop'
+        aqtversion: '==3.1.*'
         tools: 'tools_ninja tools_cmake tools_vcredist,qt.tools.vcredist_msvc2022_x64'
 
     - name: Configure CMake
