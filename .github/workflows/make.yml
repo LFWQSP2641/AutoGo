@@ -21,8 +21,9 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         version: ${{ env.QT_VERSION }}
-        host: windows
-        target: desktop
+        host: 'windows'
+        target: 'desktop'
+        tools: 'tools_ninja tools_cmake tools_vcredist,qt.tools.vcredist_msvc2022_x64'
 
     - name: Configure CMake
       run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -B ${{github.workspace}}/build
