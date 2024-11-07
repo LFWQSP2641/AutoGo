@@ -47,7 +47,7 @@ jobs:
         mkdir -p release_package
         cd release_package
         copy ${{ github.workspace }}/build/Release/AutoGo.exe .
-        windeployqt --qmldir resources/qml ./AutoGo.exe
+        windeployqt --qmldir ${{ github.workspace }}/resources/qml ./AutoGo.exe
 
     - name: Compress
       run: |
