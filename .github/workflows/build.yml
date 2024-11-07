@@ -40,3 +40,20 @@ jobs:
         cd ${{ github.workspace }}
         cd build
         cmake --build . --parallel --config Release
+
+    - name: get dir tree
+      run: |
+        cd ${{ github.workspace }}
+        tree /f > tree.txt
+
+    - name: Upload dir tree
+      uses: actions/upload-artifact@v4
+      with:
+        name: tree.txt
+        path: ${{ github.workspace }}/tree.txt
+
+    - name: Upload exe
+      uses: actions/upload-artifact@v4
+      with:
+        name: AutoGo.exe
+        path: ${{ github.workspace }}/build/Release/AutoGo.exe
