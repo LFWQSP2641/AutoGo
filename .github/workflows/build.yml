@@ -35,25 +35,33 @@ jobs:
       run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -B ${{github.workspace}}/build
 
     # 编译解决方案
-    - name: Build Solution
+    - name: Build
       run: |
         cd ${{ github.workspace }}
         cd build
         cmake --build . --parallel --config Release
 
-    - name: get dir tree
+    - name: Package
       run: |
         cd ${{ github.workspace }}
-        tree /f > tree.txt
+        mkdir -p release_package
+        cd release_package
+        copy build/Release/AutoGo.exe .
+        windeployqt --qmldir resources/qml ./AutoGo.exe
 
-    - name: Upload dir tree
-      uses: actions/upload-artifact@v4
-      with:
-        name: tree.txt
-        path: ${{ github.workspace }}/tree.txt
+    - name: Compress
+      run: |
+        cd ${{ github.workspace }}
+        7z a -t7z -m0=lzma2 -mx=9 -mfb=64 -md=32m -ms=on AutoGo.7z release_package
 
     - name: Upload exe
       uses: actions/upload-artifact@v4
       with:
         name: AutoGo.exe
         path: ${{ github.workspace }}/build/Release/AutoGo.exe
+
+    - name: Upload package
+      uses: actions/upload-artifact@v4
+      with:
+        name: AutoGo.7z
+        path: ${{ github.workspace }}/AutoGo.7z

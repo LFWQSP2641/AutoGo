@@ -86,6 +86,7 @@ QStringList KatagoAnalysisInteractor::getKataGoArgs() const
 
 void KatagoAnalysisInteractor::analyzeKatagoOutput()
 {
+    qDebug() << Q_FUNC_INFO;
     // 追加Katago进程输出
     bytes.append(katagoProcess->readAllStandardOutput());
 #if 1
