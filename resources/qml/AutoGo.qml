@@ -65,6 +65,7 @@ Item {
                     text: "自动清除缓存:"
                 }
                 TextField {
+                    id: clearCacheTurnTextField
                     Layout.fillWidth: true
                     placeholderText: "对局数 (0为不清除)"
                     text: "2"
@@ -157,7 +158,7 @@ Item {
             {
                 gameLogArea.log("清除缓存")
                 interactor.clearKataGoCache()
-                root.clearCacheGameCount = parseInt(gameLogArea.text)
+                root.clearCacheGameCount = parseInt(clearCacheTurnTextField.text)
             }
             if(continuousPlaySwitch.checked)
             {
