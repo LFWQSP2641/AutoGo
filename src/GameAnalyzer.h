@@ -76,6 +76,10 @@ protected slots:
     void resetData();
 
 signals:
+    void logMessage(const QString &message, bool formatted = false);
+    void errorOccurred(const QString &message, bool formatted = false);
+
+signals:
     void screencaptorChanged();
 
     void pauseDurationChanged();

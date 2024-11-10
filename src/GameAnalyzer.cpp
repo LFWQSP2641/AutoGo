@@ -81,7 +81,8 @@ GameData::AppNavigation GameAnalyzer::appNavigationAnalyze(const QImage &image)
             return GameData::intelligentRefereeDialogFailed;
         if (funcEqual(QStringLiteral("ReconnectSFDialog")))
             return GameData::ReconnectSuccessAndFinishDialog;
-        qWarning() << "dialog not matching" << Global::saveDebugImage(image);
+        const auto debugImageFilePath = Global::saveDebugImage(image);
+        qWarning() << "dialog not matching" << debugImageFilePath;
         return GameData::otherDialog;
     }
     if (funcEqual(QStringLiteral("AcceptCountingResult")))

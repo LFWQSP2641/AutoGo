@@ -198,6 +198,9 @@ void GameBoardHandler::connectSignals()
     connect(this, &GameBoardHandler::toPauseAnalyze, m_gameAnalyzer, &GameAnalyzer::pause);
 
     connect(this, &GameBoardHandler::toAnalyzeReset, m_gameAnalyzer, &GameAnalyzer::reset);
+
+    connect(m_katagoInteractor, &KatagoInteractor::logMessage, this, &GameBoardHandler::logMessage);
+    connect(m_katagoInteractor, &KatagoInteractor::errorOccurred, this, &GameBoardHandler::errorOccurred);
 }
 
 void GameBoardHandler::startTask()

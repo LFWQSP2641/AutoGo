@@ -19,7 +19,7 @@ KatagoAnalysisInteractor::KatagoAnalysisInteractor(QObject *parent)
 void KatagoAnalysisInteractor::clearBoard()
 {
     qDebug() << Q_FUNC_INFO;
-    m_boardData = BoardData();
+    this->KatagoInteractor::clearBoard();
 }
 
 void KatagoAnalysisInteractor::stopAnalyze()
@@ -43,6 +43,7 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
     jsonObject.insert(QStringLiteral("komi"), 7.5);
     jsonObject.insert(QStringLiteral("boardXSize"), 19);
     jsonObject.insert(QStringLiteral("boardYSize"), 19);
+    jsonObject.insert(QStringLiteral("reportDuringSearchEvery"), static_cast<double>(reportIntervalMS) / double(1000));
 
     if (Settings::getSingletonSettings()->kataGoSearchLimit())
     {
@@ -71,7 +72,6 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
     }
     else
     {
-        jsonObject.insert(QStringLiteral("reportDuringSearchEvery"), static_cast<double>(reportIntervalMS) / double(1000));
         startTimer();
     }
     const QByteArray data(QJsonDocument(jsonObject).toJson(QJsonDocument::Compact).append(10));
@@ -86,13 +86,13 @@ QStringList KatagoAnalysisInteractor::getKataGoArgs() const
 
 void KatagoAnalysisInteractor::analyzeKatagoOutput()
 {
-    qDebug() << Q_FUNC_INFO;
     // 追加Katago进程输出
     bytes.append(katagoProcess->readAllStandardOutput());
+    qDebug() << Q_FUNC_INFO << bytes;
 #if 1
     if (!bytes.endsWith(10))
     {
-        qDebug() << bytes;
+        qDebug() << QStringLiteral("bytes not ends with //10") << bytes;
         return;
     }
     QJsonParseError error;
@@ -136,6 +136,7 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
                                ? StoneData::StoneColor::White
                                : StoneData::StoneColor::Black,
                            bestMovePoint);
+    const auto isDuringSearch(bestMoveInfo.value(QStringLiteral("isDuringSearch")).toBool());
 #else
     // 定义要搜索的字符串
     const QByteArray searchString1(QByteArrayLiteral("moveInfos"));
@@ -176,8 +177,10 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
         return;
     }
 #endif
-    if (Settings::getSingletonSettings()->kataGoSearchLimit())
+    if (!isDuringSearch)
         emitBestMove();
+    else
+        emit bestMoveUpdate(m_bestMove);
 }
 
 void KatagoAnalysisInteractor::analyzeKatagoInit()

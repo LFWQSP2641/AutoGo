@@ -71,6 +71,8 @@ protected slots:
     virtual void analyzeKatagoOutput() = 0;
     virtual void analyzeKatagoInit() = 0;
 
+    virtual void outputError();
+
 signals:
     void initFinished(bool success);
     void bestMove(const StoneData &stoneData);
@@ -82,6 +84,9 @@ signals:
     void reportIntervalMSChanged();
 
     void minMoveIntervalChanged();
+
+    void logMessage(const QString &message, bool formatted = false);
+    void errorOccurred(const QString &errorString, bool formatted = false);
 
 private:
     Q_PROPERTY(KatagoInteractor::TimeMode timeMode READ timeMode WRITE setTimeMode NOTIFY timeModeChanged FINAL)

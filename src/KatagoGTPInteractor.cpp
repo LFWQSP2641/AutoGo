@@ -19,7 +19,7 @@ KatagoGTPInteractor::KatagoGTPInteractor(QObject *parent)
 void KatagoGTPInteractor::clearBoard()
 {
     qDebug() << Q_FUNC_INFO;
-    KatagoInteractor::clearBoard();
+    this->KatagoInteractor::clearBoard();
     katagoProcess->write(QByteArrayLiteral("clear_board\n"));
     katagoProcess->write(QByteArrayLiteral("komi 7.5\n"));
 }

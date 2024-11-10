@@ -20,6 +20,8 @@ KatagoInteractor::KatagoInteractor(QObject *parent)
 {
     timer->setSingleShot(true);
     connect(timer, &QTimer::timeout, this, &KatagoInteractor::emitBestMove);
+
+    connect(katagoProcess, &QProcess::readyReadStandardError, this, &KatagoInteractor::outputError);
 }
 
 void KatagoInteractor::clearBoard()
@@ -103,8 +105,8 @@ void KatagoInteractor::setTimeMode(KatagoInteractor::TimeMode newTimeMode)
 
 void KatagoInteractor::init()
 {
-    disconnect(katagoProcess, &QProcess::readyRead, this, &KatagoInteractor::analyzeKatagoOutput);
-    connect(katagoProcess, &QProcess::readyRead, this, &KatagoInteractor::analyzeKatagoInit);
+    disconnect(katagoProcess, &QProcess::readyReadStandardOutput, this, &KatagoInteractor::analyzeKatagoOutput);
+    connect(katagoProcess, &QProcess::readyReadStandardOutput, this, &KatagoInteractor::analyzeKatagoInit);
     katagoProcess->setProcessChannelMode(QProcess::MergedChannels);
     katagoProcess->start(Settings::getSingletonSettings()->kataGoPath(),
                          getKataGoArgs());
@@ -173,6 +175,13 @@ QJsonArray KatagoInteractor::stoneDataListToJsonArray(const QList<StoneData> &st
         stonesMoveJsonArray.append(stoneJsonArray);
     }
     return stonesMoveJsonArray;
+}
+
+void KatagoInteractor::outputError()
+{
+    const auto error = katagoProcess->readAllStandardError();
+    qDebug() << QStringLiteral("katago error:") << error;
+    emit errorOccurred(error);
 }
 
 void KatagoInteractor::emitBestMove()

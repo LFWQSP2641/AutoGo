@@ -43,6 +43,9 @@ signals:
 
     void checkingAppNavigation();
 
+    void logMessage(const QString &message, bool formatted = false);
+    void errorOccurred(const QString &errorString, bool formatted = false);
+
 signals:
     void taskChanged();
     void continuousPlayGameChanged();

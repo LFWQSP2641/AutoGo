@@ -20,6 +20,8 @@ AutoGoInteractor::AutoGoInteractor(QObject *parent)
     connect(m_gameBoardHandler, &GameBoardHandler::gameOver, this, &AutoGoInteractor::gameOver);
     connect(m_gameBoardHandler, &GameBoardHandler::startInitFinished, this, &AutoGoInteractor::startInitFinished);
     connect(m_gameBoardHandler, &GameBoardHandler::checkingAppNavigation, this, &AutoGoInteractor::checkingAppNavigation);
+    connect(m_gameBoardHandler, &GameBoardHandler::logMessage, this, &AutoGoInteractor::logMessage);
+    connect(m_gameBoardHandler, &GameBoardHandler::errorOccurred, this, &AutoGoInteractor::errorOccurred);
 
     // property
     connect(m_gameBoardHandler, &GameBoardHandler::taskChanged, this, &AutoGoInteractor::taskChanged);

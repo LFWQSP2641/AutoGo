@@ -20,11 +20,11 @@ Item {
         anchors.bottom: parent.bottom
         ColumnLayout {
             Flickable {
+                id: flickable
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 clip: true
                 contentHeight: gameLogArea.height
-                onContentHeightChanged: Qt.callLater(() => contentY = contentHeight - height)
                 TextArea {
                     id: gameLogArea
                     width: parent.width
@@ -32,9 +32,23 @@ Item {
                     readOnly: true
 
                     function log(text) {
-                        gameLogArea.append(Qt.formatDateTime(new Date(), "hh:mm:ss.zzz") + " " + text)
+                        gameLogArea.output(Qt.formatDateTime(new Date(), "hh:mm:ss.zzz") + " " + text)
+                    }
+
+                    function output(text) {
+                        gameLogArea.append(text)
+                        let contentY = flickable.contentHeight - flickable.height
+                        flickable.contentY = contentY > 0 ? contentY : 0
                     }
                 }
+                // onContentHeightChanged: {
+                //     console.log("contentHeight:" + contentHeight)
+                //     Qt.callLater(() => contentY = contentHeight - height)
+                // }
+                // onContentYChanged: {
+                //     console.log("contentY: " + contentY)
+                //     Qt.callLater(() => contentY = contentHeight - height)
+                // }
             }
             RowLayout {
                 Layout.fillWidth: true
@@ -139,5 +153,25 @@ Item {
             goBoard.clearBoardData()
             gameLogArea.log("开始对弈")
         }
+        onErrorOccurred: function(error, formatted) {
+            if(formatted)
+            {
+                gameLogArea.output(error)
+            }
+            else
+            {
+                gameLogArea.log("错误: " + error)
+            }
+		}
+        onLogMessage: function(message, formatted) {
+            if(formatted)
+			{
+                gameLogArea.output(message)
+			}
+            else
+			{
+				gameLogArea.log(message)
+			}
+		}
     }
 }
