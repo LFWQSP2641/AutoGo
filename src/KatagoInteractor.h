@@ -43,6 +43,8 @@ public slots:
 
     virtual void quit();
 
+    virtual void clearCache() = 0;
+
     void setTimeModeFromInt(int newTimeMode);
 
 protected:

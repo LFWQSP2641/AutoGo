@@ -15,6 +15,8 @@ public slots:
     virtual void stopAnalyze() override;
     virtual void move(const BoardData &boardData) override;
 
+    virtual void clearCache() override;
+
 protected:
     virtual QStringList getKataGoArgs() const override;
 

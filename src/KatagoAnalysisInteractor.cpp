@@ -25,7 +25,7 @@ void KatagoAnalysisInteractor::clearBoard()
 void KatagoAnalysisInteractor::stopAnalyze()
 {
     qDebug() << Q_FUNC_INFO;
-    katagoProcess->write(QByteArrayLiteral("{\"id\":\"stopAnalyze\",\"action\":\"terminate_all\"}\n"));
+    katagoProcess->write(QByteArrayLiteral("{\"id\":\"StopAnalyze\",\"action\":\"terminate_all\"}\n"));
 }
 
 void KatagoAnalysisInteractor::move(const BoardData &boardData)
@@ -79,6 +79,13 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
     katagoProcess->write(data);
 }
 
+void KatagoAnalysisInteractor::clearCache()
+{
+    qDebug() << Q_FUNC_INFO;
+    // {"id":"foo","action":"clear_cache"}
+    katagoProcess->write(QByteArrayLiteral("{\"id\":\"ClearCache\",\"action\":\"clear_cache\"}\n"));
+}
+
 QStringList KatagoAnalysisInteractor::getKataGoArgs() const
 {
     return QProcess::splitCommand(Settings::getSingletonSettings()->kataGoAnalysisCommand());
@@ -113,9 +120,14 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
         }
     }
     bytes.clear();
-    if (jsonObject.value(QStringLiteral("id")).toString() == QStringLiteral("stopAnalyze"))
+    if (jsonObject.value(QStringLiteral("id")).toString() == QStringLiteral("StopAnalyze"))
     {
-        qDebug() << QStringLiteral("stopAnalyze");
+        qDebug() << QStringLiteral("StopAnalyze");
+        return;
+    }
+    if (jsonObject.value(QStringLiteral("id")).toString() == QStringLiteral("ClearCache"))
+    {
+        qDebug() << QStringLiteral("ClearCache");
         return;
     }
     if (jsonObject.value(QStringLiteral("id")).toString() != m_boardData.uuid())

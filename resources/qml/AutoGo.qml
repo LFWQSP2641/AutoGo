@@ -4,6 +4,9 @@ import QtQuick.Layouts
 import com.LFWQSP2641.qmlcomponents
 
 Item {
+    id: root
+    property int clearCacheGameCount: 2
+
     GoBoardItem {
         id: goBoard
         anchors.left: parent.left
@@ -49,6 +52,37 @@ Item {
                 //     console.log("contentY: " + contentY)
                 //     Qt.callLater(() => contentY = contentHeight - height)
                 // }
+            }
+            RowLayout {
+                Layout.fillWidth: true
+                Button {
+                    text: "清除缓存"
+                    onClicked: {
+                        interactor.clearKataGoCache()
+                    }
+                }
+                Label {
+                    text: "自动清除缓存:"
+                }
+                TextField {
+                    Layout.fillWidth: true
+                    placeholderText: "对局数 (0为不清除)"
+                    text: "2"
+                    validator: IntValidator { bottom: 0 }
+                    onEditingFinished: {
+                        let count = parseInt(text)
+                        if (count != NaN)
+                        {
+                            root.clearCacheGameCount = count
+                        }
+                        else
+                        {
+                            gameLogArea.log("输入无效")
+                            text = "2"
+                            root.clearCacheGameCount = 2
+                        }
+                    }
+                }
             }
             RowLayout {
                 Layout.fillWidth: true
@@ -118,6 +152,13 @@ Item {
         onGameOver: {
             gameLogArea.log("对弈结束")
             gameLogArea.log("对弈次数: " + interactor.gameBoardHandler.gameCount)
+            root.clearCacheGameCount -= 1
+            if(root.clearCacheGameCount == 0)
+            {
+                gameLogArea.log("清除缓存")
+                interactor.clearKataGoCache()
+                root.clearCacheGameCount = parseInt(gameLogArea.text)
+            }
             if(continuousPlaySwitch.checked)
             {
                 gameLogArea.log("连续对弈")

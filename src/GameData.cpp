@@ -17,7 +17,7 @@ GameData::GameData(QStringView uuid)
 }
 
 GameData::GameData(const GameData &other)
-    : m_uuid(other.m_uuid),
+    : m_uuid(QString::number(QDateTime::currentMSecsSinceEpoch())),
       m_boardData(other.m_boardData),
       m_appNavigation(other.m_appNavigation),
       m_myStoneColor(other.m_myStoneColor),
@@ -27,7 +27,7 @@ GameData::GameData(const GameData &other)
 
 GameData &GameData::operator=(const GameData &other)
 {
-    m_uuid = other.m_uuid;
+    m_uuid = QString::number(QDateTime::currentMSecsSinceEpoch());
     m_boardData = other.m_boardData;
     m_appNavigation = other.m_appNavigation;
     m_myStoneColor = other.m_myStoneColor;

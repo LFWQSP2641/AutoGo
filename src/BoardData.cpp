@@ -16,7 +16,7 @@ BoardData::BoardData(QStringView uuid)
 }
 
 BoardData::BoardData(const BoardData &other)
-    : m_uuid(other.m_uuid),
+    : m_uuid(QString::number(QDateTime::currentMSecsSinceEpoch())),
       m_boardDataArray(other.m_boardDataArray),
       m_lastMoveStone(other.m_lastMoveStone),
       m_initialStonesArray(other.m_initialStonesArray),
@@ -27,7 +27,7 @@ BoardData::BoardData(const BoardData &other)
 
 BoardData &BoardData::operator=(const BoardData &other)
 {
-    m_uuid = other.m_uuid;
+    m_uuid = QString::number(QDateTime::currentMSecsSinceEpoch());
     m_boardDataArray = other.m_boardDataArray;
     m_lastMoveStone = other.m_lastMoveStone;
     m_initialStonesArray = other.m_initialStonesArray;

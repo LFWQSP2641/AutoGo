@@ -120,6 +120,8 @@ signals:
     void logMessage(const QString &message, bool formatted = false);
     void errorOccurred(const QString &errorString, bool formatted = false);
 
+    void clearKataGoCache();
+
 signals:
     void toStartInit();
     void toSetTimeMode(int timeMode);

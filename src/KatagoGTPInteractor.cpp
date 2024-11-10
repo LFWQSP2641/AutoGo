@@ -67,6 +67,12 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
     }
 }
 
+void KatagoGTPInteractor::clearCache()
+{
+    qDebug() << Q_FUNC_INFO;
+    katagoProcess->write(QByteArrayLiteral("clear_cache\n"));
+}
+
 QStringList KatagoGTPInteractor::getKataGoArgs() const
 {
     return QProcess::splitCommand(Settings::getSingletonSettings()->kataGoGTPCommand());

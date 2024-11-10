@@ -27,6 +27,7 @@ signals:
     void stopGame();
     void continuousStartGame();
     void setTimeMode(int timeMode);
+    void clearKataGoCache();
 
 signals:
     void boardDataArrayUpdate(const QList<QList<int>> boardDataArray);

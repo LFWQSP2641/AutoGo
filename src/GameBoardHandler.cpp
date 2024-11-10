@@ -201,6 +201,8 @@ void GameBoardHandler::connectSignals()
 
     connect(m_katagoInteractor, &KatagoInteractor::logMessage, this, &GameBoardHandler::logMessage);
     connect(m_katagoInteractor, &KatagoInteractor::errorOccurred, this, &GameBoardHandler::errorOccurred);
+
+    connect(this, &GameBoardHandler::clearKataGoCache, m_katagoInteractor, &KatagoInteractor::clearCache);
 }
 
 void GameBoardHandler::startTask()
