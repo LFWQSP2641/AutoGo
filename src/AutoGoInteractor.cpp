@@ -23,7 +23,7 @@ AutoGoInteractor::AutoGoInteractor(QObject *parent)
     connect(m_gameBoardHandler, &GameBoardHandler::logMessage, this, &AutoGoInteractor::logMessage);
     connect(m_gameBoardHandler, &GameBoardHandler::errorOccurred, this, &AutoGoInteractor::errorOccurred);
 
-    connect(m_gameBoardHandler, &GameBoardHandler::clearKataGoCache, this, &AutoGoInteractor::clearKataGoCache);
+    connect(this, &AutoGoInteractor::clearKataGoCache, m_gameBoardHandler, &GameBoardHandler::clearKataGoCache);
 
     // property
     connect(m_gameBoardHandler, &GameBoardHandler::taskChanged, this, &AutoGoInteractor::taskChanged);
