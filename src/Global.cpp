@@ -2,6 +2,7 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QStandardPaths>
 
 QString Global::appConfigPath;
 QString Global::appDataPath;

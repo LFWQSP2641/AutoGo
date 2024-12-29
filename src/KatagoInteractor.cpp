@@ -10,7 +10,6 @@
 #include <QJsonObject>
 #include <QJsonParseError>
 #include <QProcess>
-#include <QTimer>
 
 KatagoInteractor::KatagoInteractor(QObject *parent)
     : QObject{ parent },

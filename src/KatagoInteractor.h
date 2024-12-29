@@ -4,6 +4,7 @@
 #include "BoardData.h"
 
 #include <QObject>
+#include <QTimer>
 
 class QProcess;
 class QEventLoop;

@@ -5,6 +5,7 @@
 #include "StoneData.h"
 
 #include <QObject>
+#include <QTimer>
 
 class GameAnalyzer;
 class GameInteractor;
