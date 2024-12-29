@@ -1,7 +1,6 @@
 #include "Global.h"
 #include "Settings.h"
 
-#include <QFile>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
@@ -12,7 +11,7 @@ int main(int argc, char *argv[])
 
     // debug
 #ifdef QT_DEBUG
-    qSetMessagePattern(QStringLiteral("File:%{file} Line:%{line} ThreadId:%{threadid}\nDateTime:%{time [yyyy-MM-dd hh:mm:ss:zzz]} Function:%{function} Message:%{message}"));
+    qSetMessagePattern(QStringLiteral("DateTime:%{time [yyyy-MM-dd hh:mm:ss:zzz]} File:%{file} Line:%{line} ThreadId:%{threadid}\nMessage:%{message}"));
 #else
     qSetMessagePattern(QStringLiteral("%{time [yyyy-MM-dd hh:mm:ss:zzz]} ThreadId:%{threadid} %{message}"));
 #endif

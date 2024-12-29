@@ -4,64 +4,114 @@ on: push
 
 env:
   BUILD_TYPE: Release
-  QT_VERSION: '6.8.0'
-  VCPKG_ROOT: '${{ github.workspace }}/vcpkg'
+  QT_VERSION: '6.8.*'
+  PROJECT_NAME: AutoGo
+  EXECUTABLE_NAME: AutoGo
+  QML_DIR: ${{ github.workspace }}/resources/qml
+
+permissions:
+  contents: write
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            qt_host: windows
+            arch: win64_msvc2022_64
+            cmake_generator: 'Visual Studio 17 2022'
+          - os: ubuntu-latest
+            qt_host: linux
+            arch: linux_gcc_64
+            cmake_generator: 'Ninja'
+          - os: macos-latest
+            qt_host: mac
+            arch: clang_64
+            cmake_generator: 'Ninja'
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Get cmake
+    - name: Get CMake
       uses: lukka/get-cmake@latest
-
-    - uses: TheMrMilchmann/setup-msvc-dev@v3
-      with:
-        arch: x64
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
         cache: 'true'
         version: ${{ env.QT_VERSION }}
-        host: 'windows'
+        host: ${{ matrix.qt_host }}
         target: 'desktop'
-        arch: 'win64_msvc2022_64'
-        tools: 'tools_ninja tools_cmake tools_vcredist,qt.tools.vcredist_msvc2022_x64'
+        arch: ${{ matrix.arch }}
+        modules: 'qtwebsockets'
 
     - name: Configure CMake
-      run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -B ${{github.workspace}}/build
+      run: |
+        cmake -B ${{github.workspace}}/build -S . -G "${{ matrix.cmake_generator }}" -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DEXECUTABLE_OUTPUT_PATH=${{github.workspace}}/build/bin
 
-    # 编译解决方案
     - name: Build
       run: |
-        cd ${{ github.workspace }}
-        cd build
-        cmake --build . --parallel --config Release
+        cmake --build ${{github.workspace}}/build --config ${{ env.BUILD_TYPE }} --parallel
 
-    - name: Package
+    - name: Package (Windows Only)
+      if: matrix.os == 'windows-latest'
       run: |
-        cd ${{ github.workspace }}
         mkdir -p release_package
-        cd release_package
-        copy ${{ github.workspace }}/build/Release/AutoGo.exe .
-        windeployqt --qmldir ${{ github.workspace }}/resources/qml ./AutoGo.exe
+        cp build/Release/${{ env.EXECUTABLE_NAME }}.exe release_package/
+        windeployqt --qmldir ${{ env.QML_DIR }} release_package/${{ env.EXECUTABLE_NAME }}.exe
+      shell: bash
 
-    - name: Compress
+    - name: Compress (Windows Only)
+      if: matrix.os == 'windows-latest'
       run: |
-        cd ${{ github.workspace }}
-        7z a -t7z -m0=lzma2 -mx=9 -mfb=64 -md=32m -ms=on AutoGo.7z release_package
+        7z a -t7z -m0=lzma2 -mx=9 -mfb=64 -md=32m -ms=on ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z release_package
+      shell: bash
 
-    - name: Upload exe
+    - name: Upload executable (Windows Only)
+      if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v4
       with:
-        name: AutoGo.exe
-        path: ${{ github.workspace }}/build/Release/AutoGo.exe
+        name: ${{ env.EXECUTABLE_NAME }}.exe
+        path: build/Release/${{ env.EXECUTABLE_NAME }}.exe
+        compression-level: 0
 
-    - name: Upload package
+    - name: Upload build artifacts (Windows)
+      if: matrix.os == 'windows-latest'
       uses: actions/upload-artifact@v4
       with:
-        name: AutoGo.7z
-        path: ${{ github.workspace }}/AutoGo.7z
+        name: ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
+        path: ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
+        compression-level: 0
+
+    - name: Release Package (Windows Only)
+      if: matrix.os == 'windows-latest' && startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ${{github.workspace}}/${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
+          ${{github.workspace}}/build/Release/${{ env.EXECUTABLE_NAME }}.exe
+        generate_release_notes: true
+
+    - name: Compress (Linux/macOS)
+      if: matrix.os != 'windows-latest'
+      run: |
+        7z a -t7z -m0=lzma2 -mx=9 -mfb=64 -md=32m -ms=on ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z build/bin
+
+    - name: Upload build artifacts (Linux/macOS)
+      if: matrix.os != 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}
+        path: ${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
+        compression-level: 0
+
+    - name: Release Package (Linux/macOS)
+      if: matrix.os != 'windows-latest' && startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          ${{github.workspace}}/${{ env.PROJECT_NAME }}_${{ matrix.qt_host }}_${{ matrix.arch }}.7z
+        generate_release_notes: true

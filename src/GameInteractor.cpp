@@ -20,7 +20,7 @@ void GameInteractor::init()
 
 void GameInteractor::setTimeModeFromInt(int newTimeMode)
 {
-    qDebug() << newTimeMode;
+    qDebug() << Q_FUNC_INFO << newTimeMode;
     setTimeMode(GameInteractor::TimeMode(newTimeMode));
 }
 

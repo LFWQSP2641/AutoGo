@@ -56,10 +56,13 @@ protected:
 
     int reportIntervalMS = 1000; // ms
     StoneData m_bestMove;
-    QTimer *timer;
+    QTimer *emitBestMoveTimer;
 
     qint64 lastMoveTime = 0;
     qint64 minMoveInterval = 2000; // ms
+
+    // TODO try to fix #4
+    QTimer *chectKatagoOutputTimer;
 
     virtual QStringList getKataGoArgs() const = 0;
 
@@ -74,6 +77,10 @@ protected slots:
     virtual void analyzeKatagoInit() = 0;
 
     virtual void outputError();
+
+    // TODO try to fix #4
+    void startCheckKatagoOutputTimer();
+    void checkKatagoOutput();
 
 signals:
     void initFinished(bool success);

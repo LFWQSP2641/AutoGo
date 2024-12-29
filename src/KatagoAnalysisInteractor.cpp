@@ -30,7 +30,7 @@ void KatagoAnalysisInteractor::stopAnalyze()
 
 void KatagoAnalysisInteractor::move(const BoardData &boardData)
 {
-    qDebug() << boardData.lastMoveStone();
+    qDebug() << Q_FUNC_INFO << boardData.lastMoveStone();
     if (boardData.lastMoveStone().getColor() == StoneData::StoneColor::None)
         return;
     lastMoveTime = QDateTime::currentMSecsSinceEpoch();
@@ -75,8 +75,9 @@ void KatagoAnalysisInteractor::move(const BoardData &boardData)
         startTimer();
     }
     const QByteArray data(QJsonDocument(jsonObject).toJson(QJsonDocument::Compact).append(10));
-    qDebug() << data;
+    qDebug() << Q_FUNC_INFO << data;
     katagoProcess->write(data);
+    startCheckKatagoOutputTimer();
 }
 
 void KatagoAnalysisInteractor::clearCache()
@@ -93,13 +94,16 @@ QStringList KatagoAnalysisInteractor::getKataGoArgs() const
 
 void KatagoAnalysisInteractor::analyzeKatagoOutput()
 {
+    chectKatagoOutputTimer->stop();
     // 追加Katago进程输出
     bytes.append(katagoProcess->readAllStandardOutput());
     qDebug() << Q_FUNC_INFO << bytes;
 #if 1
     if (!bytes.endsWith(10))
     {
-        qDebug() << QStringLiteral("bytes not ends with //10") << bytes;
+        const QString message(QStringLiteral("bytes not ends with //10 : ").append(bytes));
+        qDebug() << Q_FUNC_INFO << message;
+        emit logMessage(message);
         return;
     }
     QJsonParseError error;
@@ -114,7 +118,8 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
         }
         if (error.error != QJsonParseError::NoError)
         {
-            qDebug() << error.errorString() << bytes;
+            qDebug() << Q_FUNC_INFO << error.errorString() << bytes;
+            emit logMessage(error.errorString().append(QStringLiteral(": ")).append(bytes));
             bytes.clear();
             return;
         }
@@ -122,27 +127,27 @@ void KatagoAnalysisInteractor::analyzeKatagoOutput()
     bytes.clear();
     if (jsonObject.value(QStringLiteral("id")).toString() == QStringLiteral("StopAnalyze"))
     {
-        qDebug() << QStringLiteral("StopAnalyze");
+        qDebug() << Q_FUNC_INFO << QStringLiteral("StopAnalyze");
         return;
     }
     if (jsonObject.value(QStringLiteral("id")).toString() == QStringLiteral("ClearCache"))
     {
-        qDebug() << QStringLiteral("ClearCache");
+        qDebug() << Q_FUNC_INFO << QStringLiteral("ClearCache");
         return;
     }
     if (jsonObject.value(QStringLiteral("id")).toString() != m_boardData.uuid())
     {
-        qDebug() << QStringLiteral("id is not equal");
+        qDebug() << Q_FUNC_INFO << QStringLiteral("id is not equal");
         return;
     }
     const auto bestMoveInfo(jsonObject.value(QStringLiteral("moveInfos")).toArray().at(0).toObject());
     if (bestMoveInfo.isEmpty())
     {
-        qDebug() << QStringLiteral("bestMoveInfo is empty");
+        qDebug() << Q_FUNC_INFO << QStringLiteral("bestMoveInfo is empty");
         return;
     }
     const auto bestMovePoint(gptToPoint(bestMoveInfo.value(QStringLiteral("move")).toString()));
-    qDebug() << bestMovePoint;
+    qDebug() << Q_FUNC_INFO << bestMovePoint;
     m_bestMove = StoneData(m_boardData.lastMoveStone().getColor() ==
                                    StoneData::StoneColor::Black
                                ? StoneData::StoneColor::White

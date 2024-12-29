@@ -108,12 +108,12 @@ void GameBoardHandler::init()
 
     if (Settings::getSingletonSettings()->kataGoMode() == QStringLiteral("Analysis"))
     {
-        qDebug() << QStringLiteral("Analysis");
+        qDebug() << Q_FUNC_INFO << QStringLiteral("Analysis");
         m_katagoInteractor = new KatagoAnalysisInteractor;
     }
     else if (Settings::getSingletonSettings()->kataGoMode() == QStringLiteral("GTP"))
     {
-        qDebug() << QStringLiteral("GTP");
+        qDebug() << Q_FUNC_INFO << QStringLiteral("GTP");
         m_katagoInteractor = new KatagoGTPInteractor;
     }
     else
@@ -167,7 +167,7 @@ void GameBoardHandler::continuousStartGame()
 
 void GameBoardHandler::setTimeMode(int timeMode)
 {
-    qDebug() << timeMode;
+    qDebug() << Q_FUNC_INFO << timeMode;
     m_timeMode = timeMode;
     emit toSetTimeMode(m_timeMode);
 }
@@ -297,11 +297,11 @@ void GameBoardHandler::checkStoneMove()
 void GameBoardHandler::handleGameOpening(const GameData &gameData)
 {
     const auto myStoneColor(gameData.myStoneColor());
-    qDebug() << myStoneColor;
+    qDebug() << Q_FUNC_INFO << myStoneColor;
     switch (myStoneColor)
     {
     case StoneData::StoneColor::Black:
-        qDebug() << QStringLiteral("Black");
+        qDebug() << Q_FUNC_INFO << QStringLiteral("Black");
         m_gameInteractor->moveStone(QPoint(3, 3));
         break;
     case StoneData::StoneColor::None:
@@ -330,7 +330,7 @@ void GameBoardHandler::onInitFinished(bool success)
 
 void GameBoardHandler::onGameAnalyzerDataUpdated(const GameData &gameData)
 {
-    qDebug() << gameData.appNavigation();
+    qDebug() << Q_FUNC_INFO << gameData.appNavigation();
     if (m_pauseReception)
         return;
     if (m_task != Task::StartGame)

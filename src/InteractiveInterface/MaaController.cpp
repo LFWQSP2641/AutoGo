@@ -60,7 +60,7 @@ bool MaaController::init()
 
 bool MaaController::click(const QPoint &p)
 {
-    qDebug() << p;
+    qDebug() << Q_FUNC_INFO << p;
     if (!maaTouchProcess->isOpen())
         return false;
     QByteArray bytes(QStringLiteral("d 0 %0 %1 1\r\n")

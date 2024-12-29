@@ -16,10 +16,13 @@ KatagoInteractor::KatagoInteractor(QObject *parent)
     : QObject{ parent },
       m_timeMode(KatagoInteractor::TimeMode::Short),
       katagoProcess(new QProcess(this)),
-      timer(new QTimer(this))
+      emitBestMoveTimer(new QTimer(this)),
+      chectKatagoOutputTimer(new QTimer(this))
 {
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, this, &KatagoInteractor::emitBestMove);
+    emitBestMoveTimer->setSingleShot(true);
+    chectKatagoOutputTimer->setSingleShot(true);
+    connect(emitBestMoveTimer, &QTimer::timeout, this, &KatagoInteractor::emitBestMove);
+    connect(chectKatagoOutputTimer, &QTimer::timeout, this, &KatagoInteractor::checkKatagoOutput);
 
     connect(katagoProcess, &QProcess::readyReadStandardError, this, &KatagoInteractor::outputError);
 }
@@ -35,19 +38,19 @@ void KatagoInteractor::startTimer()
     const auto moveSize(m_boardData.stoneCount());
     if (moveSize < 10)
     {
-        timer->start(Util::generateTanhRandom(1000, 3000));
+        emitBestMoveTimer->start(Util::generateTanhRandom(1000, 3000));
         return;
     }
     switch (m_timeMode)
     {
     case KatagoInteractor::Short:
-        timer->start(Util::generateTanhRandom(5000, 15000));
+        emitBestMoveTimer->start(Util::generateTanhRandom(5000, 15000));
         break;
     case KatagoInteractor::Medium:
-        timer->start(Util::generateTanhRandom(10000, 30000));
+        emitBestMoveTimer->start(Util::generateTanhRandom(10000, 30000));
         break;
     case KatagoInteractor::Long:
-        timer->start(Util::generateTanhRandom(20000, 60000));
+        emitBestMoveTimer->start(Util::generateTanhRandom(20000, 60000));
         break;
     default:
         break;
@@ -129,7 +132,7 @@ QString KatagoInteractor::pointToGTP(const QPoint &point)
 
     // 构建 GTP 格式的字符串，例如 "A1"
     const auto result(QString("%1%2").arg(columnLetter).arg(gtpRow));
-    // qDebug() << point << result;
+    // qDebug() << Q_FUNC_INFO << point << result;
     return result;
 }
 
@@ -149,7 +152,7 @@ QPoint KatagoInteractor::gptToPoint(const QString &gtpMove)
     int y = 19 - gtpRow;
 
     const QPoint result(x, y);
-    // qDebug() << gtpMove << result;
+    // qDebug() << Q_FUNC_INFO << gtpMove << result;
     return result;
 }
 
@@ -180,15 +183,46 @@ QJsonArray KatagoInteractor::stoneDataListToJsonArray(const QList<StoneData> &st
 void KatagoInteractor::outputError()
 {
     const auto error = katagoProcess->readAllStandardError();
-    qDebug() << QStringLiteral("katago error:") << error;
+    qDebug() << Q_FUNC_INFO << QStringLiteral("katago error:") << error;
     emit errorOccurred(error);
+}
+
+void KatagoInteractor::startCheckKatagoOutputTimer()
+{
+    switch (m_timeMode)
+    {
+    case KatagoInteractor::Short:
+        chectKatagoOutputTimer->start(1000 * 25);
+        break;
+    case KatagoInteractor::Medium:
+        chectKatagoOutputTimer->start(1000 * 35);
+        break;
+    case KatagoInteractor::Long:
+        chectKatagoOutputTimer->start(1000 * 65);
+        break;
+    }
+}
+
+void KatagoInteractor::checkKatagoOutput()
+{
+    if (m_bestMove.getColor() != StoneData::StoneColor::None)
+    {
+        qWarning() << Q_FUNC_INFO << QStringLiteral("unreachable");
+        return;
+    }
+    qDebug() << Q_FUNC_INFO << QStringLiteral("checkKatagoOutput");
+    emit logMessage(QStringLiteral("checkKatagoOutput"));
+    clearCache();
+    move(m_boardData);
 }
 
 void KatagoInteractor::emitBestMove()
 {
-    if (m_bestMove.getColor() == StoneData::None || QDateTime::currentMSecsSinceEpoch() - lastMoveTime < minMoveInterval)
+    if (QDateTime::currentMSecsSinceEpoch() - lastMoveTime < minMoveInterval)
     {
-        QTimer::singleShot(100, this, &KatagoInteractor::emitBestMove);
+        if (m_bestMove.getColor() == StoneData::StoneColor::None)
+            qWarning() << QStringLiteral("bestMove is none");
+        emitBestMoveTimer->start(100);
         return;
     }
     emit bestMove(m_bestMove);

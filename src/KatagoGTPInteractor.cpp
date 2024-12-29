@@ -45,7 +45,7 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
             data.append(pointToGTP(i.getPoint()).toUtf8());
             data.append(QByteArrayLiteral("\n"));
         }
-        qDebug() << data;
+        qDebug() << Q_FUNC_INFO << data;
         katagoProcess->write(data);
     }
     QByteArray data;
@@ -55,13 +55,13 @@ void KatagoGTPInteractor::move(const BoardData &boardData)
                     : QByteArrayLiteral("W "));
     data.append(pointToGTP(boardData.lastMoveStone().getPoint()).toUtf8());
     data.append(QByteArrayLiteral("\n"));
-    qDebug() << data;
+    qDebug() << Q_FUNC_INFO << data;
     katagoProcess->write(data);
     m_boardData = boardData;
     if (boardData.myStoneColor() != boardData.lastMoveStone().getColor())
     {
         const QByteArray analyzeData(QByteArrayLiteral("kata-analyze ").append(QByteArray::number(reportIntervalMS / 10)).append(10));
-        qDebug() << analyzeData;
+        qDebug() << Q_FUNC_INFO << analyzeData;
         katagoProcess->write(analyzeData);
         startTimer();
     }
