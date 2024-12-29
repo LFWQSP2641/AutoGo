@@ -7,7 +7,7 @@ env:
   QT_VERSION: '6.8.*'
   PROJECT_NAME: AutoGo
   EXECUTABLE_NAME: AutoGo
-  QML_DIR: ${{ github.workspace }}/resources/qml
+  QML_DIR: resources/qml
 
 permissions:
   contents: write
@@ -61,8 +61,8 @@ jobs:
       run: |
         mkdir -p release_package
         cp build/Release/${{ env.EXECUTABLE_NAME }}.exe release_package/
-        windeployqt --qmldir ${{ env.QML_DIR }} release_package/${{ env.EXECUTABLE_NAME }}.exe
-      shell: bash
+        windeployqt --qmldir ${{ github.workspace }}/${{ env.QML_DIR }} release_package/${{ env.EXECUTABLE_NAME }}.exe
+      shell: pwsh
 
     - name: Compress (Windows Only)
       if: matrix.os == 'windows-latest'
